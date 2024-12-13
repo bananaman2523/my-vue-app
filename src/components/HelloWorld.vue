@@ -30,13 +30,39 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: 'HelloWorld',
-  props: {
-    msg: String
-  }
+<script setup>
+import { directus } from "@/services/directus";
+import { onMounted } from "vue";
+
+async function fetchData() {
+    try {
+        const data = await directus.items("productlist").readByQuery({
+            fields: ["*"]
+        });
+        console.log(data);
+        
+    } catch (error) {
+        console.error("Error fetching data from Directus:", error);
+    }
 }
+
+onMounted(async () => {
+    try {
+        await fetchData();
+    } catch (error) {
+        console.error("Error loading configuration:", error);
+    }
+});
+
+
+// directus/sdk version ^18.0.1
+// import { readItems } from '@directus/sdk';
+// import { directus } from "@/services/directus";
+
+// const result = await directus.request(readItems('productlist'));
+// console.log(result)
+
+
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
