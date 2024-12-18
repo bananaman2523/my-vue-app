@@ -1,16 +1,16 @@
 <template>
   <div class="news-container">
-    <h1 class="news-title">News</h1>
+    <h1 class="news-title">News<hr></h1>
     <div class="news-grid">
       <div v-for="(newsItem, index) in visibleNews" :key="index" class="new-card">
         <div class="image-container">
           <img :src="getAssetURL(newsItem.image)" :alt="newsItem.title" class="new-image" />
           <a :href="newsItem.reference" target="_blank" class="new-title-link">
-            <h3 class="new-title">{{ newsItem.title }}</h3>
+            <h3 class="new-title">{{ newsItem.translations[0].title }}</h3>
           </a>
         </div>
         <div class="new-content">
-          <p class="new-description">{{ newsItem.description }}</p>
+          <p class="new-description">{{ newsItem.translations[0].description }}</p>
           <div class="bottom-content">
             <p class="new-date">{{ newsItem.date }}</p>
 
@@ -58,14 +58,26 @@ export default {
 
         const response = await directus.request(
           readItems('news_page', {
-            fields: ['id', 'title', 'description', 'date', 'reference', 'line_count', 'status', 'image', 'icon_ref.*'],
+            deep: {
+              translations: {
+                _filter: {
+                  _and: [
+                    {
+                      languages_code: { _eq: 'en-US' },
+                    },
+                  ],
+                },
+              },
+            },
+            fields: ['id', 'title', 'description', 'date', 'reference', 'line_count', 'status', 'image', 'icon_ref.*', 'translations.*'],
             filter: {
               status : {
                 _eq : 'publish'
               }
             } 
           }));
-
+          console.log(response);
+          
         if (response) {
           this.news = response.map((news) => ({
             ...news,
@@ -114,24 +126,36 @@ export default {
 }
 
 .new-image {
+  max-width: 400px;
+  max-height: 229px; 
+  display: block;
+  margin: 0 auto;
   width: 400px;
   height: 288px;
   object-fit: cover;
 }
 
-
 .news-container {
+  max-width: 1366px;
+  margin: 0 auto;
   padding: 20px;
   font-family: Arial, sans-serif;
-  background-color: #f9f9f9;
 }
 
 .news-title {
   text-align: left;
   font-size: 28px;
-  font-weight: bold;
-  margin-bottom: 20px;
-  color: #333;
+  display: flex;
+  font-size: 28px;
+  align-items: center;
+  gap: 10px;
+}
+
+.news-title hr {
+  flex-grow: 1;
+  border: 0;
+  border-top: 1px solid ; 
+  margin: 0;
 }
 
 .news-grid {

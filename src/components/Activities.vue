@@ -1,15 +1,16 @@
 <template>
+  <News /> 
   <div class="activities-container">
-    <h1 class="activities-title">Activities</h1>
+    <h1 class="activities-title">Activities<hr></h1>
     <div class="activities-grid">
-      <div v-for="(activity, index) in visibleNews" :key="index" class="activity-card" @click="navigateToDetails(activity)">
+      <div v-for="(activity, index) in visibleNews" :key="index" class="activity-card"
+        @click="navigateToDetails(activity)">
         <div class="image-container">
-          <img v-if="activity.imgs && activity.imgs.length > 0" 
-            :src="getAssetURL(activity.imgs[0].directus_files_id)" 
+          <img v-if="activity.imgs && activity.imgs.length > 0" :src="getAssetURL(activity.imgs[0].directus_files_id)"
             class="activity-image" />
         </div>
         <div class="activity-content">
-          <p class="activity-description">{{ activity.title }}</p>
+          <p class="activity-description">{{ activity.translations[0].title }}</p>
           <div class="bottom-content">
             <p class="activity-date">{{ activity.date }}</p>
           </div>
@@ -27,6 +28,8 @@
 <script>
 import { directus } from "@/services/directus";
 import { getAssetURL } from "@/services/get-asset-url";
+import News from "@/components/News.vue";
+
 import { format } from "date-fns";
 import { readItems } from "@directus/sdk";
 
@@ -44,16 +47,30 @@ export default {
       return this.showAll ? this.activities : this.activities.slice(0, this.visibleCount);
     },
   },
+  components: {
+    News
+  },
   methods: {
     async fetchData() {
       try {
 
         const response = await directus.request(
           readItems('activities_page', {
-            fields: ['id', 'title', 'description', 'date',  'status', 'imgs.*'],
+            deep: {
+              translations: {
+                _filter: {
+                  _and: [
+                    {
+                      languages_code: { _eq: 'en-US' },
+                    },
+                  ],
+                },
+              },
+            },
+            fields: ['id', 'title', 'description', 'date', 'status', 'imgs.*', 'translations.*'],
             filter: {
-              status : {
-                _eq : 'publish'
+              status: {
+                _eq: 'publish'
               }
             }
           }));
@@ -98,23 +115,34 @@ export default {
 }
 
 .activity-image {
-  width: 400px;
-  height: 229px;
-  object-fit: cover;
+  width: 100%;
+  height: auto;
+  max-width: 400px;
+  max-height: 229px; 
+  object-fit: cover; 
+  display: block;
+  margin: 0 auto;
 }
 
 .activities-container {
+  max-width: 1366px;
+  margin: 0 auto;
   padding: 20px;
   font-family: Arial, sans-serif;
-  background-color: #f9f9f9;
 }
 
 .activities-title {
-  text-align: left;
+  display: flex;
   font-size: 28px;
-  font-weight: bold;
-  margin-bottom: 20px;
-  color: #333;
+  align-items: center; 
+  gap: 10px; 
+}
+
+.activities-title hr {
+  flex-grow: 1;
+  border: 0;
+  border-top: 1px solid ; 
+  margin: 0;
 }
 
 .activities-grid {
