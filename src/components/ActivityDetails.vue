@@ -36,10 +36,20 @@ export default {
             try {
                 const response = await directus.request(
                     readItems('activities_page', {
-                        fields: ['id', 'title', 'description', 'date', 'status', 'imgs.*']
+                        deep: {
+                            translations: {
+                                _filter: {
+                                    _and: [
+                                        {
+                                            languages_code: { _eq: 'th-TH' },
+                                        },
+                                    ],
+                                },
+                            },
+                        },
+                        fields: ['id', 'title', 'description', 'date', 'status', 'imgs.*', 'translations.*']
                     }));
-                console.log(response);
-                
+
                 const data = await response
                 this.activity = data;
             } catch (error) {
