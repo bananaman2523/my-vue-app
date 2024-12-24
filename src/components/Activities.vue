@@ -1,25 +1,26 @@
 <template>
-  <News /> 
   <div class="activities-container">
-    <h1 class="activities-title">Activities<hr></h1>
+    <div class="activities-header">
+      <h1 class="activities-title">News</h1>
+      <hr class="line" />
+    </div>
     <div class="activities-grid">
       <div v-for="(activity, index) in visibleNews" :key="index" class="activity-card"
         @click="navigateToDetails(activity)">
         <div class="image-container">
-          <img v-if="activity.imgs && activity.imgs.length > 0" :src="getAssetURL(activity.imgs[0].directus_files_id)"
+          <img v-if="activity.imgs && activity.imgs.length > 0" :src="getAssetUrl(activity.imgs[0].directus_files_id)"
             class="activity-image" />
         </div>
         <div class="activity-content">
-          <p class="activity-description">{{ activity.translations[0].title }}</p>
+          <p class="activity-description">{{ activity.title }}</p>
           <div class="bottom-content">
             <p class="activity-date">{{ activity.date }}</p>
           </div>
-
         </div>
       </div>
     </div>
     <button class="load-more-button" @click="toggleVisibility">
-      <span>{{ showAll ? 'Less' : 'More' }}</span>
+      <span>{{ showAll ? "Less" : "More" }}</span>
       <i :class="showAll ? 'arrow-up' : 'arrow-down'"></i>
     </button>
   </div>
@@ -27,9 +28,7 @@
 
 <script>
 import { directus } from "@/services/directus";
-import { getAssetURL } from "@/services/get-asset-url";
-import News from "@/components/News.vue";
-
+import { getAssetUrl } from "@/services/getAssetUrl";
 import { format } from "date-fns";
 import { readItems } from "@directus/sdk";
 
@@ -44,37 +43,25 @@ export default {
   },
   computed: {
     visibleNews() {
-      return this.showAll ? this.activities : this.activities.slice(0, this.visibleCount);
+      return this.showAll
+        ? this.activities
+        : this.activities.slice(0, this.visibleCount);
     },
-  },
-  components: {
-    News
   },
   methods: {
     async fetchData() {
       try {
-
         const response = await directus.request(
-          readItems('activities_page', {
-            deep: {
-              translations: {
-                _filter: {
-                  _and: [
-                    {
-                      languages_code: { _eq: 'en-US' },
-                    },
-                  ],
-                },
-              },
-            },
-            fields: ['id', 'title', 'description', 'date', 'status', 'imgs.*', 'translations.*'],
+          readItems("activities_page", {
+            fields: ["id", "title", "description", "date", "status", "imgs.*"],
             filter: {
               status: {
-                _eq: 'publish'
-              }
-            }
-          }));
-        console.log(response)
+                _eq: "publish",
+              },
+            },
+          })
+        );
+        console.log(response);
 
         if (response) {
           this.activities = response.map((activity) => ({
@@ -89,7 +76,7 @@ export default {
     toggleVisibility() {
       this.showAll = !this.showAll;
     },
-    getAssetURL,
+    getAssetUrl,
     formatDate(dateString) {
       const date = new Date(dateString);
       return format(date, "dd MMMM yyyy");
@@ -98,7 +85,6 @@ export default {
       this.$router.push({
         name: "ActivityDetails",
         params: { id: activity.id },
-        state: { activityData: activity },
       });
     },
   },
@@ -108,7 +94,6 @@ export default {
 };
 </script>
 
-
 <style scoped>
 .image-container {
   position: relative;
@@ -116,12 +101,8 @@ export default {
 
 .activity-image {
   width: 100%;
-  height: auto;
-  max-width: 400px;
-  max-height: 229px; 
-  object-fit: cover; 
-  display: block;
-  margin: 0 auto;
+  height: 288px;
+  object-fit: cover;
 }
 
 .activities-container {
@@ -131,24 +112,35 @@ export default {
   font-family: Arial, sans-serif;
 }
 
-.activities-title {
-  display: flex;
-  font-size: 28px;
-  align-items: center; 
-  gap: 10px; 
+.line {
+  border: none;
+  height: 0.1px;
+  background-color: #707070;
+  flex-grow: 1;
 }
 
-.activities-title hr {
-  flex-grow: 1;
-  border: 0;
-  border-top: 1px solid ; 
+.activities-header {
+  padding: 30px 50px;
+  display: flex;
+  align-items: center;
+  gap: 25px;
+}
+
+.activities-title {
+  font-size: 28px;
+  font-weight: bold;
+  color: #333;
   margin: 0;
+  white-space: nowrap;
 }
 
 .activities-grid {
+  padding-left: 50px;
+  padding-right: 50px;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 50px;
+  justify-content: space-between;
 }
 
 .activity-card {
@@ -168,7 +160,7 @@ export default {
 }
 
 .activity-content {
-  padding: 10px;
+  padding: 15px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -186,20 +178,17 @@ export default {
   color: #444;
   line-height: 1.5;
   display: -webkit-box;
-  -webkit-line-clamp: 3;
+  -webkit-line-clamp: 5;
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-align: left;
-  margin-bottom: 10px;
+  margin-bottom: 15px;
 }
 
 .activity-date {
   font-size: 14px;
   text-align: left;
-  margin-bottom: 5px;
-}
-
-.activity-date {
+  margin-bottom: 10px;
   color: #888;
 }
 

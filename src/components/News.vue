@@ -1,23 +1,32 @@
 <template>
   <div class="news-container">
-    <h1 class="news-title">News<hr></h1>
+    <section class="hero-section">
+      <div class="hero-content">
+        <h1>News & <br>Activities</h1>
+      </div>
+    </section>
+    <div class="news-header">
+      <h1 class="news-title">News</h1>
+      <hr class="line" />
+    </div>
     <div class="news-grid">
       <div v-for="(newsItem, index) in visibleNews" :key="index" class="new-card">
         <div class="image-container">
-          <img :src="getAssetURL(newsItem.image)" :alt="newsItem.title" class="new-image" />
+          <img :src="getAssetUrl(newsItem.image)" :alt="newsItem.title" class="new-image" />
           <a :href="newsItem.reference" target="_blank" class="new-title-link">
-            <h3 class="new-title">{{ newsItem.translations[0].title }}</h3>
+            <h3 class="new-title">{{ newsItem.title }}</h3>
           </a>
         </div>
         <div class="new-content">
-          <p class="new-description">{{ newsItem.translations[0].description }}</p>
+          <p class="new-description">{{ newsItem.description }}</p>
           <div class="bottom-content">
             <p class="new-date">{{ newsItem.date }}</p>
 
             <div style="display: flex;">
               <p class="new-ref">Reference</p>
               <div class="images-circles">
-                  <img v-for="(icon, index) in newsItem.icon_ref" :key="index" :src="getAssetURL(icon.directus_files_id)" :alt="icon.title" class="circle-image" />
+                <img v-for="(icon, index) in newsItem.icon_ref" :key="index" :src="getAssetUrl(icon.directus_files_id)"
+                  :alt="icon.title" class="circle-image" />
               </div>
             </div>
           </div>
@@ -34,7 +43,7 @@
 
 <script>
 import { directus } from "@/services/directus";
-import { getAssetURL } from "@/services/get-asset-url";
+import { getAssetUrl } from "@/services/getAssetUrl";
 import { format } from "date-fns";
 import { readItems } from "@directus/sdk";
 
@@ -58,26 +67,14 @@ export default {
 
         const response = await directus.request(
           readItems('news_page', {
-            deep: {
-              translations: {
-                _filter: {
-                  _and: [
-                    {
-                      languages_code: { _eq: 'en-US' },
-                    },
-                  ],
-                },
-              },
-            },
-            fields: ['id', 'title', 'description', 'date', 'reference', 'line_count', 'status', 'image', 'icon_ref.*', 'translations.*'],
+            fields: ['id', 'title', 'description', 'date', 'reference', 'line_count', 'status', 'image', 'icon_ref.*'],
             filter: {
-              status : {
-                _eq : 'publish'
+              status: {
+                _eq: 'publish'
               }
-            } 
+            }
           }));
-          console.log(response);
-          
+
         if (response) {
           this.news = response.map((news) => ({
             ...news,
@@ -91,7 +88,7 @@ export default {
     toggleVisibility() {
       this.showAll = !this.showAll;
     },
-    getAssetURL,
+    getAssetUrl,
     formatDate(dateString) {
       const date = new Date(dateString);
       return format(date, "dd MMMM yyyy");
@@ -105,8 +102,42 @@ export default {
 
 
 <style scoped>
+.news-container {
+  max-width: 1366px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+}
+
 .image-container {
   position: relative;
+}
+
+.hero-section {
+  font-family: 'Kanit', sans-serif;
+  z-index: 1;
+  background: url('@/assets/placeholder.png') no-repeat center center/cover;
+  height: 40vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+.hero-content {
+  position: absolute;
+  left: 5%;
+  bottom: 40%;
+  padding: 10px;
+  text-align: left;
+  max-width: 600px;
+}
+
+.hero-content h1 {
+  font-size: 3rem;
+  color: #ffffff;
+  line-height: 1.2;
+  margin: 0;
 }
 
 .new-title {
@@ -126,42 +157,41 @@ export default {
 }
 
 .new-image {
-  max-width: 400px;
-  max-height: 229px; 
-  display: block;
-  margin: 0 auto;
-  width: 400px;
+  width: 100%;
   height: 288px;
   object-fit: cover;
 }
 
-.news-container {
-  max-width: 1366px;
-  margin: 0 auto;
-  padding: 20px;
-  font-family: Arial, sans-serif;
+.news-header {
+  padding: 30px 50px;
+  display: flex;
+  align-items: center;
+  gap: 25px;
 }
 
 .news-title {
-  text-align: left;
   font-size: 28px;
-  display: flex;
-  font-size: 28px;
-  align-items: center;
-  gap: 10px;
+  font-weight: bold;
+  color: #333;
+  margin: 0;
+  white-space: nowrap;
 }
 
-.news-title hr {
+.line {
+  border: none;
+  height: 0.1px;
+  background-color: #707070;
   flex-grow: 1;
-  border: 0;
-  border-top: 1px solid ; 
-  margin: 0;
 }
+
 
 .news-grid {
+  padding-left: 50px;
+  padding-right: 50px;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 50px;
+  justify-content: space-between;
 }
 
 .new-card {
@@ -181,18 +211,11 @@ export default {
 }
 
 .new-content {
-  padding: 10px;
+  padding: 15px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   height: 100%;
-}
-
-.bottom-content {
-  display: flex;
-  flex-direction: column;
-  font-size: 14px;
-  margin-top: auto;
 }
 
 .new-description {
@@ -203,29 +226,27 @@ export default {
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-align: left;
-  margin-bottom: 10px;
+  margin-bottom: 15px;
 }
 
 .new-date {
   font-size: 14px;
   text-align: left;
-  margin-bottom: 5px;
+  margin-bottom: 10px;
   color: #888;
 }
 
 .new-ref {
   height: 40px;
-  font-size: 14px;
+  font-size: 16px;
   text-align: left;
   margin-right: 15px;
-  margin-bottom: 5px;
+  margin-bottom: 10px;
   align-content: center;
-}
-
-.new-ref {
   color: #eb4748;
   font-weight: bold;
 }
+
 
 .load-more-button {
   margin: 20px auto;
@@ -263,5 +284,19 @@ export default {
 
 .circle-image:hover {
   transform: scale(1.1);
+}
+
+@media (max-width: 900px) {
+  .news-grid {
+    grid-template-columns: repeat(2, 1fr);
+    /* 2 columns for smaller screens */
+  }
+}
+
+@media (max-width: 600px) {
+  .news-grid {
+    grid-template-columns: 1fr;
+    /* 1 column for very small screens */
+  }
 }
 </style>
