@@ -8,7 +8,7 @@
       <div v-for="(activity, index) in visibleNews" :key="index" class="activity-card"
         @click="navigateToDetails(activity)">
         <div class="image-container">
-          <img v-if="activity.imgs && activity.imgs.length > 0" :src="getAssetUrl(activity.imgs[0].directus_files_id)"
+          <img v-if="activity.imgs && activity.imgs.length > 0" :src="getAssetURL(activity.imgs[0].directus_files_id)"
             class="activity-image" />
         </div>
         <div class="activity-content">
@@ -28,7 +28,7 @@
 
 <script>
 import { directus } from "@/services/directus";
-import { getAssetUrl } from "@/services/getAssetUrl";
+import { getAssetURL } from "@/services/get-asset-url";
 import { format } from "date-fns";
 import { readItems } from "@directus/sdk";
 
@@ -76,7 +76,7 @@ export default {
     toggleVisibility() {
       this.showAll = !this.showAll;
     },
-    getAssetUrl,
+    getAssetURL,
     formatDate(dateString) {
       const date = new Date(dateString);
       return format(date, "dd MMMM yyyy");

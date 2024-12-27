@@ -9,7 +9,7 @@
 // npm i @directus/sdk
 
 import { createDirectus , rest } from '@directus/sdk';
-export const directus = createDirectus('https://testtrueeye.southeastasia.cloudapp.azure.com/directus/').with(rest());
+export const directus = createDirectus('http://localhost:8055').with(rest());
 
 
 

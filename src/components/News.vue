@@ -12,7 +12,7 @@
     <div class="news-grid">
       <div v-for="(newsItem, index) in visibleNews" :key="index" class="new-card">
         <div class="image-container">
-          <img :src="getAssetUrl(newsItem.image)" :alt="newsItem.title" class="new-image" />
+          <img :src="getAssetURL(newsItem.image)" :alt="newsItem.title" class="new-image" />
           <a :href="newsItem.reference" target="_blank" class="new-title-link">
             <h3 class="new-title">{{ newsItem.title }}</h3>
           </a>
@@ -25,7 +25,7 @@
             <div style="display: flex;">
               <p class="new-ref">Reference</p>
               <div class="images-circles">
-                <img v-for="(icon, index) in newsItem.icon_ref" :key="index" :src="getAssetUrl(icon.directus_files_id)"
+                <img v-for="(icon, index) in newsItem.icon_ref" :key="index" :src="getAssetURL(icon.directus_files_id)"
                   :alt="icon.title" class="circle-image" />
               </div>
             </div>
@@ -43,7 +43,7 @@
 
 <script>
 import { directus } from "@/services/directus";
-import { getAssetUrl } from "@/services/getAssetUrl";
+import { getAssetURL } from "@/services/getAssetURL";
 import { format } from "date-fns";
 import { readItems } from "@directus/sdk";
 
@@ -88,7 +88,7 @@ export default {
     toggleVisibility() {
       this.showAll = !this.showAll;
     },
-    getAssetUrl,
+    getAssetURL,
     formatDate(dateString) {
       const date = new Date(dateString);
       return format(date, "dd MMMM yyyy");
