@@ -240,16 +240,22 @@ const fetchData = async () => {
   }
 };
 
+const formatDate = (date) => {
+  if (!date) return '';
+  const formattedDate = new Date(date);
+  return formattedDate.toISOString().slice(0, 10);
+};
+
 const prefillForm = (item) => {
   form.value.documentNumber = item.document_number || "";
   form.value.quotationNumber = item.quotation_number || "";
   form.value.companyName = item.company_name || "";
   form.value.branchName = item.branch_name || "";
   form.value.phoneNumber = item.phone_number || "";
-  form.value.receivedDate = item.repair_received_date || "";
-  form.value.repairDate = item.repair_date || "";
-  form.value.shippingDate = item.shipping_date || "";
-  form.value.refundDate = item.refund_date || "";
+  form.value.receivedDate = formatDate(item.repair_received_date);
+  form.value.repairDate = formatDate(item.repair_date);
+  form.value.shippingDate = formatDate(item.shipping_date);
+  form.value.refundDate = formatDate(item.refund_date);
   form.value.equipmentName = item.equipment_name || "";
   form.value.modelName = item.model || "";
   form.value.serialNumber = item.serial_number || "";
