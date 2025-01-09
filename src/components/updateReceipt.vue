@@ -3,15 +3,15 @@
     <SidebarMenu />
     <main>
       <h1>อัปเดตข้อมูลการแจ้งซ่อม</h1>
-      <div class="container"  v-for="(item, index) in data" :key="index">
+      <div class="container">
         <form @submit.prevent="submitForm">
         <div class="form-row">
           <label>เลขที่เอกสาร</label>
-          <input type="text" disabled :placeholder="item.document_number"/>
+          <input type="text" disabled v-model="form.documentNumber"/>
         </div>
         <div class="form-row">
           <label>เลขที่ใบเสนอราคา/ใบวางบิล</label>
-          <input type="text" :placeholder="item.quotation_number" v-model="item.quotation_number" />
+          <input type="text" v-model="form.quotationNumber" />
         </div>
         <div class="form-row">
           <label>ชื่อบริษัท</label>
@@ -231,10 +231,34 @@ const fetchData = async () => {
         fields: ["*"],
       })
     );
-    data.value = response
+    if (response.length) {
+      data.value = response[0];
+      prefillForm(data.value);
+    }
   } catch (error) {
     console.error("Error fetching activities:", error);
   }
+};
+
+const prefillForm = (item) => {
+  form.value.documentNumber = item.document_number || "";
+  form.value.quotationNumber = item.quotation_number || "";
+  form.value.companyName = item.company_name || "";
+  form.value.branchName = item.branch_name || "";
+  form.value.phoneNumber = item.phone_number || "";
+  form.value.receivedDate = item.repair_received_date || "";
+  form.value.repairDate = item.repair_date || "";
+  form.value.shippingDate = item.shipping_date || "";
+  form.value.refundDate = item.refund_date || "";
+  form.value.equipmentName = item.equipment_name || "";
+  form.value.modelName = item.model || "";
+  form.value.serialNumber = item.serial_number || "";
+  form.value.posTerminal = item.pos_terminal || [];
+  form.value.detailEquipment = item.detail || "";
+  form.value.repairCompany = item.repair_company || "";
+  form.value.repairReason = item.repair_reason || "";
+  form.value.warrantyStatuse = item.warranty_status || "";
+  form.value.additionalDetail = item.additional_details || "";
 };
 
 const fetchConfig = async () => {
@@ -300,7 +324,7 @@ const getModels = (equipmentName) =>
   config.value.equipments.find((c) => c.equipmentName === equipmentName)?.models ||
   [];
 
-// fetchConfig();
+fetchConfig();
 fetchData();
 </script>
 
