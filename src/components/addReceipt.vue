@@ -384,7 +384,7 @@ button:disabled {
 }
 
 .form-actions {
-  grid-column: span 2;
+  grid-column: span 3;
   text-align: right;
   margin-top: 20px;
 }
