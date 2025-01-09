@@ -3,21 +3,21 @@
     <SidebarMenu />
     <main>
       <h1>อัปเดตข้อมูลการแจ้งซ่อม</h1>
-      <div class="container">
+      <div class="container"  v-for="(item, index) in data" :key="index">
         <form @submit.prevent="submitForm">
         <div class="form-row">
           <label>เลขที่เอกสาร</label>
-          <input type="text" disabled placeholder="form.quotationNumber" v-model="form.quotationNumber" />
+          <input type="text" disabled :placeholder="item.document_number"/>
         </div>
         <div class="form-row">
           <label>เลขที่ใบเสนอราคา/ใบวางบิล</label>
-          <input type="text" v-model="form.quotationNumber" />
+          <input type="text" :placeholder="item.quotation_number" v-model="item.quotation_number" />
         </div>
         <div class="form-row">
           <label>ชื่อบริษัท</label>
           <select v-model="form.companyName">
             <option disabled value="">เลือกบริษัท</option>
-            <option v-for="company in data.companies" :key="company.companyName" :value="company.companyName">
+            <option v-for="company in config.companies" :key="company.companyName" :value="company.companyName">
               {{ company.companyName }}
             </option>
           </select>
@@ -55,7 +55,7 @@
           <label>อุปกรณ์</label>
           <select v-model="form.equipmentName">
             <option disabled value="">เลือกรายการ</option>
-            <option v-for="equipments in data.equipments" :key="equipments.equipmentName" :value="equipments.equipmentName">
+            <option v-for="equipments in config.equipments" :key="equipments.equipmentName" :value="equipments.equipmentName">
               {{ equipments.equipmentName }}
             </option>
           </select>
@@ -89,7 +89,7 @@
           <label>บริษัทรับซ่อม</label>
           <select v-model="form.repairCompany">
             <option disabled value="">เลือกรายการ</option>
-            <option v-for="company in data.repairCompanies" :key="company" :value="company">
+            <option v-for="company in config.repairCompanies" :key="company" :value="company">
               {{ company }}
             </option>
           </select>
@@ -99,7 +99,7 @@
           <label>ประกันเครื่อง</label>
           <select v-model="form.warrantyStatuse">
             <option disabled value="">เลือกรายการ</option>
-            <option v-for="warranty in data.warrantyStatuses" :key="warranty.value" :value="warranty.value">
+            <option v-for="warranty in config.warrantyStatuses" :key="warranty.value" :value="warranty.value">
               {{ warranty.status }}
             </option>
           </select>
@@ -109,7 +109,7 @@
           <label>วัตถุประสงค์ในการส่งซ่อม</label>
           <select v-model="form.repairReason">
             <option disabled value="">เลือกรายการ</option>
-            <option v-for="reason in data.repairReasons" :key="reason" :value="reason">
+            <option v-for="reason in config.repairReasons" :key="reason" :value="reason">
               {{ reason }}
             </option>
           </select>
@@ -134,8 +134,11 @@ import { ref } from 'vue';
 import { directus } from "@/services/directus";
 import { createItem, readItems , updateItems } from "@directus/sdk";
 import SidebarMenu from "@/components/SidebarMenu.vue";
+import { useRoute } from 'vue-router';
+const route = useRoute();
 
-const data = ref({
+const data = ref([])
+const config = ref({
   companies: [],
   equipments: [],
 });
@@ -216,6 +219,26 @@ function simplifyInput(input) {
 
 const fetchData = async () => {
   try {
+    const itemId = route.params.id;
+
+    const response = await directus.request(
+      readItems("device_transfer_details", {
+        filter: {
+          id: {
+              _eq: itemId,
+          },
+        },
+        fields: ["*"],
+      })
+    );
+    data.value = response
+  } catch (error) {
+    console.error("Error fetching activities:", error);
+  }
+};
+
+const fetchConfig = async () => {
+  try {
     const response = await directus.request(
       readItems("config", {
         fields: [
@@ -232,7 +255,7 @@ const fetchData = async () => {
       })
     );
 
-    Object.assign(data.value, simplifyInput(response));
+    Object.assign(config.value, simplifyInput(response));
 
   } catch (error) {
     console.error("Error fetching activities:", error);
@@ -270,15 +293,15 @@ const submitForm = async () => {
 };
 
 const getBranches = (companyName) =>
-  data.value.companies.find((c) => c.companyName === companyName)?.branches ||
+  config.value.companies.find((c) => c.companyName === companyName)?.branches ||
   [];
 
 const getModels = (equipmentName) =>
-  data.value.equipments.find((c) => c.equipmentName === equipmentName)?.models ||
+  config.value.equipments.find((c) => c.equipmentName === equipmentName)?.models ||
   [];
 
+// fetchConfig();
 fetchData();
-
 </script>
 
 <style scoped>
@@ -338,7 +361,7 @@ select {
   border: 1px solid #d0d0d0;
   border-radius: 8px;
   font-size: 16px;
-  background-color: #f7f7f7;
+  /* background-color: #F2F2F2; */
   color: #333;
   transition: all 0.3s ease;
 }
