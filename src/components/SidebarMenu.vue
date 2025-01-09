@@ -24,21 +24,14 @@
   
   <style scoped>
   .sidebar {
-    width: 250px;
-    background-color: #ffffff;
+    max-width: 250px;
+    background-color: #f2f2f2;
     color: #333;
     padding: 30px;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    box-shadow: 2px 0 12px rgba(0, 0, 0, 0.1);
     font-family: "Arial", sans-serif;
-    border-radius: 12px;
-    /* transition: all 0.3s ease; */
-  }
-
-  .sidebar:hover {
-    box-shadow: 4px 0 20px rgba(0, 0, 0, 0.2);
   }
 
   .logo {
@@ -47,14 +40,9 @@
   }
 
   .logo img {
-    max-width: 120px;
-    height: auto;
+    max-width: 257px;
+    height: 100%;
     border-radius: 50%;
-    transition: transform 0.3s ease;
-  }
-
-  .logo img:hover {
-    transform: scale(1.1);
   }
 
   ul {
@@ -96,26 +84,6 @@
 
   li:hover svg {
     transform: scale(1.2);
-  }
-
-  .sidebar-footer {
-    margin-top: auto;
-    font-size: 14px;
-    color: #aaa;
-    text-align: center;
-    margin-top: 40px;
-  }
-
-  .sidebar-footer a {
-    color: #f8c344;
-    text-decoration: none;
-    font-weight: bold;
-    transition: color 0.3s, transform 0.3s ease;
-  }
-
-  .sidebar-footer a:hover {
-    color: #d6a22e;
-    transform: translateY(-2px);
   }
 
   @media (max-width: 768px) {

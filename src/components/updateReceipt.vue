@@ -1,124 +1,128 @@
 <template>
   <div class="repair-form">
-    <SidebarMenu @navigate="handleNavigation" />
+    <SidebarMenu />
     <main>
-      <h1>เพิ่มข้อมูลการแจ้งซ่อม</h1>
+      <h1>อัปเดตข้อมูลการแจ้งซ่อม</h1>
       <div class="container">
         <form @submit.prevent="submitForm">
-          <div class="form-row">
-            <label>เลขที่ใบเสนอราคา/ใบวางบิล</label>
-            <input type="text" v-model="form.quotationNumber" />
+        <div class="form-row">
+          <label>เลขที่เอกสาร</label>
+          <input type="text" disabled placeholder="form.quotationNumber" v-model="form.quotationNumber" />
+        </div>
+        <div class="form-row">
+          <label>เลขที่ใบเสนอราคา/ใบวางบิล</label>
+          <input type="text" v-model="form.quotationNumber" />
+        </div>
+        <div class="form-row">
+          <label>ชื่อบริษัท</label>
+          <select v-model="form.companyName">
+            <option disabled value="">เลือกบริษัท</option>
+            <option v-for="company in data.companies" :key="company.companyName" :value="company.companyName">
+              {{ company.companyName }}
+            </option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label>ชื่อสาขา</label>
+          <select v-model="form.branchName" :disabled="!form.companyName">
+            <option disabled value="">เลือกสาขา</option>
+            <option v-for="branch in getBranches(form.companyName)" :key="branch" :value="branch">
+              {{ branch }}
+            </option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label>เบอร์โทรศัพท์</label>
+          <input type="text" v-model="form.phoneNumber"/>
+        </div>
+        <div class="form-row">
+          <label>วันที่รับเครื่อง</label>
+          <input type="date" v-model="form.receivedDate" />
+        </div>
+        <div class="form-row">
+          <label>วันที่ส่งซ่อม</label>
+          <input type="date" v-model="form.repairDate" />
+        </div>
+        <div class="form-row">
+          <label>วันที่จัดส่ง</label>
+          <input type="date" v-model="form.shippingDate" />
+        </div>
+        <div class="form-row">
+          <label>วันที่รับคืน</label>
+          <input type="date" v-model="form.refundDate" />
+        </div>
+        <div class="form-row">
+          <label>อุปกรณ์</label>
+          <select v-model="form.equipmentName">
+            <option disabled value="">เลือกรายการ</option>
+            <option v-for="equipments in data.equipments" :key="equipments.equipmentName" :value="equipments.equipmentName">
+              {{ equipments.equipmentName }}
+            </option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label>รุ่น/แบรนด์</label>
+          <select v-model="form.modelName" :disabled="!form.equipmentName">
+            <option disabled value="">เลือกรายการ</option>
+            <option v-for="equipment in getModels(form.equipmentName)" :key="equipment" :value="equipment">
+              {{ equipment }}
+            </option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label>S/N</label>
+          <input type="text" v-model="form.serialNumber"/>
+        </div>
+        <div class="form-row">
+          <label>POS Terminal</label>
+          <div class="checkbox-group">
+            <label><input type="checkbox" v-model="form.posTerminal" value="adapter" /> Adapter</label>
+            <label><input type="checkbox" v-model="form.posTerminal" value="ac_power_cable" /> AC power cable</label>
+            <label><input type="checkbox" v-model="form.posTerminal" value="box" /> กล่อง</label>
           </div>
-          <div class="form-row">
-            <label>ชื่อบริษัท</label>
-            <select v-model="form.companyName">
-              <option disabled value="">เลือกบริษัท</option>
-              <option v-for="company in data.companies" :key="company.companyName" :value="company.companyName">
-                {{ company.companyName }}
-              </option>
-            </select>
-          </div>
-          <div class="form-row">
-            <label>ชื่อสาขา</label>
-            <select v-model="form.branchName" :disabled="!form.companyName">
-              <option disabled value="">เลือกสาขา</option>
-              <option v-for="branch in getBranches(form.companyName)" :key="branch" :value="branch">
-                {{ branch }}
-              </option>
-            </select>
-          </div>
-          <div class="form-row">
-            <label>เบอร์โทรศัพท์</label>
-            <input type="text" v-model="form.phoneNumber"/>
-          </div>
-          <div class="form-row">
-            <label>วันที่รับเครื่อง</label>
-            <input type="date" v-model="form.receivedDate" />
-          </div>
-          <div class="form-row">
-            <label>วันที่ส่งซ่อม</label>
-            <input type="date" v-model="form.repairDate" />
-          </div>
-          <div class="form-row">
-            <label>วันที่จัดส่ง</label>
-            <input type="date" v-model="form.shippingDate" />
-          </div>
-          <div class="form-row">
-            <label>วันที่รับคืน</label>
-            <input type="date" v-model="form.refundDate" />
-          </div>
-          <div class="form-row">
-            <label>อุปกรณ์</label>
-            <select v-model="form.equipmentName">
-              <option disabled value="">เลือกรายการ</option>
-              <option v-for="equipments in data.equipments" :key="equipments.equipmentName" :value="equipments.equipmentName">
-                {{ equipments.equipmentName }}
-              </option>
-            </select>
-          </div>
-          <div class="form-row">
-            <label>รุ่น/แบรนด์</label>
-            <select v-model="form.modelName" :disabled="!form.equipmentName">
-              <option disabled value="">เลือกรายการ</option>
-              <option v-for="equipment in getModels(form.equipmentName)" :key="equipment" :value="equipment">
-                {{ equipment }}
-              </option>
-            </select>
-          </div>
-          <div class="form-row">
-            <label>S/N</label>
-            <input type="text" v-model="form.serialNumber"/>
-          </div>
-          <div class="form-row">
-            <label>POS Terminal</label>
-            <div class="checkbox-group">
-              <label><input type="checkbox" v-model="form.posTerminal" value="adapter" /> Adapter</label>
-              <label><input type="checkbox" v-model="form.posTerminal" value="ac_power_cable" /> AC power cable</label>
-              <label><input type="checkbox" v-model="form.posTerminal" value="box" /> กล่อง</label>
-            </div>
-          </div>
-          <div class="form-row">
-            <label>รายละเอียดของปัญหา</label>
-            <input type="text" v-model="form.detailEquipment"/>
-          </div>
-          <div class="form-row">
-            <label>บริษัทรับซ่อม</label>
-            <select v-model="form.repairCompany">
-              <option disabled value="">เลือกรายการ</option>
-              <option v-for="company in data.repairCompanies" :key="company" :value="company">
-                {{ company }}
-              </option>
-            </select>
-          </div>
+        </div>
+        <div class="form-row">
+          <label>รายละเอียดของปัญหา</label>
+          <input type="text" v-model="form.detailEquipment"/>
+        </div>
+        <div class="form-row">
+          <label>บริษัทรับซ่อม</label>
+          <select v-model="form.repairCompany">
+            <option disabled value="">เลือกรายการ</option>
+            <option v-for="company in data.repairCompanies" :key="company" :value="company">
+              {{ company }}
+            </option>
+          </select>
+        </div>
 
-          <div class="form-row">
-            <label>ประกันเครื่อง</label>
-            <select v-model="form.warrantyStatuse">
-              <option disabled value="">เลือกรายการ</option>
-              <option v-for="warranty in data.warrantyStatuses" :key="warranty.value" :value="warranty.value">
-                {{ warranty.status }}
-              </option>
-            </select>
-          </div>
+        <div class="form-row">
+          <label>ประกันเครื่อง</label>
+          <select v-model="form.warrantyStatuse">
+            <option disabled value="">เลือกรายการ</option>
+            <option v-for="warranty in data.warrantyStatuses" :key="warranty.value" :value="warranty.value">
+              {{ warranty.status }}
+            </option>
+          </select>
+        </div>
 
-          <div class="form-row">
-            <label>วัตถุประสงค์ในการส่งซ่อม</label>
-            <select v-model="form.repairReason">
-              <option disabled value="">เลือกรายการ</option>
-              <option v-for="reason in data.repairReasons" :key="reason" :value="reason">
-                {{ reason }}
-              </option>
-            </select>
-          </div>
-          <div class="form-row">
-            <label>รายละเอียดเพิ่มเติม/หมายเหตุ</label>
-            <input type="text" v-model="form.additionalDetail" />
-          </div>
+        <div class="form-row">
+          <label>วัตถุประสงค์ในการส่งซ่อม</label>
+          <select v-model="form.repairReason">
+            <option disabled value="">เลือกรายการ</option>
+            <option v-for="reason in data.repairReasons" :key="reason" :value="reason">
+              {{ reason }}
+            </option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label>รายละเอียดเพิ่มเติม/หมายเหตุ</label>
+          <input type="text" v-model="form.additionalDetail" />
+        </div>
 
-          <div class="form-actions">
-            <button type="submit">บันทึก</button>
-          </div>
-        </form>
+        <div class="form-actions">
+          <button type="submit">บันทึก</button>
+        </div>
+      </form>
       </div>
     </main>
   </div>
@@ -128,7 +132,7 @@
 <script setup>
 import { ref } from 'vue';
 import { directus } from "@/services/directus";
-import { createItem, readItems } from "@directus/sdk";
+import { createItem, readItems , updateItems } from "@directus/sdk";
 import SidebarMenu from "@/components/SidebarMenu.vue";
 
 const data = ref({
@@ -236,9 +240,6 @@ const fetchData = async () => {
     console.error("Error fetching activities:", error);
   }
 };
-const handleNavigation = (route) => {
-  console.log(`Navigate to ${route}`);
-};
 
 const submitForm = async () => {
   try {
@@ -288,6 +289,7 @@ fetchData();
   padding: 20px;
   overflow-x: auto;
 }
+
 .repair-form {
   display: flex;
   justify-content: center;
