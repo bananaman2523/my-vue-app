@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from "vue-router";
 import addReceiptPage from "@/components/addReceipt.vue";
 import updateReceiptPage from "@/components/updateReceipt.vue";
 import listPage from "@/components/List.vue";
+import detailPage from "@/components/Detail.vue";
 
 const routes = [
   {
@@ -18,6 +19,11 @@ const routes = [
     path: "/list",
     name: "list",
     component: listPage,
+  },
+  {
+    path: "/detail/:id",
+    name: "detail",
+    component: detailPage,
   },
   {
     path: "/",

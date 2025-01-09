@@ -27,7 +27,7 @@
               <td>{{ item.serial_number }}</td>
               <td class="action-buttons">
                 <button class="update-button" @click="goToUpdateReceipt(item.id)">อัปเดตข้อมูล</button>
-                <button class="details-button">ดูรายละเอียด</button>
+                <button class="details-button" @click="goToDetailPage(item.id)">ดูรายละเอียด</button>
               </td>
             </tr>
           </tbody>
@@ -101,6 +101,10 @@ const goToLastPage = () => {
 
 const goToUpdateReceipt = (itemId) => {
   router.push({ name: 'updateReceipt', params: { id: itemId } });
+};
+
+const goToDetailPage = (itemId) => {
+  router.push({ name: 'detail', params: { id: itemId } });
 };
 </script>
 
