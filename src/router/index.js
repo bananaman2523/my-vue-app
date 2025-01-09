@@ -10,7 +10,7 @@ const routes = [
     component: addReceiptPage,
   },
   {
-    path: "/updateReceipt",
+    path: "/updateReceipt/:id",
     name: "updateReceipt",
     component: updateReceiptPage,
   },

@@ -26,7 +26,7 @@
               <td>{{ item.model }}</td>
               <td>{{ item.serial_number }}</td>
               <td class="action-buttons">
-                <button class="update-button">อัปเดตข้อมูล</button>
+                <button class="update-button" @click="goToUpdateReceipt(item.id)">อัปเดตข้อมูล</button>
                 <button class="details-button">ดูรายละเอียด</button>
               </td>
             </tr>
@@ -49,7 +49,9 @@ import { directus } from "@/services/directus";
 import { ref, computed } from "vue";
 import { readItems } from "@directus/sdk";
 import SidebarMenu from "@/components/SidebarMenu.vue";
+import { useRouter } from 'vue-router';
 
+const router = useRouter();
 const data = ref([]);
 const currentPage = ref(1);
 const itemsPerPage = 10;
@@ -96,6 +98,10 @@ const goToNextPage = () => {
 
 const goToLastPage = () => {
   currentPage.value = totalPages.value;
+};
+
+const goToUpdateReceipt = (itemId) => {
+  router.push({ name: 'updateReceipt', params: { id: itemId } });
 };
 </script>
 
