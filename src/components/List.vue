@@ -64,7 +64,6 @@ const fetchData = async () => {
       })
     );
     data.value = response;
-    console.log(data);
   } catch (error) {
     console.error("Error fetching activities:", error);
   }

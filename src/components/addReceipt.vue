@@ -1,6 +1,6 @@
 <template>
   <div class="repair-form">
-    <SidebarMenu @navigate="handleNavigation" />
+    <SidebarMenu/>
     <main>
       <h1>เพิ่มข้อมูลการแจ้งซ่อม</h1>
       <div class="container">
@@ -228,21 +228,15 @@ const fetchData = async () => {
       })
     );
 
-    console.log(simplifyInput(response));
-    console.log(response);
     Object.assign(data.value, simplifyInput(response));
 
   } catch (error) {
     console.error("Error fetching activities:", error);
   }
 };
-const handleNavigation = (route) => {
-  console.log(`Navigate to ${route}`);
-};
 
 const submitForm = async () => {
   try {
-    console.log('create item');
     const result = await directus.request(
       createItem('device_transfer_details', {
         quotation_number: form.value.quotationNumber,

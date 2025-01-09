@@ -232,8 +232,6 @@ const fetchData = async () => {
       })
     );
 
-    console.log(simplifyInput(response));
-    console.log(response);
     Object.assign(data.value, simplifyInput(response));
 
   } catch (error) {
@@ -243,7 +241,6 @@ const fetchData = async () => {
 
 const submitForm = async () => {
   try {
-    console.log('create item');
     const result = await directus.request(
       createItem('device_transfer_details', {
         quotation_number: form.value.quotationNumber,
