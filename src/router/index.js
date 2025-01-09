@@ -14,10 +14,13 @@ const routes = [
     name: "updateReceipt",
     component: updateReceiptPage,
   },
-
   {
     path: "/list",
     name: "list",
+    component: listPage,
+  },
+  {
+    path: "/",
     component: listPage,
   }
 ];
