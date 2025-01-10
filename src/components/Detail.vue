@@ -5,11 +5,26 @@
       <h1>อัปเดตข้อมูลการแจ้งซ่อม</h1>
       <div class="container">
         <div class="detail-item">
-          <div v-for="(item, index) in form" :key="index" class="item">
-            <span class="label">{{ item.label }}</span>
-            <span class="value">{{ item.value }}</span>
+          <table  v-for="(item, index) in form" :key="index" class="item">
+            <tr>
+              <td>
+                {{ item.label }}
+              </td>
+            </tr>
+            <tr>
+              <td>
+                {{ item.value }}
+              </td>
+              
+            </tr>
+          </table>
+          <div>
+            <div class="form-actions">
+              <button type="submit" @click="goToUpdateReceipt()">บันทึก</button>
+            </div>
           </div>
-        </div>
+          
+        </div>  
       </div>
     </main>
   </div>
@@ -17,11 +32,12 @@
 
 <script setup>
 import { ref } from "vue";
-import { useRoute } from "vue-router";
+import { useRoute , useRouter} from "vue-router";
 import SidebarMenu from "@/components/SidebarMenu.vue";
 import { directus } from "@/services/directus";
-import { readItems, updateItems } from "@directus/sdk";
+import { readItems } from "@directus/sdk";
 
+const router = useRouter(); 
 const route = useRoute();
 const itemId = route.params.id;
 const data = ref([]);
@@ -90,6 +106,10 @@ const fetchData = async () => {
   } catch (error) {
     console.error("Error fetching activities:", error);
   }
+};
+
+const goToUpdateReceipt = () => {
+  router.push({ name: 'updateReceipt', params: { id: itemId } });
 };
 
 fetchData();
