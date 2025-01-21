@@ -1,8 +1,8 @@
 <template>
   <div class="repair-form">
-    <SidebarMenu/>
+    <SidebarMenu />
     <main>
-      <h1>เพิ่มข้อมูลการแจ้งซ่อม</h1>
+      <h1>อัปเดตข้อมูลการแจ้งซ่อม</h1>
       <div class="container">
         <form @submit.prevent="submitForm">
           <div class="form-row">
@@ -11,13 +11,58 @@
           </div>
           <div class="form-row">
             <label>เลขที่ใบเสนอราคา/ใบวางบิล</label>
-            <input type="text" v-model="form.quotationNumber" />
+            <input type="text" class="disable-form" disabled v-model="form.quotationNumber" />
+          </div>
+          <div class="form-row">
+            <label>วันที่ได้รับเครื่องกลับคืน</label>
+            <input type="date" />
           </div>
           <div class="form-row">
             <label>ชื่อบริษัท</label>
+            <input type="text" class="disable-form" disabled v-model="form.companyName" />
+          </div>
+          <div class="form-row">
+            <label>ชื่อสาขา</label>
+            <input type="text" class="disable-form" disabled v-model="form.branchName" />
+          </div>
+          <div class="form-row">
+            <label>เบอร์โทรศัพท์</label>
+            <input type="text" class="disable-form" disabled v-model="form.phoneNumber" />
+          </div>
+          <div class="form-row">
+            <label>อุปกรณ์</label>
+            <input type="text" class="disable-form" disabled v-model="form.equipmentName" />
+          </div>
+          <div class="form-row">
+            <label>รุ่น/แบรนด์ เดิมของสาขา</label>
+            <input type="text" class="disable-form" disabled v-model="form.modelName" />
+          </div>
+          <div class="form-row">
+            <label>S/N เดิมของสาขา</label>
+            <input type="text" class="disable-form" disabled v-model="form.serialNumber" />
+          </div>
+          <div class="form-row">
+            <label>วันที่เปลี่ยน/ย้าย/สลับเครื่อง</label>
+            <input type="date"/>
+          </div>
+          <div class="form-row">
+            <label>รุ่น/แบรนด์ ที่นำไปสลับ</label>
+            <select :disabled="!form.equipmentName">
+              <option disabled value="">เลือกรายการ</option>
+              <option v-for="equipment in getModels(form.equipmentName)" :key="equipment" :value="equipment">
+                {{ equipment }}
+              </option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label>S/N ที่นำไปสลับ</label>
+            <input type="text" />
+          </div>
+          <!-- <div class="form-row">
+            <label>ชื่อบริษัท</label>
             <select v-model="form.companyName">
               <option disabled value="">เลือกบริษัท</option>
-              <option v-for="company in data.companies" :key="company.companyName" :value="company.companyName">
+              <option v-for="company in config.companies" :key="company.companyName" :value="company.companyName">
                 {{ company.companyName }}
               </option>
             </select>
@@ -55,7 +100,7 @@
             <label>อุปกรณ์</label>
             <select v-model="form.equipmentName">
               <option disabled value="">เลือกรายการ</option>
-              <option v-for="equipments in data.equipments" :key="equipments.equipmentName" :value="equipments.equipmentName">
+              <option v-for="equipments in config.equipments" :key="equipments.equipmentName" :value="equipments.equipmentName">
                 {{ equipments.equipmentName }}
               </option>
             </select>
@@ -89,7 +134,7 @@
             <label>บริษัทรับซ่อม</label>
             <select v-model="form.repairCompany">
               <option disabled value="">เลือกรายการ</option>
-              <option v-for="company in data.repairCompanies" :key="company" :value="company">
+              <option v-for="company in config.repairCompanies" :key="company" :value="company">
                 {{ company }}
               </option>
             </select>
@@ -99,7 +144,7 @@
             <label>ประกันเครื่อง</label>
             <select v-model="form.warrantyStatuse">
               <option disabled value="">เลือกรายการ</option>
-              <option v-for="warranty in data.warrantyStatuses" :key="warranty.value" :value="warranty.value">
+              <option v-for="warranty in config.warrantyStatuses" :key="warranty.value" :value="warranty.value">
                 {{ warranty.status }}
               </option>
             </select>
@@ -109,7 +154,7 @@
             <label>วัตถุประสงค์ในการส่งซ่อม</label>
             <select v-model="form.repairReason">
               <option disabled value="">เลือกรายการ</option>
-              <option v-for="reason in data.repairReasons" :key="reason" :value="reason">
+              <option v-for="reason in config.repairReasons" :key="reason" :value="reason">
                 {{ reason }}
               </option>
             </select>
@@ -117,7 +162,7 @@
           <div class="form-row">
             <label>รายละเอียดเพิ่มเติม/หมายเหตุ</label>
             <input type="text" v-model="form.additionalDetail" />
-          </div>
+          </div> -->
 
           <div class="form-actions">
             <button type="submit">บันทึก</button>
@@ -132,10 +177,13 @@
 <script setup>
 import { ref } from 'vue';
 import { directus } from "@/services/directus";
-import { createItem, readItems } from "@directus/sdk";
+import { readItems , updateItems } from "@directus/sdk";
 import SidebarMenu from "@/components/SidebarMenu.vue";
-
-const data = ref({
+import { useRoute } from 'vue-router';
+const route = useRoute();
+const itemId = route.params.id;
+const data = ref([])
+const config = ref({
   companies: [],
   equipments: [],
 });
@@ -217,6 +265,54 @@ function simplifyInput(input) {
 const fetchData = async () => {
   try {
     const response = await directus.request(
+      readItems("device_transfer_details", {
+        filter: {
+          id: {
+              _eq: itemId,
+          },
+        },
+        fields: ["document_number","quotation_number","company_name","branch_name","phone_number","equipment_name","model","serial_number"],
+      })
+    );
+    if (response.length) {
+      data.value = response[0];
+      prefillForm(data.value);
+    }
+  } catch (error) {
+    console.error("Error fetching activities:", error);
+  }
+};
+
+const formatDate = (date) => {
+  if (!date) return '';
+  const formattedDate = new Date(date);
+  return formattedDate.toISOString().slice(0, 10);
+};
+
+const prefillForm = (item) => {
+  form.value.documentNumber = item.document_number || "";
+  form.value.quotationNumber = item.quotation_number || "";
+  form.value.companyName = item.company_name || "";
+  form.value.branchName = item.branch_name || "";
+  form.value.phoneNumber = item.phone_number || "";
+  form.value.receivedDate = formatDate(item.repair_received_date);
+  form.value.repairDate = formatDate(item.repair_date);
+  form.value.shippingDate = formatDate(item.shipping_date);
+  form.value.refundDate = formatDate(item.refund_date);
+  form.value.equipmentName = item.equipment_name || "";
+  form.value.modelName = item.model || "";
+  form.value.serialNumber = item.serial_number || "";
+  form.value.posTerminal = item.pos_terminal || [];
+  form.value.detailEquipment = item.detail || "";
+  form.value.repairCompany = item.repair_company || "";
+  form.value.repairReason = item.repair_reason || "";
+  form.value.warrantyStatuse = item.warranty_status || "";
+  form.value.additionalDetail = item.additional_details || "";
+};
+
+const fetchConfig = async () => {
+  try {
+    const response = await directus.request(
       readItems("config", {
         fields: [
           "template",
@@ -232,7 +328,7 @@ const fetchData = async () => {
       })
     );
 
-    Object.assign(data.value, simplifyInput(response));
+    Object.assign(config.value, simplifyInput(response));
 
   } catch (error) {
     console.error("Error fetching activities:", error);
@@ -241,14 +337,16 @@ const fetchData = async () => {
 
 const submitForm = async () => {
   try {
+    console.log("update ");
+    
     const result = await directus.request(
-      createItem('device_transfer_details', {
+      updateItems('device_transfer_details',{ filter: {id:{_eq:itemId}}},{
         quotation_number: form.value.quotationNumber,
         phone_number: form.value.phoneNumber,
-        repair_received_date: form.value.receivedDate || null,
-        repair_date: form.value.repairDate || null,
-        shipping_date: form.value.shippingDate || null,
-        refund_date: form.value.refundDate || null,
+        repair_received_date: formatDate(form.value.receivedDate),
+        repair_date: formatDate(form.value.repairDate),
+        shipping_date: formatDate(form.value.shippingDate),
+        refund_date: formatDate(form.value.refundDate),
         company_name: form.value.companyName,
         branch_name: form.value.branchName,
         equipment_name: form.value.equipmentName,
@@ -263,22 +361,22 @@ const submitForm = async () => {
         additional_details: form.value.additionalDetail,
       })
     );
-    console.log('Article created successfully:', result);
+    console.log('Item updated successfully:', result);
   } catch (error) {
-    console.error('Error creating article:', error);
+    console.error('Error updating item:', error.response ? error.response.data : error);
   }
 };
 
 const getBranches = (companyName) =>
-  data.value.companies.find((c) => c.companyName === companyName)?.branches ||
+  config.value.companies.find((c) => c.companyName === companyName)?.branches ||
   [];
 
 const getModels = (equipmentName) =>
-  data.value.equipments.find((c) => c.equipmentName === equipmentName)?.models ||
+  config.value.equipments.find((c) => c.equipmentName === equipmentName)?.models ||
   [];
 
+fetchConfig();
 fetchData();
-
 </script>
 
 <style scoped>
@@ -289,6 +387,7 @@ fetchData();
   padding: 20px;
   overflow-x: auto;
 }
+
 .repair-form {
   display: flex;
   justify-content: center;
@@ -340,7 +439,6 @@ select {
   border: 1px solid #d0d0d0;
   border-radius: 8px;
   font-size: 16px;
-  background-color: #f7f7f7;
   color: #333;
   transition: all 0.3s ease;
 }

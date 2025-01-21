@@ -7,7 +7,7 @@
         <form @submit.prevent="submitForm">
           <div class="form-row">
             <label>เลขที่เอกสาร</label>
-            <input type="text" disabled v-model="form.documentNumber"/>
+            <input type="text" class="disable-form"  disabled v-model="form.documentNumber"/>
           </div>
           <div class="form-row">
             <label>เลขที่ใบเสนอราคา/ใบวางบิล</label>
@@ -335,6 +335,10 @@ fetchData();
 </script>
 
 <style scoped>
+.disable-form{
+  background-color: #D9D9D9;
+}
+
 .container {
   padding: 20px;
   overflow-x: auto;

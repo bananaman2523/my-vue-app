@@ -2,7 +2,7 @@
   <div class="repair-form">
     <SidebarMenu />
     <main>
-      <h1>อัปเดตข้อมูลการแจ้งซ่อม</h1>
+      <h1>รายละเอียด</h1>
       <div class="container">
         <div class="detail-item">
           <table  v-for="(item, index) in form" :key="index" class="item">
@@ -15,18 +15,19 @@
               <td>
                 {{ item.value }}
               </td>
-              
             </tr>
           </table>
           <div>
             <div class="form-actions">
-              <button type="submit" @click="goToUpdateReceipt()">บันทึก</button>
+              <button type="submit" @click="goToUpdateReceipt()">อัปเดตข้อมูล</button>
             </div>
           </div>
           
         </div>  
       </div>
+      <DocumentDetail />
     </main>
+    
   </div>
 </template>
 
@@ -36,6 +37,7 @@ import { useRoute , useRouter} from "vue-router";
 import SidebarMenu from "@/components/SidebarMenu.vue";
 import { directus } from "@/services/directus";
 import { readItems } from "@directus/sdk";
+import DocumentDetail from "./DocumentDetail.vue";
 
 const router = useRouter(); 
 const route = useRoute();
