@@ -1,0 +1,69 @@
+{
+    "POS Monitor 1": [
+        "PP-9635",
+        "PP-9735",
+        "MP-3725",
+        "MP-3275A",
+        "AP-3615",
+        "ไม่ทราบรุ่น"
+    ],
+    "POS Monitor 2": [
+        "PP-9635",
+        "PP-9735",
+        "AM-1015",
+        "AM-3015",
+        "AP-3615",
+        "ไม่ทราบรุ่น"
+    ],
+    "Receipt Printer": [
+        "TP-3250IIL",
+        "TP-3300",
+        "TP-300k",
+        "TP-3260VL",
+        "PL-330KUSE",
+        "EPSON TM-L90",
+        "ACE-H2",
+        "ACE-OR",
+        "FEC-360II",
+        "ไม่ทราบรุ่น"
+    ],
+    "Label Printer": [
+        "PL-C3200",
+        "TM-L90",
+        "ไม่ทราบรุ่น"
+    ],
+    "Kitchen Printer": [
+        "TP-3250IIL",
+        "TP-3300",
+        "TP-300k",
+        "TP-3260VL",
+        "PL-330KUSE",
+        "EPSON TM-L90",
+        "ACE-H2",
+        "ACE-OR",
+        "FEC-360II",
+        "RP80USE",
+        "ไม่ทราบรุ่น"
+    ],
+    "UPS": [
+        "BV1000I-MS",
+        "BV800I-MST",
+        "ML-1000S",
+        "ML-850Q",
+        "ไม่ทราบรุ่น"
+    ],
+    "Scanner": [
+        "NLS-HR20",
+        "Zebra",
+        "SK-2010",
+        "Newland",
+        "ไม่ทราบรุ่น"
+    ],
+    "Drawer": [
+        "EC-410",
+        "POWER",
+        "ไม่ทราบรุ่น"
+    ],
+    "Casio POS": [],
+    "เครื่องคิดเลข": []
+}

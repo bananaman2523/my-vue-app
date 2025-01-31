@@ -74,7 +74,7 @@
                     {{ dataDeviceTransfer.document_number != null ? 'รอตรวจสอบการลงนามของเอกสาร' :
                         'กรุณากรอกรายละเอียดเพื่อจัดทำเอกสาร' }}
                     <span class="warning-text">
-                        {{ dataDeviceTransfer.document_number == null ? '(ยังไม่มีรายละเอียด)' :
+                        {{ dataProductRequest.have_data == false ? '(ยังไม่มีรายละเอียด)' :
                             (dataDeviceTransfer.device_transfer_file_1 == null ? '(รอดำเนินการลงนามรอบแรก)' :
                                 '(รอดำเนินการลงนามรอบสุดท้าย)') }}
                     </span>
@@ -105,6 +105,13 @@ const dataDeviceTransfer = ref([]);
 const dataProductRequest = ref([]);
 const dataExchange = ref([]);
 
+function replaceDocumentNumber(input, newValue) {
+    if (typeof input !== 'string') {
+        throw new Error("Invalid input, expected a string.");
+    }
+    return input.replace(/R/g, newValue);
+}
+
 const fetchData = async () => {
     try {
         const response = await directus.request(
@@ -118,6 +125,7 @@ const fetchData = async () => {
 
         if (response.length) {
             dataDeviceTransfer.value = response[0];
+            fetchDataProductRequest();
         }
     } catch (error) {
         console.error("Error fetching activities:", error);
@@ -126,10 +134,14 @@ const fetchData = async () => {
 
 const fetchDataProductRequest = async () => {
     try {
+        const documentNumber = String(dataDeviceTransfer.value.document_number);
+        const queryItem = replaceDocumentNumber(documentNumber, "S");
+        console.log(queryItem);
+        
         const response = await directus.request(
             readItems("product_request_details", {
                 filter: {
-                    id: { _eq: itemId },
+                    document_number: { _contains: queryItem },
                 },
                 fields: ["document_number", "have_data"],
             })
@@ -145,7 +157,6 @@ const fetchDataProductRequest = async () => {
 };
 
 fetchData();
-fetchDataProductRequest();
 
 const handlePrint = async (doc) => {
     try {

@@ -6,6 +6,7 @@
     <ul>
       <li @click="navigate('addReceipt')">เพิ่มข้อมูลการแจ้งซ่อม</li>
       <li @click="navigate('list')">แสดงรายการทั้งหมด</li>
+      <li @click="navigate('receiptProduct')">สินค้าเข้า</li>
       <!-- <li @click="navigate('completed')">รายการที่เสร็จสิ้นแล้ว</li>
       <li @click="navigate('in-progress')">รายการที่กำลังดำเนินการ</li> -->
     </ul>
