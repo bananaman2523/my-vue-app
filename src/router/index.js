@@ -4,6 +4,7 @@ import updateReceiptPage from "@/components/updateReceipt.vue";
 import listPage from "@/components/List.vue";
 import detailPage from "@/components/Detail.vue";
 import addProductRequestPage from "@/components/addProductRequest.vue";
+import receiptProductPage from "@/components/receiptProduct.vue";
 
 const routes = [
   {
@@ -34,6 +35,11 @@ const routes = [
   {
     path: "/",
     component: listPage,
+  },
+  {
+    path: "/receiptProduct",
+    name: "receiptProduct",
+    component: receiptProductPage,
   }
 ];
 
