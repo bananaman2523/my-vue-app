@@ -5,6 +5,7 @@ import listPage from "@/components/List.vue";
 import detailPage from "@/components/Detail.vue";
 import addProductRequestPage from "@/components/addProductRequest.vue";
 import receiptProductPage from "@/components/receiptProduct.vue";
+import ListStockPage from "@/components/ListStock.vue";
 
 const routes = [
   {
@@ -40,6 +41,11 @@ const routes = [
     path: "/receiptProduct",
     name: "receiptProduct",
     component: receiptProductPage,
+  },
+  {
+    path: "/listStock",
+    name: "listStock",
+    component: ListStockPage,
   }
 ];
 

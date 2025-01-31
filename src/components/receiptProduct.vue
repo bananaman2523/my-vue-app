@@ -2,7 +2,7 @@
   <div class="repair-form">
     <SidebarMenu/>
     <main>
-      <h1>สินค้าเข้า</h1>
+      <h1>เพิ่มสินค้าเข้า Stock</h1>
       <div class="container">
         <form @submit.prevent="submitForm">
           <div class="form-row">
@@ -13,10 +13,16 @@
             <label>ชื่อ supplier</label>
             <input type="text"/>
           </div>
+          <br>
           <div class="form-row">
             <label>เลขที่ใบส่งสินค้า</label>
             <input type="text"/>
           </div>
+          <div class="form-row">
+            <label>วันเลขที่ใบส่งสินค้า</label>
+            <input type="date"/>
+          </div>
+          <br>
           <div class="form-row">
             <label>เลขที่ใบกำกับภาษี</label>
             <input type="text"/>
@@ -55,7 +61,7 @@
           <br>
         </form>
       </div>
-      <h1>เพิ่มสินค้า</h1>
+      <h1>อุปกรณ์</h1>
       <addReceiptProduct />
       <div class="form-actions">
         <button type="submit">บันทึก</button>
