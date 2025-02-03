@@ -8,9 +8,13 @@
       <li @click="navigate('list')">แสดงรายการทั้งหมด</li> -->
       <li @click="navigate('receiptProduct')">เพิ่มสินค้าเข้า Stock</li>
       <li @click="navigate('listStock')">Stock</li>
+      <li @click="navigate('DocumentPreparation')">ใบเตรียมจัดของ</li>
       <!-- <li @click="navigate('completed')">รายการที่เสร็จสิ้นแล้ว</li>
       <li @click="navigate('in-progress')">รายการที่กำลังดำเนินการ</li> -->
     </ul>
+    <div class="login">
+      test
+    </div>
   </aside>
 </template>
 
@@ -25,6 +29,10 @@ const navigate = (route) => {
 </script>
 
 <style scoped>
+.login{
+  display: flex;
+}
+
 .sidebar {
   max-width: 250px;
   background-color: #f2f2f2;

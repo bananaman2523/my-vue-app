@@ -8,8 +8,8 @@
 // directus/sdk version ^18.0.1
 // npm i @directus/sdk
 
-import { createDirectus , rest } from '@directus/sdk';
-export const directus = createDirectus('http://localhost:8055').with(rest());
+import { createDirectus, rest, authentication, login } from '@directus/sdk';
+export const directus = createDirectus('http://localhost:8055').with(authentication('json')).with(rest());
 
 
 

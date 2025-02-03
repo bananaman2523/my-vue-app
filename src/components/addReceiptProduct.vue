@@ -5,27 +5,27 @@
         <form @submit.prevent="submitForm">
           <div style="display: contents;">
             <div class="form-row">
-              <label>รหัสสินค้า Office Design</label>
-              <input type="text" v-model="form.productCode" />
+              <label>รหัสสินค้า Office Design <label style="color: red;">*</label></label>
+              <input type="text" v-model="form.productCode" required/>
             </div>
             <div class="form-row">
-              <label>ชื่อสินค้า Office Design</label>
-              <input type="text" v-model="form.productName" />
+              <label>ชื่อสินค้า Office Design <label style="color: red;">*</label></label>
+              <input type="text" v-model="form.productName" required/>
             </div>
             <div style="display: flex;justify-content: end;">
               <button type="button" @click="removeForm(index)" class="delete-button">X</button>
             </div>
             <div class="form-row">
-              <label>หมวดหมู่สินค้า</label>
+              <label>หมวดหมู่สินค้า <label style="color: red;">*</label></label>
               <select v-model="form.selectedCategory">
                 <option value="">Select a category</option>
-                <option v-for="category in categories" :key="category" :value="category">
-                  {{ category }}
+                <option v-for="product in data.product" :key="product.productGroup" :value="product.productGroup">
+                  {{ product.productGroup }}
                 </option>
               </select>
-            </div>
+            </div>            
             <div class="form-row">
-              <label>model</label>
+              <label>model <label style="color: red;">*</label></label>
               <select v-model="form.selectedModel" :disabled="!form.selectedCategory">
                 <option value="">Select a model</option>
                 <option v-for="model in models(form.selectedCategory)" :key="model" :value="model">
@@ -34,7 +34,7 @@
               </select>
             </div>
             <div class="form-row">
-              <label>S/N</label>
+              <label>S/N <label style="color: red;">*</label></label>
               <input type="text" v-model="form.serialNumber" />
             </div>
           </div>
@@ -47,8 +47,15 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed , watch} from 'vue';
 import productData from "@/data/products.json";
+import { directus } from "@/services/directus";
+import { createItem, readItems } from "@directus/sdk";
+
+const emit = defineEmits(['update:products']);
+const data = ref({
+  product: [],
+});
 
 const forms = ref([
   { productCode: '', productName: '', selectedCategory: '', selectedModel: '', serialNumber: '' }
@@ -57,7 +64,8 @@ const forms = ref([
 const categories = computed(() => Object.keys(productData));
 
 const models = (category) => {
-  return category ? productData[category] : [];
+  const productGroup = category ? data.value.product.find(item => item.productGroup === category) : null;
+  return category ? productGroup.productCodes : [];
 };
 
 const addForm = () => {
@@ -67,6 +75,49 @@ const addForm = () => {
 const removeForm = (index) => {
   forms.value.splice(index, 1);
 };
+
+watch(forms, (newForms) => {
+  emit('update:products', newForms);
+}, { deep: true });
+
+function simplifyInput(input) {
+  const result = {
+    product: [],
+  };
+
+  input.forEach(item => {
+    if (item.product) {
+      item.product.forEach(productItem => {
+        const productCodes = productItem.product_list.map(product => product.product_list_id.product_code);
+        result.product.push({
+          productGroup: productItem.product_group,
+          productCodes: productCodes
+        });
+      });
+    }
+  });
+
+  return result;
+}
+
+const fetchData = async () => {
+  try {
+    const response = await directus.request(
+      readItems("config", {
+        fields: [
+          "product.product_group",
+          "product.product_list.product_list_id.product_code",
+        ],
+      })
+    );
+    Object.assign(data.value, simplifyInput(response));
+
+  } catch (error) {
+    console.error("Error fetching activities:", error);
+  }
+};
+
+fetchData();
 </script>
 
 <style scoped>

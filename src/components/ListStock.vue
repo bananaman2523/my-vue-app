@@ -26,15 +26,23 @@
               <th>S/N</th>
             </tr>
           </thead>
-          <!-- <tbody>
+          <tbody>
             <tr v-for="(item, index) in paginatedData" :key="index">
-              <td>{{ item.company_name }}</td>
-              <td>{{ item.branch_name }}</td>
-              <td>{{ item.equipment_name }}</td>
-              <td>{{ item.model }}</td>
-              <td>{{ item.serial_number }}</td>
+              <td>{{ item.receive_date }}</td>
+              <td>{{ item.name_supplier }}</td>
+              <td>{{ item.bill_lading_number }}</td>
+              <td>{{ item.bill_lading_number_date }}</td>
+              <td>{{ item.invoice_number }}</td>
+              <td>{{ item.invoice_number_date }}</td>
+              <td>{{ item.receipt_number }}</td>
+              <td>{{ item.receipt_number_date }}</td>
+              <td>{{ item.bill_number }}</td>
+              <td>{{ item.due_date }}</td>
+              <td>{{ item.item_code }}</td>
+              <td>{{ item.product_name_supplier }}</td>
+              <td>{{ item.product_code_office_design }}</td>
             </tr>
-          </tbody> -->
+          </tbody>
         </table>
       </div>
       <div class="pagination">
@@ -63,7 +71,7 @@ const itemsPerPage = 10;
 const fetchData = async () => {
   try {
     const response = await directus.request(
-      readItems("device_transfer_details", {
+      readItems("stock", {
         fields: ["*.*"],
       })
     );

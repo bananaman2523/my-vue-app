@@ -6,6 +6,8 @@ import detailPage from "@/components/Detail.vue";
 import addProductRequestPage from "@/components/addProductRequest.vue";
 import receiptProductPage from "@/components/receiptProduct.vue";
 import ListStockPage from "@/components/ListStock.vue";
+import DocumentPreparationPage from "@/components/DocumentPreparation.vue";
+import LoginPage from "@/components/Login.vue";
 
 const routes = [
   {
@@ -46,6 +48,15 @@ const routes = [
     path: "/listStock",
     name: "listStock",
     component: ListStockPage,
+  },
+  {
+    path: "/DocumentPreparation",
+    name: "DocumentPreparation",
+    component: DocumentPreparationPage,
+  },
+  {
+    path: "/login",
+    component: LoginPage,
   }
 ];
 

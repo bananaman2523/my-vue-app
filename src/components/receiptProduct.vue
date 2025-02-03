@@ -1,80 +1,142 @@
 <template>
   <div class="repair-form">
-    <SidebarMenu/>
+    <SidebarMenu />
     <main>
       <h1>เพิ่มสินค้าเข้า Stock</h1>
       <div class="container">
         <form @submit.prevent="submitForm">
           <div class="form-row">
-            <label>วันที่รับ</label>
-            <input type="date" />
+            <label>วันที่รับ <label style="color: red;">*</label></label>
+            <input type="date" v-model="formData.receivedDate" required/>
           </div>
           <div class="form-row">
-            <label>ชื่อ supplier</label>
-            <input type="text"/>
+            <label>ชื่อ supplier <label style="color: red;">*</label></label>
+            <input type="text" v-model="formData.supplierName" required/>
           </div>
           <br>
           <div class="form-row">
             <label>เลขที่ใบส่งสินค้า</label>
-            <input type="text"/>
+            <input type="text" v-model="formData.deliveryNoteNumber" />
           </div>
           <div class="form-row">
             <label>วันเลขที่ใบส่งสินค้า</label>
-            <input type="date"/>
+            <input type="date" v-model="formData.deliveryNoteDate" />
           </div>
           <br>
           <div class="form-row">
-            <label>เลขที่ใบกำกับภาษี</label>
-            <input type="text"/>
+            <label>เลขที่ใบกำกับภาษี <label style="color: red;">*</label></label>
+            <input type="text" v-model="formData.taxInvoiceNumber" required/>
           </div>
           <div class="form-row">
-            <label>Invoice date</label>
-            <input type="date" />
+            <label>Invoice date <label style="color: red;">*</label></label>
+            <input type="date" v-model="formData.invoiceDate" required/>
           </div>
           <br>
           <div class="form-row">
             <label>เลขที่ใบเสร็จ</label>
-            <input type="text" />
+            <input type="text" v-model="formData.receiptNumber" />
           </div>
           <div class="form-row">
             <label>วันที่ใบเสร็จ</label>
-            <input type="date"/>
+            <input type="date" v-model="formData.receiptDate" />
           </div>
           <br>
           <div class="form-row">
             <label>เลขที่ใบวางบิล</label>
-            <input type="date"/>
+            <input type="text" v-model="formData.billingNoteNumber" />
           </div>
           <div class="form-row">
             <label>วันที่ due ชำระ</label>
-            <input type="date"/>
+            <input type="date" v-model="formData.dueDate" />
           </div>
           <br>
           <div class="form-row">
-            <label>Item code</label>
-            <input type="text"/>
+            <label>Item code <label style="color: red;">*</label></label>
+            <input type="text" v-model="formData.itemCode" required/>
           </div>
           <div class="form-row">
-            <label>ชื่อสินค้า (Supplier)</label>
-            <input type="text"/>
+            <label>ชื่อสินค้า (Supplier) <label style="color: red;">*</label></label>
+            <input type="text" v-model="formData.supplierProductName" required/>
           </div>
-          <br>
         </form>
       </div>
       <h1>อุปกรณ์</h1>
-      <addReceiptProduct />
+      <addReceiptProduct v-model:products="receiptProducts"/>
       <div class="form-actions">
-        <button type="submit">บันทึก</button>
+        <button type="button" @click="submitForm">บันทึก</button>
       </div>
     </main>
   </div>
 </template>
 
-
 <script setup>
-import { ref , computed} from 'vue';
+import { ref } from "vue";
+import { directus } from "@/services/directus";
+import { createItem, readItems } from "@directus/sdk";
 import SidebarMenu from "@/components/SidebarMenu.vue";
-import addReceiptProduct from './addReceiptProduct.vue';
+import addReceiptProduct from "./addReceiptProduct.vue";
+
+const addStock = async () => {
+  try {
+    for (let index = 0; index < receiptProducts.value.length; index++) {
+      const result = await directus.request(
+        createItem('stock', {
+          receive_date: formData.value.receivedDate || null,
+          name_supplier: formData.value.supplierName || null,
+          bill_lading_number: formData.value.deliveryNoteNumber || null,
+          bill_lading_number_date: formData.value.deliveryNoteDate || null,
+          invoice_number: formData.value.taxInvoiceNumber || null,
+          invoice_number_date: formData.value.invoiceDate || null,
+          receipt_number: formData.value.receiptNumber || null,
+          receipt_number_date: formData.value.receiptDate || null,
+          bill_number: formData.value.billingNoteNumber || null,
+          due_date: formData.value.dueDate || null,
+          item_code: formData.value.itemCode || null,
+          product_name_supplier: formData.value.supplierProductName || null,
+          product_code_office_design: receiptProducts.value[index].productCode || null,
+          product_name_office_design: receiptProducts.value[index].productName || null,
+          serial_number: receiptProducts.value[index].serialNumber || null,
+        })
+      ); 
+    }
+    
+  } catch (error) {
+    console.error('Error creating article:', error);
+  }
+};
+
+const formData = ref({
+  receivedDate: "",
+  supplierName: "",
+  deliveryNoteNumber: "",
+  deliveryNoteDate: "",
+  taxInvoiceNumber: "",
+  invoiceDate: "",
+  receiptNumber: "",
+  receiptDate: "",
+  billingNoteNumber: "",
+  dueDate: "",
+  itemCode: "",
+  supplierProductName: "",
+});
+
+const receiptProducts = ref([]);
+
+const submitForm = () => {
+  if (
+    !formData.value.receivedDate ||
+    !formData.value.supplierName ||
+    !formData.value.taxInvoiceNumber ||
+    !formData.value.invoiceDate ||
+    !formData.value.itemCode ||
+    !formData.value.supplierProductName
+  ) {
+    alert("กรุณากรอกข้อมูลให้ครบทุกช่อง!");
+    return;
+  }
+
+  addStock();
+};
 
 </script>
 
