@@ -2,7 +2,7 @@
   <div class="repair-form">
     <SidebarMenu/>
     <main>
-      <h1>ใบเตรียมจัดของ</h1>
+      <h1>เพิ่มรายการจัดของ</h1>
       <div class="container">
         <form @submit.prevent="submitForm">
           <div class="form-row">
@@ -10,7 +10,25 @@
             <input type="text"/>
           </div>
           <div class="form-row">
-            <label>ชื่อสาขา</label>
+            <label>ชื่อบริษัท</label>
+            <select v-model="form.companyName">
+              <option disabled value="">เลือกบริษัท</option>
+              <option v-for="company in data.companies" :key="company.companyName" :value="company.companyName">
+                {{ company.companyName }}
+              </option>
+            </select>
+          </div>
+          <div class="form-row" v-if="form.companyName !== 'ไม่ระบุ'">
+            <label>สาขา</label>
+            <select v-model="form.branchName" :disabled="!form.companyName">
+              <option disabled value="">เลือกสาขา</option>
+              <option v-for="branch in getBranches(form.companyName)" :key="branch" :value="branch">
+                {{ branch }}
+              </option>
+            </select>
+          </div>
+          <div class="form-row" v-if="form.companyName === 'ไม่ระบุ'">
+            <label>สาขา</label>
             <input type="text"/>
           </div>
           <div class="form-row">
@@ -34,34 +52,41 @@
             <input type="date"/>
           </div>
           <div class="form-row">
-            <label>รหัสสินค้าของ Office Design</label>
-            <input type="text"/>
-          </div>
-          <div class="form-row">
-            <label>ชื่อกลุ่มสินค้าของ Office Design</label>
-            <input type="text"/>
-          </div>
-          <div class="form-row">
             <label>จัดเตรียมโดย</label>
-            <input type="text"/>
+            <input v-model="user" type="text" disabled class="disable-form"/>
           </div>
-          <div class="form-row">
-            <label>ตรวจเช็คอุปกรณ์โดย</label>
-            <input type="text"/>
-          </div>
-          <div class="form-row">
-            <label>ตรวจอนุมัติ พร้อมจัดส่ง</label>
-            <input type="text"/>
-          </div>
-          <div class="form-row">
-            <label>ชื่อสินค้า (Supplier)</label>
-            <input type="text"/>
-          </div>
-          <br>
         </form>
       </div>
       <h1>อุปกรณ์</h1>
-      <addReceiptProduct />
+      <div v-for="(formItem, index) in form" :key="index" class="container-product">
+        <form @submit.prevent="submitForm">
+          <div class="form-row">
+            <label>รหัสสินค้าของ Office Design</label>
+            <input v-model="formItem.productCode" type="text" />
+          </div>
+          <div class="form-row">
+            <label>ชื่อสินค้าของ Office Design</label>
+            <input v-model="formItem.productName" type="text" />
+          </div>
+          <div style="display: flex;justify-content: end;">
+            <button type="button" @click="removeForm(index)" class="delete-button">X</button>
+          </div>
+          <div class="form-row">
+            <label>ชื่อกลุ่มสินค้าของ Office Design</label>
+            <input v-model="formItem.selectedCategory" type="text" />
+          </div>
+          <div class="form-row">
+            <label>Serial Number</label>  
+            <select v-model="formItem.serialNumber">
+              <option value="">Select serial number</option>
+              <option v-for="model in availableSerialNumbers(index)" :key="model" :value="model">
+                {{ model }}
+              </option>
+            </select>
+          </div>
+        </form>
+      </div>
+      <button @click="addForm" class="add-button">+ Add New</button>
       <div class="form-actions">
         <button type="submit">บันทึก</button>
       </div>
@@ -71,13 +96,119 @@
 
 
 <script setup>
-import { ref , computed} from 'vue';
+import { ref } from 'vue';
+import { directus } from "@/services/directus";
+import { createItem, readItems } from "@directus/sdk";
 import SidebarMenu from "@/components/SidebarMenu.vue";
-import addReceiptProduct from './addReceiptProduct.vue';
 
+const getUser = JSON.parse(localStorage.getItem('user'))
+const user = `${getUser.first_name} ${getUser.last_name}`
+const data = ref({
+  companies: [],
+  equipments: [],
+});
+
+const serialNumbers = ref([])
+const form = ref([
+  { productCode: '', productName: '', selectedCategory: '', selectedModel: '', serialNumber: '' }
+]);
+
+const addForm = () => {
+  form.value.push({ productCode: '', productName: '', selectedCategory: '', selectedModel: '', serialNumber: '' });
+};
+
+const removeForm = (index) => {
+  form.value.splice(index, 1);
+};
+
+function simplifyInput(input) {
+  const result = {
+    companies: [],
+  };
+
+  input.forEach(item => {
+    if (item.company) {
+      item.company.forEach(company => {
+        const branches = company.branch.map(branch => branch.branch_id.branch_name);
+        result.companies.push({
+          companyName: company.company_name,
+          branches
+        });
+      });
+    }
+  });
+
+  return result;
+}
+
+const availableSerialNumbers = (index) => {
+  const selectedSerialNumbers = form.value
+    .filter((_, i) => i !== index)
+    .map((item) => item.serialNumber);
+  return serialNumbers.value.filter((serialNumber) => !selectedSerialNumbers.includes(serialNumber));
+};
+
+const fetchData = async () => {
+  try {
+    const response = await directus.request(
+      readItems("config", {
+        fields: [
+          "company.company_name",
+          "company.branch.branch_id.branch_name",
+        ],
+      })
+    );
+
+    const stock = await directus.request(
+      readItems("stock", {
+        fields: [
+          "product_code_office_design",
+          "product_name_office_design",
+          "serial_number",
+          "group_product",
+          "model"
+        ],
+        filter:{
+          status:{
+            _eq:null
+          }
+        }
+      })
+    );  
+    serialNumbers.value = stock.map(item => item.serial_number);
+
+    Object.assign(data.value, simplifyInput(response));
+
+  } catch (error) {
+    console.error("Error fetching activities:", error);
+  }
+};
+
+const getBranches = (companyName) =>
+  data.value.companies.find((c) => c.companyName === companyName)?.branches ||
+  [];
+
+fetchData();
 </script>
 
 <style scoped>
+.add-button {
+  margin-left: 16px;
+  margin-top: 10px;
+  padding: 8px 12px;
+  font-size: 16px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  border-radius: 5px;
+}
+
+.add-button:hover {
+  background-color: #0056b3;
+}
+
 .disable-form{
   background-color: #D9D9D9;
 }
@@ -85,6 +216,13 @@ import addReceiptProduct from './addReceiptProduct.vue';
   padding: 20px;
   overflow-x: auto;
 }
+.container-product{
+  padding: 20px;
+  border: 2px solid #F1F0E8;
+  border-radius: 16px;
+  margin: 16px;
+}
+
 .repair-form {
   display: flex;
   justify-content: center;
@@ -192,6 +330,22 @@ button:disabled {
   margin: 20px;
 }
 
+.delete-button {
+  background-color: #e74c3c;
+  color: white;
+  /* width: 30px; */
+  height: 30px;
+  padding: 6px 12px;
+  font-size: 14px;
+  border: none;
+  cursor: pointer;
+  /* border-radius: 5px; */
+  /* margin-top: 10px; */
+}
+
+.delete-button:hover {
+  background-color: #c0392b;
+}
 @media (max-width: 768px) {
   .repair-form {
     padding: 20px;

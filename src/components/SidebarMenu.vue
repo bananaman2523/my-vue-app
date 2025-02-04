@@ -6,9 +6,10 @@
     <ul>
       <!-- <li @click="navigate('addReceipt')">เพิ่มข้อมูลการแจ้งซ่อม</li>
       <li @click="navigate('list')">แสดงรายการทั้งหมด</li> -->
-      <li @click="navigate('receiptProduct')">เพิ่มสินค้าเข้า Stock</li>
-      <li @click="navigate('listStock')">Stock</li>
-      <li @click="navigate('DocumentPreparation')">ใบเตรียมจัดของ</li>
+      <li @click="navigate('receiptProduct')">เพิ่มสินค้านำเข้า</li>
+      <li @click="navigate('listStock')">คลังสินค้า</li>
+      <li @click="navigate('DocumentPreparation')">เพิ่มรายการจัดของ</li>
+      <li @click="navigate('listPreparationPage')">แสดงรายการจัดของ</li>
       <li @click="navigate('productOrder')">ใบส่งสินค้า</li>
       <!-- <li @click="navigate('stickerOrder')">ใบสติ๊กเกอร์ติดอุปกรณ์</li> -->
       <!-- <li @click="navigate('completed')">รายการที่เสร็จสิ้นแล้ว</li>
@@ -38,6 +39,12 @@ const navigate = (route) => {
   router.push({ name: route });
 };
 const fetchData = async () => {
+  const storedUser = localStorage.getItem('user');
+  if (storedUser) {
+    user.value = JSON.parse(storedUser);
+    return;
+  }
+
   try {
     const response = await directus.request(
       readUsers({
@@ -49,7 +56,7 @@ const fetchData = async () => {
     );
     
     user.value = response[0];
-    
+    localStorage.setItem('user', JSON.stringify(user.value));
   } catch (error) {
     console.error("Error fetching activities:", error);
   }
@@ -60,6 +67,7 @@ fetchData();
 const handleLogout = () => {
   localStorage.removeItem('directus-data');
   localStorage.removeItem('user_email');
+  localStorage.removeItem('user')
   
   router.push({ name: 'login' });
 };

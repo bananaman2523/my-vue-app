@@ -2,7 +2,7 @@
   <div class="repair-form">
     <SidebarMenu />
     <main>
-      <h1>คลังสินค้า</h1>
+      <h1>รายการจัดของ</h1>
       <div class="input-container">
         <input type="date" v-model="filterData.receive_date_from" placeholder="From Date">
         <input type="date" v-model="filterData.receive_date_to" placeholder="To Date">
@@ -36,23 +36,27 @@
               <th>หมวดหมู่สินค้า</th>
               <th>model</th>
               <th>S/N</th>
+              <th style="text-align: center;">สถานะ</th>
+              <th></th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(item, index) in paginatedData" :key="index" :id="item.id" @click="navigate('receiptDetail',item.id)">
-              <td>{{ item.receive_date }}</td>
-              <td>{{ item.name_supplier }}</td>
-              <td>{{ item.bill_lading_number }}</td>
-              <td>{{ item.bill_lading_number_date }}</td>
-              <td>{{ item.invoice_number }}</td>
-              <td>{{ item.invoice_number_date }}</td>
-              <td>{{ item.receipt_number }}</td>
-              <td>{{ item.receipt_number_date }}</td>
-              <td>{{ item.bill_number }}</td>
-              <td>{{ item.due_date }}</td>
-              <td>{{ item.item_code }}</td>
-              <td>{{ item.product_name_supplier }}</td>
-              <td>{{ item.product_code_office_design }}</td>
+            <tr v-for="(item, index) in paginatedData" :key="index" :id="item.id">
+              <td @click="navigate('receiptDetail',item.id)">{{ item.receive_date }}</td>
+              <td @click="navigate('receiptDetail',item.id)">{{ item.name_supplier }}</td>
+              <td @click="navigate('receiptDetail',item.id)">{{ item.bill_lading_number }}</td>
+              <td @click="navigate('receiptDetail',item.id)">{{ item.bill_lading_number_date }}</td>
+              <td @click="navigate('receiptDetail',item.id)">{{ item.invoice_number }}</td>
+              <td @click="navigate('receiptDetail',item.id)">{{ item.invoice_number_date }}</td>
+              <td @click="navigate('receiptDetail',item.id)">{{ item.receipt_number }}</td>
+              <td @click="navigate('receiptDetail',item.id)">{{ item.receipt_number_date }}</td>
+              <td @click="navigate('receiptDetail',item.id)">{{ item.bill_number }}</td>
+              <td @click="navigate('receiptDetail',item.id)">{{ item.due_date }}</td>
+              <td @click="navigate('receiptDetail',item.id)">{{ item.item_code }}</td>
+              <td @click="navigate('receiptDetail',item.id)">{{ item.product_name_supplier }}</td>
+              <td @click="navigate('receiptDetail',item.id)">{{ item.product_code_office_design }}</td>
+              <td>รอตรวจเช็ค</td>
+              <td><button style="background-color: #003566;color: white;">ตรวจเช็ค</button></td>
             </tr>
           </tbody>
         </table>
@@ -78,7 +82,7 @@ import { useRouter } from 'vue-router';
 const router = useRouter();
 const data = ref([]);
 const currentPage = ref(1);
-const itemsPerPage = 10;
+const itemsPerPage = 20;
 
 const filterData = ref({
   receive_date: "",
@@ -196,7 +200,7 @@ h1 {
 }
 
 .table-container {
-  padding: 20px;
+  padding-top: 20px;
   overflow-x: auto;
 }
 
@@ -232,6 +236,19 @@ table tbody tr:nth-child(even) {
 table tbody tr:hover {
   background-color: #eaf4fc;
   transition: background-color 0.3s ease;
+}
+
+table th:nth-last-child(1), table td:nth-last-child(1) {
+  position: sticky;
+  right: -1px;
+  background-color: #ffffff;
+  z-index: 4;
+}
+table th:nth-last-child(2), table td:nth-last-child(2) {
+  position: sticky;
+  right: 7%;
+  background-color: #ffffff;
+  z-index: 4;
 }
 
 .action-buttons {

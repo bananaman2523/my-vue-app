@@ -2,7 +2,7 @@
   <div class="repair-form">
     <SidebarMenu />
     <main>
-      <h1>เพิ่มสินค้าเข้า Stock</h1>
+      <h1>เพิ่มสินค้านำเข้า</h1>
       <div class="container">
         <form @submit.prevent="submitForm">
           <div class="form-row">

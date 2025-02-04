@@ -100,7 +100,7 @@ main {
   flex: 1;
   background-color: #ffffff;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
+  /* overflow: hidden; */
   min-height: 100vh;
 }
 
