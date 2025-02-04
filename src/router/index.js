@@ -10,6 +10,7 @@ import DocumentPreparationPage from "@/components/DocumentPreparation.vue";
 import LoginPage from "@/components/Login.vue";
 import productOrderPage from "@/components/productOrder.vue";
 import stickerOrderPage from "@/components/stickerOrder.vue";
+import receiptDetailsPage from "@/components/receiptDetails.vue";
 
 const routes = [
   {
@@ -49,7 +50,7 @@ const routes = [
   {
     path: "/receiptDetail/:id",
     name: "receiptDetail",
-    component: receiptProductPage,
+    component: receiptDetailsPage,
   },
   {
     path: "/listStock",

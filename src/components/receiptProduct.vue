@@ -96,6 +96,8 @@ const addStock = async () => {
           product_code_office_design: receiptProducts.value[index].productCode || null,
           product_name_office_design: receiptProducts.value[index].productName || null,
           serial_number: receiptProducts.value[index].serialNumber || null,
+          group_product: receiptProducts.value[index].selectedCategory || null,
+          model: receiptProducts.value[index].selectedModel || null,
         })
       ); 
     }
