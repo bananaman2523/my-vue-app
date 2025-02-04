@@ -27,7 +27,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(item, index) in paginatedData" :key="index">
+            <tr v-for="(item, index) in paginatedData" :key="index" :id="item.id" @click="navigate('receiptDetail',item.id)">
               <td>{{ item.receive_date }}</td>
               <td>{{ item.name_supplier }}</td>
               <td>{{ item.bill_lading_number }}</td>
@@ -111,6 +111,9 @@ const goToLastPage = () => {
   currentPage.value = totalPages.value;
 };
 
+const navigate = (route, itemId) => {
+  router.push({ name: route , params: { id: itemId }});
+};
 </script>
 
 <style scoped>
