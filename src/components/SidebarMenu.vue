@@ -9,30 +9,63 @@
       <li @click="navigate('receiptProduct')">เพิ่มสินค้าเข้า Stock</li>
       <li @click="navigate('listStock')">Stock</li>
       <li @click="navigate('DocumentPreparation')">ใบเตรียมจัดของ</li>
+      <li @click="navigate('productOrder')">ใบส่งสินค้า</li>
+      <!-- <li @click="navigate('stickerOrder')">ใบสติ๊กเกอร์ติดอุปกรณ์</li> -->
       <!-- <li @click="navigate('completed')">รายการที่เสร็จสิ้นแล้ว</li>
       <li @click="navigate('in-progress')">รายการที่กำลังดำเนินการ</li> -->
     </ul>
     <div class="login">
-      test
+      <div>
+        <p>{{ user?.first_name }} {{ user?.last_name }}</p>
+        <p>Email: {{ user?.email }}</p>
+      </div>
+
+      <button @click="handleLogout">Log out</button>
     </div>
   </aside>
 </template>
 
 <script setup>
+import { directus } from '@/services/directus';
 import { useRouter } from 'vue-router';
-const router = useRouter();
+import { readUsers } from "@directus/sdk";
+import { ref } from 'vue';
 
+const router = useRouter();
+const user = ref();
 const emit = defineEmits(['navigate']);
 const navigate = (route) => {
   router.push({ name: route });
 };
+const fetchData = async () => {
+  try {
+    const response = await directus.request(
+      readUsers({
+        filter: {
+          email: { _eq: localStorage.getItem('user_email') },
+        },
+        fields: ["*"],
+      })
+    );
+    
+    user.value = response[0];
+    
+  } catch (error) {
+    console.error("Error fetching activities:", error);
+  }
+};
+
+fetchData();
+
+const handleLogout = () => {
+  localStorage.removeItem('directus-data');
+  localStorage.removeItem('user_email');
+  
+  router.push({ name: 'login' });
+};
 </script>
 
 <style scoped>
-.login{
-  display: flex;
-}
-
 .sidebar {
   max-width: 250px;
   background-color: #f2f2f2;
@@ -96,6 +129,29 @@ li:hover svg {
   transform: scale(1.2);
 }
 
+.login {
+  margin-top: auto;
+  width: 100%;
+  text-align: center;
+}
+
+.login button {
+  padding: 12px 20px;
+  background-color: #004080;
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  width: 100%;
+}
+
+.login button:hover {
+  background-color: #003366;
+}
+
 @media (max-width: 768px) {
   .sidebar {
     width: 100%;
@@ -109,6 +165,10 @@ li:hover svg {
   li {
     font-size: 16px;
     padding: 12px 20px;
+  }
+
+  .login button {
+    font-size: 14px;
   }
 }
 </style>

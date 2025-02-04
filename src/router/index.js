@@ -8,6 +8,8 @@ import receiptProductPage from "@/components/receiptProduct.vue";
 import ListStockPage from "@/components/ListStock.vue";
 import DocumentPreparationPage from "@/components/DocumentPreparation.vue";
 import LoginPage from "@/components/Login.vue";
+import productOrderPage from "@/components/productOrder.vue";
+import stickerOrderPage from "@/components/stickerOrder.vue";
 
 const routes = [
   {
@@ -45,6 +47,11 @@ const routes = [
     component: receiptProductPage,
   },
   {
+    path: "/receiptDetail/:id",
+    name: "receiptDetail",
+    component: receiptProductPage,
+  },
+  {
     path: "/listStock",
     name: "listStock",
     component: ListStockPage,
@@ -56,7 +63,18 @@ const routes = [
   },
   {
     path: "/login",
+    name: "login",
     component: LoginPage,
+  },
+  {
+    path: "/productOrder",
+    name: "productOrder",
+    component: productOrderPage,
+  },
+  {
+    path: "/stickerOrder",
+    name: "stickerOrder",
+    component: stickerOrderPage,
   }
 ];
 

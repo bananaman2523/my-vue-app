@@ -34,9 +34,7 @@ const handleLogin = async () => {
 
     try {
         const result = await directus.login(email.value, password.value);
-        
-        localStorage.setItem('directus_token', result.access_token);
-
+        localStorage.setItem('user_email', email.value)
         router.push('/listStock');
 
         console.log('Logged in successfully');
