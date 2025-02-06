@@ -19,9 +19,9 @@
         <input v-model="filterData.model" type="text" class="input-field" placeholder="model">
         <input v-model="filterData.sn" type="text" class="input-field" placeholder="S/N">
       </div>
-      <button @click="toggleFilterVisibility" class="toggle-btn">
+      <!-- <button @click="toggleFilterVisibility" class="toggle-btn">
         {{ isFilterVisible ? 'ซ่อน Filter' : 'แสดง Filter' }}
-      </button>
+      </button> -->
       <div class="table-container">
         <table>
           <thead>
