@@ -23,39 +23,31 @@
         <table>
           <thead>
             <tr>
-              <th>วันที่รับ</th>
-              <th>ชื่อ supplier</th>
-              <th>เลขที่ใบส่งสินค้า</th>
-              <th>เลขที่ใบกำกับภาษี</th>
-              <th>เลขที่ใบเสร็จ</th>
-              <th>เลขที่ใบวางบิล</th>
-              <th>Item code</th>
-              <th>ชื่อสินค้า (Supplier)</th>
-              <th>รหัสสินค้า Office Design</th>
-              <th>ชื่อสินค้า Office Design</th>
-              <th>หมวดหมู่สินค้า</th>
-              <th>model</th>
-              <th>S/N</th>
+              <th>ชื่อลูกค้า</th>
+              <th>ชื่อบริษัท</th>
+              <th>สาขา</th>
+              <th>รหัสสาขา</th>
+              <th>เลขที่ใบเสนอราคา (Office Design)</th>
+              <th>เลขที่ใบสั่งซื้อของลูกค้า</th>
+              <th>วันเตรียมสินค้า</th>
+              <th>วัน plan จัดส่ง</th>
+              <th>จัดเตรียมโดย</th>
               <th style="text-align: center;">สถานะ</th>
               <th></th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="(item, index) in paginatedData" :key="index" :id="item.id">
-              <td @click="navigate('receiptDetail',item.id)">{{ item.receive_date }}</td>
-              <td @click="navigate('receiptDetail',item.id)">{{ item.name_supplier }}</td>
-              <td @click="navigate('receiptDetail',item.id)">{{ item.bill_lading_number }}</td>
-              <td @click="navigate('receiptDetail',item.id)">{{ item.bill_lading_number_date }}</td>
-              <td @click="navigate('receiptDetail',item.id)">{{ item.invoice_number }}</td>
-              <td @click="navigate('receiptDetail',item.id)">{{ item.invoice_number_date }}</td>
-              <td @click="navigate('receiptDetail',item.id)">{{ item.receipt_number }}</td>
-              <td @click="navigate('receiptDetail',item.id)">{{ item.receipt_number_date }}</td>
-              <td @click="navigate('receiptDetail',item.id)">{{ item.bill_number }}</td>
-              <td @click="navigate('receiptDetail',item.id)">{{ item.due_date }}</td>
-              <td @click="navigate('receiptDetail',item.id)">{{ item.item_code }}</td>
-              <td @click="navigate('receiptDetail',item.id)">{{ item.product_name_supplier }}</td>
-              <td @click="navigate('receiptDetail',item.id)">{{ item.product_code_office_design }}</td>
-              <td>รอตรวจเช็ค</td>
+              <td>{{ item.customer_name }}</td>
+              <td>{{ item.company_name }}</td>
+              <td>{{ item.branch_name }}</td>
+              <td>{{ item.branch_code }}</td>
+              <td>{{ item.quotation_number_office_design }}</td>
+              <td>{{ item.customer_order_number }}</td>
+              <td>{{ item.product_preparation_date }}</td>
+              <td>{{ item.plan_delivery_date }}</td>
+              <td>{{ item.prepared_by }}</td>
+              <td>{{ item.status }}</td>
               <td><button style="background-color: #003566;color: white;">ตรวจเช็ค</button></td>
             </tr>
           </tbody>
@@ -103,7 +95,7 @@ const filterData = ref({
 const fetchData = async () => {
   try {
     const response = await directus.request(
-      readItems("stock", {
+      readItems("packing_sheet", {
         fields: ["*.*"],
       })
     );

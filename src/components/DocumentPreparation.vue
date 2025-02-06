@@ -7,7 +7,7 @@
         <form @submit.prevent="submitForm">
           <div class="form-row">
             <label>ชื่อลูกค้า</label>
-            <input type="text"/>
+            <input v-model="form.customerName" type="text"/>
           </div>
           <div class="form-row">
             <label>ชื่อบริษัท</label>
@@ -29,27 +29,27 @@
           </div>
           <div class="form-row" v-if="form.companyName === 'ไม่ระบุ'">
             <label>สาขา</label>
-            <input type="text"/>
+            <input v-model="form.branchName" type="text"/>
           </div>
           <div class="form-row">
             <label>รหัสสาขา</label>
-            <input type="text"/>
+            <input v-model="form.branchCode" type="text"/>
           </div>
           <div class="form-row">
             <label>เลขที่ใบเสนอราคา (Office Design)</label>
-            <input type="text"/>
+            <input v-model="form.quotationNumber" type="text"/>
           </div>
           <div class="form-row">
             <label>เลขที่ใบสั่งซื้อของลูกค้า</label>
-            <input type="text"/>
+            <input v-model="form.customerOrderNumber" type="text"/>
           </div>
           <div class="form-row">
             <label>วันเตรียมสินค้า</label>
-            <input type="date"/>
+            <input v-model="form.preparedDate" type="date"/>
           </div>
           <div class="form-row">
             <label>วัน plan จัดส่ง</label>
-            <input type="date"/>
+            <input v-model="form.deliveryDate" type="date"/>
           </div>
           <div class="form-row">
             <label>จัดเตรียมโดย</label>
@@ -58,29 +58,29 @@
         </form>
       </div>
       <h1>อุปกรณ์</h1>
-      <div v-for="(formItem, index) in form" :key="index" class="container-product">
+      <div v-for="(formItem, index) in form.items" :key="index" class="container-product">
         <form @submit.prevent="submitForm">
           <div class="form-row">
             <label>รหัสสินค้าของ Office Design</label>
-            <input v-model="formItem.productCode" type="text" />
+            <input v-model="formItem.productCode" type="text" disabled class="disable-form"/>
           </div>
           <div class="form-row">
             <label>ชื่อสินค้าของ Office Design</label>
-            <input v-model="formItem.productName" type="text" />
+            <input v-model="formItem.productName" type="text" disabled class="disable-form"/>
           </div>
           <div style="display: flex;justify-content: end;">
             <button type="button" @click="removeForm(index)" class="delete-button">X</button>
           </div>
           <div class="form-row">
             <label>ชื่อกลุ่มสินค้าของ Office Design</label>
-            <input v-model="formItem.selectedCategory" type="text" />
+            <input v-model="formItem.selectedCategory" type="text" disabled class="disable-form"/>
           </div>
           <div class="form-row">
             <label>Serial Number</label>  
-            <select v-model="formItem.serialNumber">
+            <select v-model="formItem.serialNumber" @change="updateSerialId(formItem)">
               <option value="">Select serial number</option>
-              <option v-for="model in availableSerialNumbers(index)" :key="model" :value="model">
-                {{ model }}
+              <option v-for="serial in availableSerialNumbers(index)" :key="serial.id" :value="serial.serial_number">
+                {{ serial.serial_number }}
               </option>
             </select>
           </div>
@@ -88,17 +88,16 @@
       </div>
       <button @click="addForm" class="add-button">+ Add New</button>
       <div class="form-actions">
-        <button type="submit">บันทึก</button>
+        <button type="button" @click="submitForm">บันทึก</button>
       </div>
     </main>
   </div>
 </template>
 
-
 <script setup>
 import { ref } from 'vue';
 import { directus } from "@/services/directus";
-import { createItem, readItems } from "@directus/sdk";
+import { createItem, readItems , updateItems } from "@directus/sdk";
 import SidebarMenu from "@/components/SidebarMenu.vue";
 
 const getUser = JSON.parse(localStorage.getItem('user'))
@@ -109,16 +108,26 @@ const data = ref({
 });
 
 const serialNumbers = ref([])
-const form = ref([
-  { productCode: '', productName: '', selectedCategory: '', selectedModel: '', serialNumber: '' }
-]);
+const form = ref({
+  customerName: '',
+  companyName: '',
+  branchName: '',
+  branchCode: '',
+  quotationNumber: '',
+  customerOrderNumber: '',
+  preparedDate: '',
+  deliveryDate: '',
+  items: [
+    { productCode: '', productName: '', selectedCategory: '', selectedModel: '', serialNumber: '' }
+  ]
+});
 
 const addForm = () => {
-  form.value.push({ productCode: '', productName: '', selectedCategory: '', selectedModel: '', serialNumber: '' });
+  form.value.items.push({ productCode: '', productName: '', selectedCategory: '', selectedModel: '', serialNumber: '' });
 };
 
 const removeForm = (index) => {
-  form.value.splice(index, 1);
+  form.value.items.splice(index, 1);
 };
 
 function simplifyInput(input) {
@@ -142,10 +151,31 @@ function simplifyInput(input) {
 }
 
 const availableSerialNumbers = (index) => {
-  const selectedSerialNumbers = form.value
+  const selectedSerialNumbers = form.value.items
     .filter((_, i) => i !== index)
     .map((item) => item.serialNumber);
-  return serialNumbers.value.filter((serialNumber) => !selectedSerialNumbers.includes(serialNumber));
+  
+  return serialNumbers.value.filter((serialNumber) => {
+    return !selectedSerialNumbers.includes(serialNumber.serial_number);
+  });
+};
+
+const updateSerialId = (formItem) => {
+  const selectedSerial = serialNumbers.value.find(
+    (serial) => serial.serial_number === formItem.serialNumber
+  );
+  
+  if (selectedSerial) {
+    formItem.serialNumberId = selectedSerial.id;
+    formItem.productCode = selectedSerial.product_code_office_design;
+    formItem.productName = selectedSerial.product_name_office_design;
+    formItem.selectedCategory = selectedSerial.group_product;
+  } else {
+    formItem.serialNumberId = null;
+    formItem.productCode = '';
+    formItem.productName = '';
+    formItem.selectedCategory = '';
+  }
 };
 
 const fetchData = async () => {
@@ -162,6 +192,7 @@ const fetchData = async () => {
     const stock = await directus.request(
       readItems("stock", {
         fields: [
+          "id",
           "product_code_office_design",
           "product_name_office_design",
           "serial_number",
@@ -175,7 +206,15 @@ const fetchData = async () => {
         }
       })
     );  
-    serialNumbers.value = stock.map(item => item.serial_number);
+    
+    serialNumbers.value = stock.map(item => ({
+      id: item.id,
+      serial_number: item.serial_number,
+      product_code_office_design: item.product_code_office_design,
+      product_name_office_design: item.product_name_office_design,
+      group_product: item.group_product,
+      model: item.model
+    }));
 
     Object.assign(data.value, simplifyInput(response));
 
@@ -189,9 +228,50 @@ const getBranches = (companyName) =>
   [];
 
 fetchData();
+const addStock = async () => {
+  try {
+    const create = await directus.request(
+      createItem('packing_sheet', {
+        customer_name: form.value.customerName,
+        company_name: form.value.companyName,
+        branch_name: form.value.branchName,
+        branch_code: form.value.branchCode,
+        product_preparation_date: form.value.preparedDate,
+        plan_delivery_date: form.value.deliveryDate,
+        quotation_number_office_design: form.value.quotationNumber,
+        customer_order_number: form.value.customerOrderNumber,
+        prepared_by: user,
+        status: 'รอตรวจเช็ก',
+        stock: form.value.items.map(item => ({
+          id: item.serialNumberId,
+        }))
+      })
+    )
+    const stockIds = form.value.items
+      .map(item => item.serialNumberId)
+      .filter(id => id !== undefined);
+      
+    const updateStock = await directus.request(
+      updateItems('stock', stockIds, {
+        status: 'รอตรวจเช็ก',
+      })
+    )
+    
+  } catch (error) {
+    console.error('Error creating article:', error);
+  }
+}
+
+const submitForm = () => {
+  addStock();
+};
 </script>
 
 <style scoped>
+.disable-form{
+  background-color: #D9D9D9;
+}
+
 .add-button {
   margin-left: 16px;
   margin-top: 10px;

@@ -48,7 +48,6 @@
 
 <script setup>
 import { ref, computed , watch} from 'vue';
-import productData from "@/data/products.json";
 import { directus } from "@/services/directus";
 import { createItem, readItems } from "@directus/sdk";
 
@@ -61,8 +60,6 @@ const forms = ref([
   { productCode: '', productName: '', selectedCategory: '', selectedModel: '', serialNumber: '' }
 ]);
 
-const categories = computed(() => Object.keys(productData));
-
 const models = (category) => {
   const productGroup = category ? data.value.product.find(item => item.productGroup === category) : null;
   return category ? productGroup.productCodes : [];
@@ -70,6 +67,10 @@ const models = (category) => {
 
 const addForm = () => {
   forms.value.push({ productCode: '', productName: '', selectedCategory: '', selectedModel: '', serialNumber: '' });
+};
+
+const resetForm = () => {
+  forms.value = [{ productCode: '', productName: '', selectedCategory: '', selectedModel: '', serialNumber: '' }];
 };
 
 const removeForm = (index) => {

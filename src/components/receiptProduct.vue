@@ -76,6 +76,24 @@ import { createItem, readItems } from "@directus/sdk";
 import SidebarMenu from "@/components/SidebarMenu.vue";
 import addReceiptProduct from "./addReceiptProduct.vue";
 
+const resetForm = () => {
+  formData.value = {
+    receivedDate: new Date().toISOString().split("T")[0],
+    supplierName: "",
+    deliveryNoteNumber: "",
+    deliveryNoteDate: "",
+    taxInvoiceNumber: "",
+    invoiceDate: "",
+    receiptNumber: "",
+    receiptDate: "",
+    billingNoteNumber: "",
+    dueDate: "",
+    itemCode: "",
+    supplierProductName: "",
+  };
+  receiptProducts.value = [];
+};
+
 const addStock = async () => {
   try {
     for (let index = 0; index < receiptProducts.value.length; index++) {
@@ -101,7 +119,9 @@ const addStock = async () => {
         })
       ); 
     }
-    
+    alert("บันทึกข้อมูลสำเร็จ!");
+    resetForm();
+
   } catch (error) {
     console.error('Error creating article:', error);
   }
