@@ -3,7 +3,7 @@
     <SidebarMenu />
     <main>
       <h1>คลังสินค้า</h1>
-      <div class="input-container">
+      <div v-show="isFilterVisible" class="input-container">
         <input type="date" v-model="filterData.receive_date_from" placeholder="From Date">
         <input type="date" v-model="filterData.receive_date_to" placeholder="To Date">
         <input v-model="filterData.name_supplier" type="text" class="input-field" placeholder="ชื่อ supplier">
@@ -19,6 +19,9 @@
         <input v-model="filterData.model" type="text" class="input-field" placeholder="model">
         <input v-model="filterData.sn" type="text" class="input-field" placeholder="S/N">
       </div>
+      <button @click="toggleFilterVisibility" class="toggle-btn">
+        {{ isFilterVisible ? 'ซ่อน Filter' : 'แสดง Filter' }}
+      </button>
       <div class="table-container">
         <table>
           <thead>
@@ -75,6 +78,7 @@ import { readItems } from "@directus/sdk";
 import SidebarMenu from "@/components/SidebarMenu.vue";
 import { useRouter } from 'vue-router';
 
+const isFilterVisible = ref(true);
 const router = useRouter();
 const data = ref([]);
 const currentPage = ref(1);
@@ -166,9 +170,19 @@ const goToLastPage = () => {
 const navigate = (route, itemId) => {
   router.push({ name: route , params: { id: itemId }});
 };
+
+const toggleFilterVisibility = () => {
+  isFilterVisible.value = !isFilterVisible.value;
+};
 </script>
 
 <style scoped>
+.toggle-btn{
+  margin: 16px;
+  border-radius: 16px;
+  font-size: 16px;
+  align-content: flex-end;
+}
 .repair-form {
   display: flex;
   justify-content: center;

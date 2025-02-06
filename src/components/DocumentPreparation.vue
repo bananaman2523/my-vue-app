@@ -256,6 +256,8 @@ const addStock = async () => {
         status: 'รอตรวจเช็ก',
       })
     )
+    window.scrollTo(0, 0);
+    window.location.reload();
     
   } catch (error) {
     console.error('Error creating article:', error);
