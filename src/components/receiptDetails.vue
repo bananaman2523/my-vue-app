@@ -89,6 +89,9 @@
               <label>S/N <label style="color: red;">*</label></label>
               <input type="text" v-model="formData.serial_number" required :disabled="disabledField" class="disable-form"/>
             </div>
+            <div class="form-delete">
+              <button type="button" @click="deleteForm">ลบ</button>
+            </div>
           </div>
         </form>
       </div>
@@ -99,11 +102,12 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import { directus } from "@/services/directus";
-import { readItems } from "@directus/sdk";
+import { readItems, deleteItem } from "@directus/sdk";
 import SidebarMenu from "@/components/SidebarMenu.vue";
-import { useRoute } from "vue-router";
+import { useRoute , useRouter} from "vue-router";
 
 const route = useRoute();
+const router = useRouter();
 const disabledField = ref(false);
 
 const formData = ref({
@@ -173,6 +177,23 @@ onMounted(() => {
     fetchData();
   }
 });
+
+async function deleteForm() {
+  const confirmDelete = window.confirm("Are you sure you want to delete this item?");
+  if (!confirmDelete) return;
+
+  try {
+    await directus.request(
+      deleteItem("stock", route.params.id)
+    );
+    router.push({ name: 'listStock' });
+    alert("Item deleted successfully!");
+  } catch (error) {
+    alert("Failed to delete item: " + error.message);
+  }
+}
+
+
 </script>
 
 <style scoped>
@@ -284,10 +305,13 @@ button:disabled {
   cursor: not-allowed;
 }
 
-.form-actions {
+.form-delete {
   grid-column: span 3;
   text-align: right;
   margin: 20px;
+}
+.form-delete button {
+  background-color: red;
 }
 
 @media (max-width: 768px) {

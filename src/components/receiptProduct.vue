@@ -108,7 +108,7 @@ const addStock = async () => {
 };
 
 const formData = ref({
-  receivedDate: "",
+  receivedDate: new Date().toISOString().split("T")[0],
   supplierName: "",
   deliveryNoteNumber: "",
   deliveryNoteDate: "",
