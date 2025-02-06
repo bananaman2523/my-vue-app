@@ -121,6 +121,8 @@ const addStock = async () => {
     }
     alert("บันทึกข้อมูลสำเร็จ!");
     resetForm();
+    window.scrollTo(0, 0);
+    window.location.reload();
 
   } catch (error) {
     console.error('Error creating article:', error);
