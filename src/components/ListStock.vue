@@ -18,6 +18,7 @@
         <input v-model="filterData.product_category" type="text" class="input-field" placeholder="หมวดหมู่สินค้า">
         <input v-model="filterData.model" type="text" class="input-field" placeholder="model">
         <input v-model="filterData.sn" type="text" class="input-field" placeholder="S/N">
+        <button @click="downloadReport" style="border-radius: 16px;">Export</button>
       </div>
       <!-- <button @click="toggleFilterVisibility" class="toggle-btn">
         {{ isFilterVisible ? 'ซ่อน Filter' : 'แสดง Filter' }}
@@ -67,7 +68,6 @@
         <button @click="goToNextPage" :disabled="currentPage === totalPages">ถัดไป</button>
         <button @click="goToLastPage" :disabled="currentPage === totalPages">หน้าสุดท้าย</button>
       </div>
-      <button @click="downloadReport">Export</button>
     </main>
   </div>
 </template>
@@ -80,29 +80,61 @@ import SidebarMenu from "@/components/SidebarMenu.vue";
 import { useRouter } from 'vue-router';
 import axios from 'axios';
 
+const paginatedDataTest = ref([
+  {
+    id: 1,
+    receive_date: '2025-02-01',
+    name_supplier: 'Supplier A',
+    bill_lading_number: 'INV001',
+    bill_lading_number_date: '2025-02-01',
+    invoice_number: 'TAX001',
+    invoice_number_date: '2025-02-01',
+    receipt_number: 'REC001',
+    receipt_number_date: '2025-02-02',
+    bill_number: 'BILL001',
+    due_date: '2025-02-15',
+    item_code: 'ITEM001',
+    product_name_supplier: 'Product A',
+    product_code_office_design: 'CODE001'
+  },
+  {
+    id: 2,
+    receive_date: '2025-02-02',
+    name_supplier: 'Supplier B',
+    bill_lading_number: 'INV002',
+    bill_lading_number_date: '2025-02-02',
+    invoice_number: 'TAX002',
+    invoice_number_date: '2025-02-02',
+    receipt_number: 'REC002',
+    receipt_number_date: '2025-02-03',
+    bill_number: 'BILL002',
+    due_date: '2025-02-16',
+    item_code: 'ITEM002',
+    product_name_supplier: 'Product B',
+    product_code_office_design: 'CODE002'
+  }
+]);
+
 const downloadReport = async () => {
+  console.log(paginatedData.value);
+  
   try {
-    const response = await axios({
-      method: 'get',
-      url: 'http://localhost:3000/download',
+    const payload = paginatedData.value
+    const response = await axios.post('http://localhost:3000/download', payload, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
       responseType: 'blob'
     });
-
-    // Create a link element to simulate a download
-    const url = window.URL.createObjectURL(new Blob([response.data]));
+    
     const link = document.createElement('a');
-    link.href = url;
-    link.setAttribute('download', 'data.xlsx'); // Set the filename for the download
-    document.body.appendChild(link);
+    link.href = URL.createObjectURL(response.data);
+    link.download = 'report.xlsx';
     link.click();
-
-    // Clean up after download
-    document.body.removeChild(link);
-    window.URL.revokeObjectURL(url);
   } catch (error) {
-    console.error("Error downloading the file:", error);
+    console.error('Error exporting report:', error);
   }
-}
+};
 
 const isFilterVisible = ref(true);
 const router = useRouter();
