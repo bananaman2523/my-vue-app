@@ -75,6 +75,7 @@ import { directus } from "@/services/directus";
 import { createItem, readItems } from "@directus/sdk";
 import SidebarMenu from "@/components/SidebarMenu.vue";
 import addReceiptProduct from "./addReceiptProduct.vue";
+import axios from 'axios';
 
 const resetForm = () => {
   formData.value = {
@@ -93,6 +94,29 @@ const resetForm = () => {
   };
   receiptProducts.value = [];
 };
+
+function objectToArray(obj) {
+    return Object.values(obj);
+}
+
+function formatDate(dateString) {
+    if (!dateString) return null;
+    const date = new Date(dateString);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+
+    return `${day}/${month}/${year}`;
+}
+
+function formatObjectDates(obj) {
+    Object.keys(obj).forEach(key => {
+        if (obj[key] && typeof obj[key] === 'string' && !isNaN(Date.parse(obj[key]))) {
+            obj[key] = formatDate(obj[key]);
+        }
+    });
+    return obj;
+}
 
 const addStock = async () => {
   try {
@@ -117,7 +141,10 @@ const addStock = async () => {
           group_product: receiptProducts.value[index].selectedCategory || null,
           model: receiptProducts.value[index].selectedModel || null,
         })
-      ); 
+      );
+      const format = formatObjectDates(result)
+      const payload = objectToArray(format);
+      await axios.post('http://localhost:3000/api/addRows', { rows: payload });
     }
     alert("บันทึกข้อมูลสำเร็จ!");
     resetForm();
