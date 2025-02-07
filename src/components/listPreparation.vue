@@ -37,7 +37,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(item, index) in paginatedData" :key="index" :id="item.id">
+            <tr v-for="(item, index) in paginatedData" :key="index" :id="item.id" @click="navigate('documentPreparationDetail',item.id)">
               <td>{{ item.customer_name }}</td>
               <td>{{ item.company_name }}</td>
               <td>{{ item.branch_name }}</td>

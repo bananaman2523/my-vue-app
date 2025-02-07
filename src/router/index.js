@@ -12,6 +12,7 @@ import LoginPage from "@/components/Login.vue";
 import productOrderPage from "@/components/productOrder.vue";
 import stickerOrderPage from "@/components/stickerOrder.vue";
 import receiptDetailsPage from "@/components/receiptDetails.vue";
+import documentPreparationDetailPage from "@/components/documentPreparationDetail.vue";
 
 const routes = [
   {
@@ -82,6 +83,11 @@ const routes = [
     path: "/listPreparation",
     name: "listPreparationPage",
     component: listPreparationPage,
+  },
+  {
+    path: "/documentPreparationDetail/:id",
+    name: "documentPreparationDetail",
+    component: documentPreparationDetailPage
   }
 ];
 
