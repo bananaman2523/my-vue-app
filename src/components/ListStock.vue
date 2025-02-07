@@ -105,7 +105,7 @@ const filterData = ref({
 const downloadReport = async () => {
   try {
     const payload = paginatedDataExport.value
-    const response = await axios.post('http://localhost:3000/downloadProduct', payload, {
+    const response = await axios.post('http://localhost:3000/download', payload, {
       headers: {
         'Content-Type': 'application/json',
       },
