@@ -112,6 +112,9 @@
           </tbody>
         </table>
       </div>
+      <div class="form-actions">
+        <button type="button" @click="submitForm">Export</button>
+      </div>
     </main>
   </div>
 </template>
@@ -122,6 +125,28 @@ import { directus } from "@/services/directus";
 import { createItem, readItems , updateItems } from "@directus/sdk";
 import SidebarMenu from "@/components/SidebarMenu.vue";
 import { useRoute , useRouter} from "vue-router";
+import axios from 'axios';
+
+const downloadReport = async () => {
+  console.log(paginatedData.value);
+  
+  try {
+    const payload = paginatedData.value
+    const response = await axios.post('http://localhost:3000/downloadProduct', payload, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      responseType: 'blob'
+    });
+    
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(response.data);
+    link.download = 'report.xlsx';
+    link.click();
+  } catch (error) {
+    console.error('Error exporting report:', error);
+  }
+};
 
 const formatDate = (dateString) => {
   if (!dateString) return "";

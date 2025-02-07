@@ -80,62 +80,6 @@ import SidebarMenu from "@/components/SidebarMenu.vue";
 import { useRouter } from 'vue-router';
 import axios from 'axios';
 
-const paginatedDataTest = ref([
-  {
-    id: 1,
-    receive_date: '2025-02-01',
-    name_supplier: 'Supplier A',
-    bill_lading_number: 'INV001',
-    bill_lading_number_date: '2025-02-01',
-    invoice_number: 'TAX001',
-    invoice_number_date: '2025-02-01',
-    receipt_number: 'REC001',
-    receipt_number_date: '2025-02-02',
-    bill_number: 'BILL001',
-    due_date: '2025-02-15',
-    item_code: 'ITEM001',
-    product_name_supplier: 'Product A',
-    product_code_office_design: 'CODE001'
-  },
-  {
-    id: 2,
-    receive_date: '2025-02-02',
-    name_supplier: 'Supplier B',
-    bill_lading_number: 'INV002',
-    bill_lading_number_date: '2025-02-02',
-    invoice_number: 'TAX002',
-    invoice_number_date: '2025-02-02',
-    receipt_number: 'REC002',
-    receipt_number_date: '2025-02-03',
-    bill_number: 'BILL002',
-    due_date: '2025-02-16',
-    item_code: 'ITEM002',
-    product_name_supplier: 'Product B',
-    product_code_office_design: 'CODE002'
-  }
-]);
-
-const downloadReport = async () => {
-  console.log(paginatedData.value);
-  
-  try {
-    const payload = paginatedData.value
-    const response = await axios.post('http://localhost:3000/download', payload, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      responseType: 'blob'
-    });
-    
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(response.data);
-    link.download = 'report.xlsx';
-    link.click();
-  } catch (error) {
-    console.error('Error exporting report:', error);
-  }
-};
-
 const isFilterVisible = ref(true);
 const router = useRouter();
 const data = ref([]);
@@ -157,6 +101,25 @@ const filterData = ref({
   model: "",
   sn: "",
 });
+
+const downloadReport = async () => {
+  try {
+    const payload = paginatedDataExport.value
+    const response = await axios.post('http://localhost:3000/downloadProduct', payload, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      responseType: 'blob'
+    });
+    
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(response.data);
+    link.download = 'report.xlsx';
+    link.click();
+  } catch (error) {
+    console.error('Error exporting report:', error);
+  }
+};
 
 const fetchData = async () => {
   try {
@@ -203,6 +166,34 @@ const paginatedData = computed(() => {
   });
 
   return filteredData.slice(start, start + itemsPerPage);
+});
+
+const paginatedDataExport = computed(() => {
+  const filteredData = data.value.filter(item => {
+    const itemReceiveDate = new Date(item.receive_date);
+    const fromDate = filterData.value.receive_date_from ? new Date(filterData.value.receive_date_from) : null;
+    const toDate = filterData.value.receive_date_to ? new Date(filterData.value.receive_date_to) : null;
+
+    const isInDateRange = (!fromDate || itemReceiveDate >= fromDate) && (!toDate || itemReceiveDate <= toDate);
+
+    return (
+      isInDateRange &&
+      (!filterData.value.name_supplier || (item.name_supplier && item.name_supplier.includes(filterData.value.name_supplier))) &&
+      (!filterData.value.bill_lading_number || (item.bill_lading_number && item.bill_lading_number.includes(filterData.value.bill_lading_number))) &&
+      (!filterData.value.bill_lading_number_date || (item.bill_lading_number_date && item.bill_lading_number_date.includes(filterData.value.bill_lading_number_date))) &&
+      (!filterData.value.invoice_number || (item.invoice_number && item.invoice_number.includes(filterData.value.invoice_number))) &&
+      (!filterData.value.invoice_number_date || (item.invoice_number_date && item.invoice_number_date.includes(filterData.value.invoice_number_date))) &&
+      (!filterData.value.item_code || (item.item_code && item.item_code.includes(filterData.value.item_code))) &&
+      (!filterData.value.product_name_supplier || (item.product_name_supplier && item.product_name_supplier.includes(filterData.value.product_name_supplier))) &&
+      (!filterData.value.product_code_office_design || (item.product_code_office_design && item.product_code_office_design.includes(filterData.value.product_code_office_design))) &&
+      (!filterData.value.product_name_office_design || (item.product_name_office_design && item.product_name_office_design.includes(filterData.value.product_name_office_design))) &&
+      (!filterData.value.product_category || (item.product_category && item.product_category.includes(filterData.value.product_category))) &&
+      (!filterData.value.model || (item.model && item.model.includes(filterData.value.model))) &&
+      (!filterData.value.sn || (item.sn && item.sn.includes(filterData.value.sn)))
+    );
+  });
+
+  return filteredData;
 });
 
 const goToFirstPage = () => {

@@ -1,6 +1,6 @@
 const XLSX = require('xlsx-js-style');
 
-function writeFileAndDownload(filename = 'data.xlsx', data) {
+function writeFileProductAndDownload(filename = 'data.xlsx', data) {
     const transformedData = data.map(item => ({
         id: item.id,
         'วันที่รับ': item.receive_date,
@@ -83,4 +83,4 @@ function writeFileAndDownload(filename = 'data.xlsx', data) {
     XLSX.writeFile(wb, filename);
 }
 
-module.exports = { writeFileAndDownload };
+module.exports = { writeFileProductAndDownload };
