@@ -1,7 +1,7 @@
 const XLSX = require('xlsx');
 
 function writeFileAndDownload(filename = 'data.xlsx', data) {
-    // Transform data to match the header
+
     const transformedData = data.map(item => ({
         id: item.id,
         'วันที่รับ': item.receive_date,
@@ -23,7 +23,7 @@ function writeFileAndDownload(filename = 'data.xlsx', data) {
         'S/N': item.serial_number
     }));
 
-    // Create worksheet
+
     const ws = XLSX.utils.json_to_sheet(transformedData, {
         header: [
             'id', 'วันที่รับ', 'ชื่อ supplier', 'เลขที่ใบส่งสินค้า', 'วันเลขที่ใบส่งสินค้า',
@@ -33,11 +33,35 @@ function writeFileAndDownload(filename = 'data.xlsx', data) {
         ]
     });
 
-    // Create workbook and append the sheet
+
+    const columnWidths = [
+        { wpx: 50 },
+        { wpx: 100 },
+        { wpx: 150 },
+        { wpx: 150 },
+        { wpx: 120 },
+        { wpx: 150 },
+        { wpx: 100 },
+        { wpx: 150 },
+        { wpx: 150 },
+        { wpx: 150 },
+        { wpx: 120 },
+        { wpx: 120 },
+        { wpx: 150 },
+        { wpx: 150 },
+        { wpx: 150 },
+        { wpx: 120 },
+        { wpx: 100 },
+        { wpx: 100 },
+    ];
+
+
+    ws['!cols'] = columnWidths;
+
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
 
-    // Write to file
+
     XLSX.writeFile(wb, filename);
 }
 
