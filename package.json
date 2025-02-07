@@ -11,6 +11,7 @@
     "@directus/sdk": "^18.0.1",
     "axios": "^1.7.9",
     "core-js": "^3.8.3",
+    "googleapis": "^144.0.0",
     "vue": "^3.2.13",
     "vue-router": "^4.5.0",
     "vue-signature-pad": "^3.0.2"
