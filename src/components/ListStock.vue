@@ -67,6 +67,7 @@
         <button @click="goToNextPage" :disabled="currentPage === totalPages">ถัดไป</button>
         <button @click="goToLastPage" :disabled="currentPage === totalPages">หน้าสุดท้าย</button>
       </div>
+      <button @click="downloadReport">Export</button>
     </main>
   </div>
 </template>
@@ -77,6 +78,31 @@ import { ref, computed } from "vue";
 import { readItems } from "@directus/sdk";
 import SidebarMenu from "@/components/SidebarMenu.vue";
 import { useRouter } from 'vue-router';
+import axios from 'axios';
+
+const downloadReport = async () => {
+  try {
+    const response = await axios({
+      method: 'get',
+      url: 'http://localhost:3000/download',
+      responseType: 'blob'
+    });
+
+    // Create a link element to simulate a download
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', 'data.xlsx'); // Set the filename for the download
+    document.body.appendChild(link);
+    link.click();
+
+    // Clean up after download
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+  } catch (error) {
+    console.error("Error downloading the file:", error);
+  }
+}
 
 const isFilterVisible = ref(true);
 const router = useRouter();
