@@ -4,22 +4,64 @@
     <main>
       <h1>คลังสินค้า</h1>
       <div v-show="isFilterVisible" class="input-container">
-        <input type="date" v-model="filterData.receive_date_from" placeholder="From Date">
-        <input type="date" v-model="filterData.receive_date_to" placeholder="To Date">
-        <input v-model="filterData.name_supplier" type="text" class="input-field" placeholder="ชื่อ supplier">
-        <input v-model="filterData.bill_lading_number" type="text" class="input-field" placeholder="เลขที่ใบส่งสินค้า">
-        <input v-model="filterData.bill_lading_number_date" type="text" class="input-field" placeholder="เลขที่ใบกำกับภาษี">
-        <input v-model="filterData.invoice_number" type="text" class="input-field" placeholder="เลขที่ใบเสร็จ">
-        <input v-model="filterData.invoice_number_date" type="text" class="input-field" placeholder="เลขที่ใบวางบิล">
-        <input v-model="filterData.item_code" type="text" class="input-field" placeholder="Item code">
-        <input v-model="filterData.product_name_supplier" type="text" class="input-field" placeholder="ชื่อสินค้า (Supplier)">
-        <input v-model="filterData.product_code_office_design" type="text" class="input-field" placeholder="รหัสสินค้า Office Design">
-        <input v-model="filterData.product_name_office_design" type="text" class="input-field" placeholder="ชื่อสินค้า Office Design">
-        <input v-model="filterData.product_category" type="text" class="input-field" placeholder="หมวดหมู่สินค้า">
-        <input v-model="filterData.model" type="text" class="input-field" placeholder="model">
-        <input v-model="filterData.sn" type="text" class="input-field" placeholder="S/N">
-        <button @click="downloadReport" style="border-radius: 16px;">Export</button>
+        <div class="form-row">
+          <label>ค้นหาด้วย วันที่รับ เริ่มต้น</label>
+          <input type="date" v-model="filterData.receive_date_from" placeholder="From Date">
+        </div>
+        <div class="form-row">
+          <label>ค้นหาด้วย วันที่รับ สิ้นสุด</label>
+          <input type="date" v-model="filterData.receive_date_to" placeholder="To Date">
+        </div>
+        <div class="form-row">
+          <label class="label-filter">ค้นหาด้วย ชื่อ supplier</label>
+          <input v-model="filterData.name_supplier" type="text" class="input-field" placeholder="ชื่อ supplier">
+        </div>
+        <div class="form-row">
+          <label class="label-filter">ค้นหาด้วย เลขที่ใบส่งสินค้า</label>
+          <input v-model="filterData.bill_lading_number" type="text" class="input-field" placeholder="เลขที่ใบส่งสินค้า">
+        </div>
+        <div class="form-row">
+          <label class="label-filter">ค้นหาด้วย เลขที่ใบกำกับภาษี</label>
+          <input v-model="filterData.bill_lading_number_date" type="text" class="input-field" placeholder="เลขที่ใบกำกับภาษี">
+        </div>
+        <div class="form-row">
+          <label class="label-filter">ค้นหาด้วย เลขที่ใบเสร็จ</label>
+          <input v-model="filterData.invoice_number" type="text" class="input-field" placeholder="เลขที่ใบเสร็จ">
+        </div>
+        <div class="form-row">
+          <label class="label-filter">ค้นหาด้วย เลขที่ใบวางบิล</label>
+          <input v-model="filterData.invoice_number_date" type="text" class="input-field" placeholder="เลขที่ใบวางบิล">
+        </div>
+        <div class="form-row">
+          <label class="label-filter">ค้นหาด้วย Item code</label>
+          <input v-model="filterData.item_code" type="text" class="input-field" placeholder="Item code">
+        </div>
+        <div class="form-row">
+          <label class="label-filter">ค้นหาด้วย ชื่อ supplier</label>
+          <input v-model="filterData.product_name_supplier" type="text" class="input-field" placeholder="ชื่อสินค้า (Supplier)">
+        </div>
+        <div class="form-row">
+          <label class="label-filter">ค้นหาด้วย รหัสสินค้า office design</label>
+          <input v-model="filterData.product_code_office_design" type="text" class="input-field" placeholder="รหัสสินค้า Office Design">
+        </div>
+        <div class="form-row">
+          <label class="label-filter">ค้นหาด้วย ชื่อสินค้า office design</label>
+          <input v-model="filterData.product_name_office_design" type="text" class="input-field" placeholder="ชื่อสินค้า Office Design">
+        </div>
+        <div class="form-row">
+          <label class="label-filter">ค้นหาด้วย รหัสสินค้า</label>
+          <input v-model="filterData.product_category" type="text" class="input-field" placeholder="หมวดหมู่สินค้า">
+        </div>
+        <div class="form-row">
+          <label class="label-filter">ค้นหาด้วยรุ่น</label>
+          <input v-model="filterData.model" type="text" class="input-field" placeholder="model">
+        </div>
+        <div class="form-row">
+          <label class="label-filter">ค้นหาด้วย S/N</label>
+          <input v-model="filterData.sn" type="text" class="input-field" placeholder="S/N">
+        </div>
       </div>
+      <button @click="downloadReport()" style="border-radius: 16px;">Export</button>
       <!-- <button @click="toggleFilterVisibility" class="toggle-btn">
         {{ isFilterVisible ? 'ซ่อน Filter' : 'แสดง Filter' }}
       </button> -->
@@ -47,16 +89,16 @@
               <td>{{ item.receive_date }}</td>
               <td>{{ item.name_supplier }}</td>
               <td>{{ item.bill_lading_number }}</td>
-              <td>{{ item.bill_lading_number_date }}</td>
               <td>{{ item.invoice_number }}</td>
-              <td>{{ item.invoice_number_date }}</td>
               <td>{{ item.receipt_number }}</td>
-              <td>{{ item.receipt_number_date }}</td>
               <td>{{ item.bill_number }}</td>
-              <td>{{ item.due_date }}</td>
               <td>{{ item.item_code }}</td>
               <td>{{ item.product_name_supplier }}</td>
               <td>{{ item.product_code_office_design }}</td>
+              <td>{{ item.product_name_office_design }}</td>
+              <td>{{ item.group_product }}</td>
+              <td>{{ item.model }}</td>
+              <td>{{ item.serial_number }}</td>
             </tr>
           </tbody>
         </table>
@@ -105,6 +147,7 @@ const filterData = ref({
 const downloadReport = async () => {
   try {
     const payload = paginatedDataExport.value
+    
     const response = await axios.post('http://localhost:3000/download', payload, {
       headers: {
         'Content-Type': 'application/json',
@@ -226,6 +269,11 @@ const toggleFilterVisibility = () => {
 </script>
 
 <style scoped>
+.form-row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
 .toggle-btn{
   margin: 16px;
   border-radius: 16px;
@@ -396,8 +444,8 @@ table tbody tr:hover {
 
 .input-field:focus {
   outline: none;
-  border-color: #4CAF50;
-  box-shadow: 0 0 8px rgba(76, 175, 80, 0.5);
+  border-color: #004080;
+  box-shadow: 0 0 8px rgba(0, 64, 128, 0.5);
 }
 
 input[type="date"] {
