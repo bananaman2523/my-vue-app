@@ -70,7 +70,7 @@
                 <td>{{ item.product_name_office_design }}</td>
                 <td>{{ item.model }}</td>
                 <td>{{ item.serial_number }}</td>
-                <td style="display: flex; justify-content: center; align-items: center; height: 100px;">
+                <td style="display: flex; justify-content: center; align-items: center;">
                   <select v-model="item.status">
                     <option>ระบุ</option>
                     <option style="color: white; background-color: greenyellow;">ผ่าน</option>
@@ -85,27 +85,30 @@
               </tr>
               <tr v-if="item.status === 'ชำรุด'">
                 <td>
-                  <select>
-                    <option>รหัสสินค้า</option>
-                  </select>
+                  <input type="text" v-model="selectedItem.product_code_office_design" disabled/>
                 </td>
                 <td>
-                  <select>
-                    <option>อุปกรณ์</option>
-                  </select>
+                  <input type="text" v-model="selectedItem.product_name_office_design" disabled/>
                 </td>
                 <td>
-                  <select>
-                    <option>รุ่น/แบรนด์</option>
-                  </select>
+                  <input type="text" v-model="selectedItem.model" disabled />
                 </td>
                 <td>
-                  <select>
-                    <option>S/N</option>
+                  <select v-model="selectedSerialNumber" @change="updateSelectedItem">
+                    <option value="">S/N</option>
+                    <option v-for="serial in serialNumbers" :key="serial.id" :value="serial.serial_number">
+                      {{ serial.serial_number }}
+                    </option>
                   </select>
                 </td>
                 <td>
                   <button>สับเปลี่ยน</button>
+                </td>
+              </tr>
+              <tr v-if="item.status === 'ชำรุด'">
+                <td colspan="5" style="text-align: left;">
+                  <label>เหตุผล</label>
+                  <input type="text" style="padding-right: 100vh;display: flex;"/>
                 </td>
               </tr>
             </template>
@@ -113,7 +116,10 @@
         </table>
       </div>
       <div class="form-actions">
-        <button type="button" @click="submitForm">Export</button>
+        <label style="padding-right: 8px;">ผู้ตรวจสอบ</label>
+        <input v-model="user" type="text" disabled class="disable-form-user"/>
+        <button type="button" @click="submitForm()">บันทึก</button>
+        <!-- <button type="button" @click="submitForm">Export</button> -->
       </div>
     </main>
   </div>
@@ -122,29 +128,51 @@
 <script setup>
 import { ref } from 'vue';
 import { directus } from "@/services/directus";
-import { createItem, readItems , updateItems } from "@directus/sdk";
+import { createItem, readItems , updateItem } from "@directus/sdk";
 import SidebarMenu from "@/components/SidebarMenu.vue";
 import { useRoute , useRouter} from "vue-router";
 import axios from 'axios';
 
-const downloadReport = async () => {
-  console.log(paginatedData.value);
-  
+const getUser = JSON.parse(localStorage.getItem('user'))
+const user = `${getUser.first_name} ${getUser.last_name}`
+
+async function submitForm() {
   try {
-    const payload = paginatedData.value
-    const response = await axios.post('http://localhost:3000/downloadProduct', payload, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      responseType: 'blob'
-    });
-    
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(response.data);
-    link.download = 'report.xlsx';
-    link.click();
+    const packingID = route.params.id
+    const allPassed = formData.value.stock.every(item => item.status === 'ผ่าน');
+    if (allPassed) {
+      const updateStock = await directus.request(
+        updateItem('packing_sheet', packingID, {
+          status: 'ผ่าน',
+          checked_by: user
+        })
+      );
+      console.log('Update successful:', updateStock);
+    } else {
+      console.warn('Not all items are marked as "ผ่าน". Update skipped.');
+    }
   } catch (error) {
-    console.error('Error exporting report:', error);
+    console.error('Error updating stock:', error);
+  }
+}
+const selectedSerialNumber = ref("");
+const selectedItem = ref({
+  product_code_office_design: "",
+  product_name_office_design: "",
+  group_product: "",
+  model: "",
+});
+const updateSelectedItem = () => {
+  const found = serialNumbers.value.find((s) => s.serial_number === selectedSerialNumber.value);
+  if (found) {
+    selectedItem.value = { ...found };
+  } else {
+    selectedItem.value = {
+      product_code_office_design: "",
+      product_name_office_design: "",
+      group_product: "",
+      model: "",
+    };
   }
 };
 
@@ -152,7 +180,7 @@ const formatDate = (dateString) => {
   if (!dateString) return "";
   return dateString.split("T")[0];
 };
-
+const serialNumbers = ref([])
 const route = useRoute();
 const router = useRouter();
 const data = ref({
@@ -204,6 +232,35 @@ const fetchData = async () => {
       })
     );  
 
+    const stock = await directus.request(
+      readItems("stock", {
+        fields: [
+          "id",
+          "product_code_office_design",
+          "product_name_office_design",
+          "serial_number",
+          "group_product",
+          "model"
+        ],
+        filter:{
+          status:{
+            _eq:null
+          }
+        }
+      })
+    );  
+
+    serialNumbers.value = stock.map(item => ({
+      id: item.id,
+      serial_number: item.serial_number,
+      product_code_office_design: item.product_code_office_design,
+      product_name_office_design: item.product_name_office_design,
+      group_product: item.group_product,
+      model: item.model
+    }));
+    console.log(serialNumbers.value);
+    
+
     if (packing_sheet.length > 0) {
       const data = packing_sheet[0];
       
@@ -221,9 +278,6 @@ const fetchData = async () => {
         status: data.status || "",
         stock: data.stock || []
       };
-      console.log(formData.value);
-      
-      console.log("Fetched data:", data);
     }
       
 
@@ -237,6 +291,27 @@ const getBranches = (companyName) =>
   [];
 
 fetchData();
+
+// const downloadReport = async () => {
+//   console.log(paginatedData.value);
+  
+//   try {
+//     const payload = paginatedData.value
+//     const response = await axios.post('http://localhost:3000/downloadProduct', payload, {
+//       headers: {
+//         'Content-Type': 'application/json',
+//       },
+//       responseType: 'blob'
+//     });
+    
+//     const link = document.createElement('a');
+//     link.href = URL.createObjectURL(response.data);
+//     link.download = 'report.xlsx';
+//     link.click();
+//   } catch (error) {
+//     console.error('Error exporting report:', error);
+//   }
+// };
 </script>
 
 <style scoped>
@@ -250,7 +325,7 @@ fetchData();
 .stock-table td {
   padding: 10px;
   border: 1px solid #ddd;
-  text-align: left;
+  text-align: center;
 }
 
 .stock-table th {
@@ -267,6 +342,11 @@ fetchData();
 }
 
 .disable-form{
+  background-color: #D9D9D9;
+}
+
+.disable-form-user{
+  margin-right: 8px;
   background-color: #D9D9D9;
 }
 
