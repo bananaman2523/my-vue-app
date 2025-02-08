@@ -60,8 +60,10 @@
           <label class="label-filter">ค้นหาด้วย S/N</label>
           <input v-model="filterData.sn" type="text" class="input-field" placeholder="S/N">
         </div>
+        <div style="text-align: right; padding: 25px;">
+          <button @click="downloadReport()" style="border-radius: 16px;padding: 10px 20px; min-width: 120px; height: 40px;">Export</button>
+        </div>    
       </div>
-      <button @click="downloadReport()" style="border-radius: 16px;">Export</button>
       <!-- <button @click="toggleFilterVisibility" class="toggle-btn">
         {{ isFilterVisible ? 'ซ่อน Filter' : 'แสดง Filter' }}
       </button> -->
