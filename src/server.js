@@ -4,7 +4,7 @@ const app = express();
 const port = 3000;
 const { addRows } = require('./services/node.js');
 const { writeFileAndDownload } = require('./services/writeFile.js');
-// const { writeFileProductAndDownload } = require('./services/writeFileProduct.js');
+const { writeExcel } = require('./services/writeFileProduct.js');
 
 app.use(express.json());
 app.post('/api/addRows', (req, res) => {
@@ -34,15 +34,19 @@ app.post('/download', (req, res) => {
 
 app.post('/downloadProduct', (req, res) => {
     const data = req.body;
-    const filename = 'report.xlsx';
+    const filename = 'output_with_image.xlsx';
 
-    writeFileProductAndDownload(filename, data);
-
-    res.download(filename, filename, (err) => {
-        if (err) {
-            console.error('Error sending file:', err);
-            res.status(500).send('Error generating report');
-        }
+    writeExcel(filename, data).then(() => {
+        // Send the file back as a response
+        res.download(filename, (err) => {
+            if (err) {
+                console.error("Error sending file:", err);
+                res.status(500).send("Error downloading the report");
+            }
+        });
+    }).catch((err) => {
+        console.error("Error generating report:", err);
+        res.status(500).send('Error generating report');
     });
 });
 

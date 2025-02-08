@@ -13,7 +13,7 @@ import productOrderPage from "@/components/productOrder.vue";
 import stickerOrderPage from "@/components/stickerOrder.vue";
 import receiptDetailsPage from "@/components/receiptDetails.vue";
 import documentPreparationDetailPage from "@/components/documentPreparationDetail.vue";
-
+import testPage from "@/components/test.vue";
 const routes = [
   {
     path: "/addReceipt",
@@ -88,6 +88,10 @@ const routes = [
     path: "/documentPreparationDetail/:id",
     name: "documentPreparationDetail",
     component: documentPreparationDetailPage
+  },
+  {
+    path: "/test/:id",
+    component: testPage
   }
 ];
 

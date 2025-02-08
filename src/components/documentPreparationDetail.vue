@@ -71,7 +71,7 @@
                 <td>{{ item.model }}</td>
                 <td>{{ item.serial_number }}</td>
                 <td style="display: flex; justify-content: center; align-items: center;">
-                  <select v-model="item.status">
+                  <select v-model="item.status" :disabled="formData.status === 'ผ่าน'">
                     <option>ระบุ</option>
                     <option style="color: white; background-color: greenyellow;">ผ่าน</option>
                     <option style="color: white; background-color: red;">ชำรุด</option>
@@ -108,7 +108,7 @@
               <tr v-if="item.status === 'ชำรุด'">
                 <td colspan="5" style="text-align: left;">
                   <label>เหตุผล</label>
-                  <input type="text" style="padding-right: 100vh;display: flex;"/>
+                  <input type="text" style="display: flex;"/>
                 </td>
               </tr>
             </template>
@@ -118,8 +118,8 @@
       <div class="form-actions">
         <label style="padding-right: 8px;">ผู้ตรวจสอบ</label>
         <input v-model="user" type="text" disabled class="disable-form-user"/>
-        <button type="button" @click="submitForm()">บันทึก</button>
-        <!-- <button type="button" @click="submitForm">Export</button> -->
+        <button v-if="formData.status !== 'ผ่าน'" type="button" @click="submitForm()">บันทึก</button>
+        <button v-if="formData.status === 'ผ่าน'" style="margin-left: 16px;" type="button" @click="downloadReport">Export</button>
       </div>
     </main>
   </div>
@@ -128,7 +128,7 @@
 <script setup>
 import { ref } from 'vue';
 import { directus } from "@/services/directus";
-import { createItem, readItems , updateItem } from "@directus/sdk";
+import { updateItems , readItems , updateItem } from "@directus/sdk";
 import SidebarMenu from "@/components/SidebarMenu.vue";
 import { useRoute , useRouter} from "vue-router";
 import axios from 'axios';
@@ -141,13 +141,20 @@ async function submitForm() {
     const packingID = route.params.id
     const allPassed = formData.value.stock.every(item => item.status === 'ผ่าน');
     if (allPassed) {
-      const updateStock = await directus.request(
+      const updatePacking = await directus.request(
         updateItem('packing_sheet', packingID, {
           status: 'ผ่าน',
           checked_by: user
         })
       );
-      console.log('Update successful:', updateStock);
+      const ids = formData.value.stock.map(item => item.id);      
+      const updateStock = await directus.request(
+        updateItems('stock', ids, {
+          status: 'ผ่าน',
+      })
+      )
+      window.scrollTo(0, 0);
+      window.location.reload();
     } else {
       console.warn('Not all items are marked as "ผ่าน". Update skipped.');
     }
@@ -258,7 +265,6 @@ const fetchData = async () => {
       group_product: item.group_product,
       model: item.model
     }));
-    console.log(serialNumbers.value);
     
 
     if (packing_sheet.length > 0) {
@@ -292,26 +298,39 @@ const getBranches = (companyName) =>
 
 fetchData();
 
-// const downloadReport = async () => {
-//   console.log(paginatedData.value);
-  
-//   try {
-//     const payload = paginatedData.value
-//     const response = await axios.post('http://localhost:3000/downloadProduct', payload, {
-//       headers: {
-//         'Content-Type': 'application/json',
-//       },
-//       responseType: 'blob'
-//     });
+const downloadReport = async () => {
+  try {
+    const packing_sheet = await directus.request(
+      readItems("packing_sheet", {
+        fields: [
+          "*.*",
+        ],
+        filter:{
+          id:{
+            _eq: route.params.id
+          }
+        }
+      })
+    );
     
-//     const link = document.createElement('a');
-//     link.href = URL.createObjectURL(response.data);
-//     link.download = 'report.xlsx';
-//     link.click();
-//   } catch (error) {
-//     console.error('Error exporting report:', error);
-//   }
-// };
+    const payload = packing_sheet[0]
+    console.log(payload);
+
+    const response = await axios.post('http://localhost:3000/downloadProduct', payload, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      responseType: 'blob'
+    });
+    
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(response.data);
+    link.download = 'report.xlsx';
+    link.click();
+  } catch (error) {
+    console.error('Error exporting report:', error);
+  }
+};
 </script>
 
 <style scoped>
