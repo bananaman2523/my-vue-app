@@ -23,6 +23,7 @@
         <table>
           <thead>
             <tr>
+              <th>เลขที่ใบจัดสินค้า</th>
               <th>ชื่อลูกค้า</th>
               <th>ชื่อบริษัท</th>
               <th>สาขา</th>
@@ -38,6 +39,7 @@
           </thead>
           <tbody>
             <tr v-for="(item, index) in paginatedData" :key="index" :id="item.id" @click="navigate('documentPreparationDetail',item.id)">
+              <td>{{ item.document_preparation_number }}</td>
               <td>{{ item.customer_name }}</td>
               <td>{{ item.company_name }}</td>
               <td>{{ item.branch_name }}</td>

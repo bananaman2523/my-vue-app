@@ -105,7 +105,6 @@
               <td>{{ item.model }}</td>
               <td>{{ item.serial_number }}</td>
               <td>{{ item.status}}</td>
-              <td>{{ item.stock_id?.document_preparation_number || '-' }}</td>
               <td></td>
             </tr>
           </tbody>

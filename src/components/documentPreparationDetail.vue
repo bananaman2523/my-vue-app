@@ -46,6 +46,10 @@
             <input v-model="formData.plan_delivery_date" type="date" disabled class="disable-form"/>
           </div>
           <div class="form-row">
+            <label>เลขใบจัดของ</label>
+            <input v-model="formData.document_preparation_number" type="text" disabled class="disable-form"/>
+          </div>
+          <div class="form-row">
             <label>จัดเตรียมโดย</label>
             <input v-model="formData.prepared_by" type="text" disabled class="disable-form"/>
           </div>
@@ -102,15 +106,15 @@
                   </select>
                 </td>
                 <td>
-                  <button>สับเปลี่ยน</button>
+                  <button @click="switchEquipment(selectedSerialNumber, item)">สับเปลี่ยน</button>
                 </td>
               </tr>
-              <tr v-if="item.status === 'ชำรุด'">
+              <!-- <tr v-if="item.status === 'ชำรุด'">
                 <td colspan="5" style="text-align: left;">
                   <label>เหตุผล</label>
                   <input type="text" style="display: flex;"/>
                 </td>
-              </tr>
+              </tr> -->
             </template>
           </tbody>
         </table>
@@ -189,11 +193,6 @@ const formatDate = (dateString) => {
 };
 const serialNumbers = ref([])
 const route = useRoute();
-const router = useRouter();
-const data = ref({
-  companies: [],
-  equipments: [],
-});
 
 const form = ref({
   customerName: '',
@@ -221,8 +220,48 @@ const formData = ref({
   company_name: "",
   prepared_by: "",
   status: "",
+  document_preparation_number: "",
   stock: [],
 });
+
+async function switchEquipment(selectedSerialNumber, item) {
+  try {
+    const packingID = route.params.id;
+
+    await directus.request(
+      updateItem('stock', item.id, { status: 'ชำรุด' })
+    );
+
+    const [newStockItem] = await directus.request(
+      readItems("stock", {
+        fields: ["*"],
+        filter: {
+          serial_number: { _eq: selectedSerialNumber }
+        }
+      })
+    );  
+
+    if (!newStockItem) {
+      throw new Error("Stock item not found with the given serial number.");
+    }
+
+    console.log("New stock ID:", newStockItem.id);
+
+    const updatePackingStock = await directus.request(
+      updateItem('packing_sheet', packingID, { stock: [newStockItem.id] })
+    );
+
+    console.log("Packing sheet updated:", updatePackingStock);
+
+    await directus.request(
+      updateItem('stock', newStockItem.id, { status: 'รอตรวจสอบ' })
+    );
+
+    window.location.reload();
+  } catch (error) {
+    console.error("Error updating equipment:", error);
+  }
+}
 
 const fetchData = async () => {
   try {
@@ -282,6 +321,7 @@ const fetchData = async () => {
         company_name: data.company_name || "",
         prepared_by: data.prepared_by || "",
         status: data.status || "",
+        document_preparation_number: data.document_preparation_number || "",
         stock: data.stock || []
       };
     }
@@ -291,10 +331,6 @@ const fetchData = async () => {
     console.error("Error fetching activities:", error);
   }
 };
-
-const getBranches = (companyName) =>
-  data.value.companies.find((c) => c.companyName === companyName)?.branches ||
-  [];
 
 fetchData();
 
@@ -325,7 +361,7 @@ const downloadReport = async () => {
     
     const link = document.createElement('a');
     link.href = URL.createObjectURL(response.data);
-    link.download = 'report.xlsx';
+    link.download = 'ใบจัดเตรียมสินค้า.xlsx';
     link.click();
   } catch (error) {
     console.error('Error exporting report:', error);

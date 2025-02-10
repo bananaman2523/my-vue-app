@@ -12,7 +12,7 @@ function formatDate(dateString) {
 }
 
 async function writeExcel(filename, data) {
-    
+
     // Create a new workbook and worksheet
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet("Sheet1");
@@ -109,7 +109,7 @@ async function writeExcel(filename, data) {
     ];
 
     worksheet.mergeCells("A13:Q13");
-    
+
     // Table fields
     worksheet.getCell("A14").value = "ลำดับที่";
     worksheet.getCell("A14").border = borderStyle;
@@ -193,7 +193,7 @@ async function writeExcel(filename, data) {
     }
 
     // input data
-    
+
 
     worksheet.getCell("C11").value = data.company_name;
     worksheet.getCell("I11").value = data.branch_code;
@@ -205,10 +205,11 @@ async function writeExcel(filename, data) {
     worksheet.getCell("F12").value = data.quotation_number_office_design;
     const prepared_by = data.prepared_by
     const checked_by = data.checked_by
+    worksheet.getCell("P40").value = "................................";
+    worksheet.getCell("Q40").value = "................................";
+    worksheet.getCell("P41").value = prepared_by;
+    worksheet.getCell("Q41").value = checked_by;
 
-    worksheet.getCell("P40").value = prepared_by;
-    worksheet.getCell("Q40").value = checked_by;
-    
     worksheet.getCell("P43").value = formatDate(data.plan_delivery_date);
     worksheet.getCell("P43").font = { bold: false, size: 12 };
     worksheet.getCell("P43").alignment = { horizontal: "center", vertical: "middle" };
@@ -217,7 +218,7 @@ async function writeExcel(filename, data) {
     worksheet.getCell("Q43").alignment = { horizontal: "center", vertical: "middle" };
     data.stock.forEach((stock, index) => {
         const row = 15 + index;
-    
+
         worksheet.getCell(`A${row}`).value = (index + 1);;
         worksheet.getCell(`B${row}`).value = stock.name_supplier;
         worksheet.getCell(`D${row}`).value = stock.product_name_office_design;

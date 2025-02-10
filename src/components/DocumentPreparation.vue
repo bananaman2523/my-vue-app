@@ -228,10 +228,46 @@ const getBranches = (companyName) =>
   [];
 
 fetchData();
+
+async function generatePreparationNumber() {
+  const prefix = "OFD-";
+  const date = new Date();
+
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+
+  const formattedDate = `${year}${month}${day}`;
+  let docNumber = "";
+
+  try {
+    const packing_sheet = await directus.request(
+      readItems("packing_sheet", {
+        fields: ['*'],
+        filter: {
+          document_preparation_number: {
+            _contains: `${prefix}${formattedDate}`,
+          },
+        },
+      })
+    );
+
+    const sequence = String(packing_sheet.length + 1).padStart(2, '0');
+    docNumber = `${prefix}${formattedDate}${sequence}`;
+  } catch (error) {
+    console.error("Error generating preparation number:", error);
+  }
+
+  return docNumber;
+}
+
+
 const addStock = async () => {
+  const docNumber = await generatePreparationNumber()
   try {
     const create = await directus.request(
       createItem('packing_sheet', {
+        document_preparation_number: docNumber,
         customer_name: form.value.customerName,
         company_name: form.value.companyName,
         branch_name: form.value.branchName,
