@@ -104,7 +104,7 @@
               <td>{{ item.model }}</td>
               <td>{{ item.serial_number }}</td>
               <td>{{ item.status}}</td>
-              <td></td>
+              <td>{{ item.broken_category }}</td>
             </tr>
           </tbody>
         </table>
@@ -175,6 +175,11 @@ const fetchData = async () => {
     const response = await directus.request(
       readItems("stock", {
         fields: ["*.*"],
+        filter: {
+          status:{
+            _eq: 'ชำรุด'
+          }
+        }
       })
     );
     data.value = response;

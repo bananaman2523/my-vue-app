@@ -109,12 +109,20 @@
                   <button @click="switchEquipment(selectedSerialNumber, item)">สับเปลี่ยน</button>
                 </td>
               </tr>
-              <!-- <tr v-if="item.status === 'ชำรุด'">
-                <td colspan="5" style="text-align: left;">
-                  <label>เหตุผล</label>
-                  <input type="text" style="display: flex;"/>
+              <tr v-if="item.status === 'ชำรุด'">
+                <td style="text-align: left;">
+                  <label>ประเภทชำรุด</label>
+                  <select v-model="brokenCategory" style="display: flex;">
+                    <option value="">เลือกประเภทชำรุด</option>
+                    <option value="hardware">hardware</option>
+                    <option value="software">software</option>
+                  </select>
                 </td>
-              </tr> -->
+                <td colspan="4" style="text-align: left;">
+                  <label>เหตุผล</label>
+                  <input v-model="brokenDescription" type="text" style="display: flex;width: 85%;" />
+                </td>
+              </tr>
             </template>
           </tbody>
         </table>
@@ -170,6 +178,9 @@ async function submitForm() {
   }
 }
 const selectedSerialNumber = ref("");
+const brokenCategory = ref("");
+const brokenDescription = ref("");
+
 const selectedItem = ref({
   product_code_office_design: "",
   product_name_office_design: "",
@@ -230,9 +241,13 @@ const formData = ref({
 async function switchEquipment(selectedSerialNumber, item) {
   try {
     const packingID = route.params.id;
-
+    
     await directus.request(
-      updateItem('stock', item.id, { status: 'ชำรุด' })
+      updateItem('stock', item.id, { 
+        status: 'ชำรุด',
+        description: brokenDescription.value,
+        broken_category: brokenCategory.value,
+      })
     );
 
     const [newStockItem] = await directus.request(
