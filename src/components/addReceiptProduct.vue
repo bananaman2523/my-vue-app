@@ -12,9 +12,6 @@
               <label>ชื่อสินค้า Office Design <label style="color: red;">*</label></label>
               <input type="text" v-model="form.productName" required/>
             </div>
-            <div style="display: flex;justify-content: end;">
-              <button type="button" @click="removeForm(index)" class="delete-button">X</button>
-            </div>
             <div class="form-row">
               <label>หมวดหมู่สินค้า <label style="color: red;">*</label></label>
               <select v-model="form.selectedCategory">
@@ -34,11 +31,17 @@
               </select>
             </div>
             <div class="form-row">
-              <label>S/N <label style="color: red;">*</label></label>
-              <input type="text" v-model="form.serialNumber" />
+              <label>จำนวนสินค้า <label style="color: red;">*</label></label>
+              <input type="number" v-model.number="form.quantity" min="1" @change="generateSerialNumbers(index)" />
+            </div>
+            <div class="form-row" v-for="(sn, snIndex) in form.serialNumbers" :key="snIndex">
+              <label>S/N {{ snIndex + 1 }} <label style="color: red;">*</label></label>
+              <input type="text" v-model="form.serialNumbers[snIndex]" />
+            </div>
+            <div style="display: flex; justify-content: end;">
+              <button type="button" @click="removeForm(index)" class="delete-button">X</button>
             </div>
           </div>
-          
         </form>
       </div>
       <button @click="addForm" class="add-button">+ Add New</button>
@@ -47,59 +50,39 @@
 </template>
 
 <script setup>
-import { ref, computed , watch} from 'vue';
+import { ref, watch } from 'vue';
 import { directus } from "@/services/directus";
-import { createItem, readItems } from "@directus/sdk";
+import { readItems } from "@directus/sdk";
 
 const emit = defineEmits(['update:products']);
-const data = ref({
-  product: [],
-});
+const data = ref({ product: [] });
 
 const forms = ref([
-  { productCode: '', productName: '', selectedCategory: '', selectedModel: '', serialNumber: '' }
+  { productCode: '', productName: '', selectedCategory: '', selectedModel: '', quantity: 1, serialNumbers: [] }
 ]);
 
 const models = (category) => {
   const productGroup = category ? data.value.product.find(item => item.productGroup === category) : null;
-  return category ? productGroup.productCodes : [];
+  return category ? productGroup?.productCodes || [] : [];
 };
 
 const addForm = () => {
-  forms.value.push({ productCode: '', productName: '', selectedCategory: '', selectedModel: '', serialNumber: '' });
-};
-
-const resetForm = () => {
-  forms.value = [{ productCode: '', productName: '', selectedCategory: '', selectedModel: '', serialNumber: '' }];
+  forms.value.push({ productCode: '', productName: '', selectedCategory: '', selectedModel: '', quantity: 1, serialNumbers: [] });
 };
 
 const removeForm = (index) => {
   forms.value.splice(index, 1);
 };
 
+const generateSerialNumbers = (index) => {
+  const form = forms.value[index];
+  const newQuantity = form.quantity || 1;
+  form.serialNumbers = Array.from({ length: newQuantity }, () => '');
+};
+
 watch(forms, (newForms) => {
   emit('update:products', newForms);
 }, { deep: true });
-
-function simplifyInput(input) {
-  const result = {
-    product: [],
-  };
-
-  input.forEach(item => {
-    if (item.product) {
-      item.product.forEach(productItem => {
-        const productCodes = productItem.product_list.map(product => product.product_list_id.product_code);
-        result.product.push({
-          productGroup: productItem.product_group,
-          productCodes: productCodes
-        });
-      });
-    }
-  });
-
-  return result;
-}
 
 const fetchData = async () => {
   try {
@@ -111,10 +94,12 @@ const fetchData = async () => {
         ],
       })
     );
-    Object.assign(data.value, simplifyInput(response));
-
+    data.value.product = response.map(item => ({
+      productGroup: item.product_group,
+      productCodes: item.product_list.map(p => p.product_list_id.product_code)
+    }));
   } catch (error) {
-    console.error("Error fetching activities:", error);
+    console.error("Error fetching data:", error);
   }
 };
 
@@ -183,6 +168,12 @@ form {
 }
 
 .form-row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-row.add{
   display: flex;
   flex-direction: column;
   gap: 8px;
