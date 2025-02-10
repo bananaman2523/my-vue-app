@@ -13,7 +13,10 @@
             <label>ชื่อ supplier <label style="color: red;">*</label></label>
             <input type="text" v-model="formData.supplierName" required/>
           </div>
-          <br>
+          <div class="form-row">
+            <label>เลข PO <label style="color: red;">*</label></label>
+            <input type="text" v-model="formData.poNumber" required/>
+          </div>
           <div class="form-row">
             <label>เลขที่ใบส่งสินค้า</label>
             <input type="text" v-model="formData.deliveryNoteNumber" />
@@ -140,6 +143,7 @@ const addStock = async () => {
           serial_number: receiptProducts.value[index].serialNumber || null,
           group_product: receiptProducts.value[index].selectedCategory || null,
           model: receiptProducts.value[index].selectedModel || null,
+          po_number: formData.value.poNumber || null,
         })
       );
       const format = formatObjectDates(result)
@@ -169,6 +173,7 @@ const formData = ref({
   dueDate: "",
   itemCode: "",
   supplierProductName: "",
+  poNumber: "",
 });
 
 const receiptProducts = ref([]);
@@ -180,7 +185,8 @@ const submitForm = () => {
     !formData.value.taxInvoiceNumber ||
     !formData.value.invoiceDate ||
     !formData.value.itemCode ||
-    !formData.value.supplierProductName
+    !formData.value.supplierProductName ||
+    !formData.value.poNumber
   ) {
     alert("กรุณากรอกข้อมูลให้ครบทุกช่อง!");
     return;

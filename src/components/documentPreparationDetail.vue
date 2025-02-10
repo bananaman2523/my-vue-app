@@ -125,6 +125,9 @@
         <button v-if="formData.status !== 'ผ่าน'" type="button" @click="submitForm()">บันทึก</button>
         <button v-if="formData.status === 'ผ่าน'" style="margin-left: 16px;" type="button" @click="downloadReport">Export</button>
       </div>
+      <div class="form-delete">
+        <button type="button" @click="deleteForm">ลบ</button>
+      </div>
     </main>
   </div>
 </template>
@@ -370,6 +373,15 @@ const downloadReport = async () => {
 </script>
 
 <style scoped>
+.form-delete {
+  grid-column: span 3;
+  text-align: right;
+  margin: 20px;
+}
+.form-delete button {
+  background-color: red;
+}
+
 .stock-table {
   width: 100%;
   border-collapse: collapse;

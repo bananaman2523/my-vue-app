@@ -7,13 +7,14 @@ import addProductRequestPage from "@/components/addProductRequest.vue";
 import receiptProductPage from "@/components/receiptProduct.vue";
 import ListStockPage from "@/components/ListStock.vue";
 import listPreparationPage from "@/components/listPreparation.vue";
-import DocumentPreparationPage from "@/components/DocumentPreparation.vue";
+import DocumentPreparationPage from "@/components/documentPreparation.vue";
 import LoginPage from "@/components/Login.vue";
 import productOrderPage from "@/components/productOrder.vue";
 import stickerOrderPage from "@/components/stickerOrder.vue";
 import receiptDetailsPage from "@/components/receiptDetails.vue";
-import documentPreparationDetailPage from "@/components/documentPreparationDetail.vue";
-import testPage from "@/components/test.vue";
+import DocumentPreparationDetailPage from "@/components/DocumentPreparationDetail.vue";
+import ListStockDefectivePage from "@/components/ListStockDefective.vue";
+
 const routes = [
   {
     path: "/addReceipt",
@@ -87,11 +88,12 @@ const routes = [
   {
     path: "/documentPreparationDetail/:id",
     name: "documentPreparationDetail",
-    component: documentPreparationDetailPage
+    component: DocumentPreparationDetailPage
   },
   {
-    path: "/test/:id",
-    component: testPage
+    path: "/listStockDefective",
+    name: "listStockDefective",
+    component: ListStockDefectivePage
   }
 ];
 
