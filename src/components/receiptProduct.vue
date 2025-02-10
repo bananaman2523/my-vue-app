@@ -75,7 +75,7 @@
 <script setup>
 import { ref } from "vue";
 import { directus } from "@/services/directus";
-import { createItem, readItems } from "@directus/sdk";
+import { createItems } from "@directus/sdk";
 import SidebarMenu from "@/components/SidebarMenu.vue";
 import addReceiptProduct from "./addReceiptProduct.vue";
 import axios from 'axios';
@@ -112,44 +112,47 @@ function formatDate(dateString) {
     return `${day}/${month}/${year}`;
 }
 
-function formatObjectDates(obj) {
-    Object.keys(obj).forEach(key => {
-        if (obj[key] && typeof obj[key] === 'string' && !isNaN(Date.parse(obj[key]))) {
-            obj[key] = formatDate(obj[key]);
-        }
-    });
-    return obj;
-}
+// function formatObjectDates(obj) {
+//     Object.keys(obj).forEach(key => {
+//         if (obj[key] && typeof obj[key] === 'string' && !isNaN(Date.parse(obj[key]))) {
+//             obj[key] = formatDate(obj[key]);
+//         }
+//     });
+//     return obj;
+// }
 
 const addStock = async () => {
-  try {
-    for (let index = 0; index < receiptProducts.value.length; index++) {
-      const result = await directus.request(
-        createItem('stock', {
-          receive_date: formData.value.receivedDate || null,
-          name_supplier: formData.value.supplierName || null,
-          bill_lading_number: formData.value.deliveryNoteNumber || null,
-          bill_lading_number_date: formData.value.deliveryNoteDate || null,
-          invoice_number: formData.value.taxInvoiceNumber || null,
-          invoice_number_date: formData.value.invoiceDate || null,
-          receipt_number: formData.value.receiptNumber || null,
-          receipt_number_date: formData.value.receiptDate || null,
-          bill_number: formData.value.billingNoteNumber || null,
-          due_date: formData.value.dueDate || null,
-          item_code: formData.value.itemCode || null,
-          product_name_supplier: formData.value.supplierProductName || null,
-          product_code_office_design: receiptProducts.value[index].productCode || null,
-          product_name_office_design: receiptProducts.value[index].productName || null,
-          serial_number: receiptProducts.value[index].serialNumber || null,
-          group_product: receiptProducts.value[index].selectedCategory || null,
-          model: receiptProducts.value[index].selectedModel || null,
-          po_number: formData.value.poNumber || null,
-        })
-      );
-      const format = formatObjectDates(result)
-      const payload = objectToArray(format);
-      await axios.post('http://localhost:3000/api/addRows', { rows: payload });
+  const stockItems = []
+  for (let i = 0; i < receiptProducts.value.length; i++) {
+    for (let j = 0; j < receiptProducts.value[i].serialNumbers.length; j++) {
+      const stockItem = {
+        receive_date: formData.value.receivedDate || null,
+        name_supplier: formData.value.supplierName || null,
+        bill_lading_number: formData.value.deliveryNoteNumber || null,
+        bill_lading_number_date: formData.value.deliveryNoteDate || null,
+        invoice_number: formData.value.taxInvoiceNumber || null,
+        invoice_number_date: formData.value.invoiceDate || null,
+        receipt_number: formData.value.receiptNumber || null,
+        receipt_number_date: formData.value.receiptDate || null,
+        bill_number: formData.value.billingNoteNumber || null,
+        due_date: formData.value.dueDate || null,
+        item_code: formData.value.itemCode || null,
+        product_name_supplier: formData.value.supplierProductName || null,
+        product_code_office_design: receiptProducts.value[i].productCode || null,
+        product_name_office_design: receiptProducts.value[i].productName || null,
+        serial_number: receiptProducts.value[i].serialNumbers[j] || null,
+        group_product: receiptProducts.value[i].selectedCategory || null,
+        model: receiptProducts.value[i].selectedModel || null,
+        po_number: formData.value.poNumber || null,
+      };
+      stockItems.push(stockItem);
     }
+    // const format = formatObjectDates(result)
+    // const payload = objectToArray(format);
+    // await axios.post('http://localhost:3000/api/addRows', { rows: payload });
+  }
+  try {
+    const result = await directus.request(createItems('stock', stockItems));
     alert("บันทึกข้อมูลสำเร็จ!");
     resetForm();
     window.scrollTo(0, 0);

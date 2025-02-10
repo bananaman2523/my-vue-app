@@ -12,6 +12,9 @@
               <label>ชื่อสินค้า Office Design <label style="color: red;">*</label></label>
               <input type="text" v-model="form.productName" required/>
             </div>
+            <div style="display: flex; justify-content: end;">
+              <button type="button" @click="removeForm(index)" class="delete-button">X</button>
+            </div>
             <div class="form-row">
               <label>หมวดหมู่สินค้า <label style="color: red;">*</label></label>
               <select v-model="form.selectedCategory">
@@ -32,14 +35,14 @@
             </div>
             <div class="form-row">
               <label>จำนวนสินค้า <label style="color: red;">*</label></label>
-              <input type="number" v-model.number="form.quantity" min="1" @change="generateSerialNumbers(index)" />
+              <div>
+                <input type="number" v-model.number="form.quantity" min="1" />
+                <button @click="generateSerialNumbers(index)" style="margin-left: 12px;height: 36px;width: 56px;">เพิ่ม</button>  
+              </div>
             </div>
             <div class="form-row" v-for="(sn, snIndex) in form.serialNumbers" :key="snIndex">
               <label>S/N {{ snIndex + 1 }} <label style="color: red;">*</label></label>
               <input type="text" v-model="form.serialNumbers[snIndex]" />
-            </div>
-            <div style="display: flex; justify-content: end;">
-              <button type="button" @click="removeForm(index)" class="delete-button">X</button>
             </div>
           </div>
         </form>
@@ -94,7 +97,7 @@ const fetchData = async () => {
         ],
       })
     );
-    data.value.product = response.map(item => ({
+    data.value.product = response[0].product.map(item => ({
       productGroup: item.product_group,
       productCodes: item.product_list.map(p => p.product_list_id.product_code)
     }));
