@@ -77,12 +77,7 @@
           </div>
           <div class="form-row">
             <label>Serial Number</label>  
-            <select v-model="formItem.serialNumber" @change="updateSerialId(formItem)">
-              <option value="">Select serial number</option>
-              <option v-for="serial in availableSerialNumbers(index)" :key="serial.id" :value="serial.serial_number">
-                {{ serial.serial_number }}
-              </option>
-            </select>
+            <input v-model="formItem.serialNumber" @change="cheakSerialNumberInStock(formItem.serialNumber, formItem)">
           </div>
         </form>
       </div>
@@ -90,6 +85,8 @@
       <div class="form-actions">
         <button type="button" @click="submitForm">บันทึก</button>
       </div>
+      <WarningPopup ref="warningPopup"/>
+
     </main>
   </div>
 </template>
@@ -99,6 +96,8 @@ import { ref } from 'vue';
 import { directus } from "@/services/directus";
 import { createItem, readItems , updateItems } from "@directus/sdk";
 import SidebarMenu from "@/components/SidebarMenu.vue";
+import WarningPopup from "@/components/WarningPopup.vue";
+const warningPopup = ref(null);
 
 const getUser = JSON.parse(localStorage.getItem('user'))
 const user = `${getUser.first_name} ${getUser.last_name}`
@@ -160,7 +159,50 @@ const availableSerialNumbers = (index) => {
   });
 };
 
+async function cheakSerialNumberInStock(serialNumber, formItem) {
+  try {
+    if (serialNumber) {
+      const isDuplicateInForm = form.value.items.some(
+        (item) => item !== formItem && item.serialNumber === serialNumber
+      );
+
+      if (isDuplicateInForm) {
+        warningPopup.value.showWarningDuplicate();
+        formItem.serialNumber = "";
+        return;
+      }
+
+      const checks = (await directus.request(
+        readItems("stock", {
+          filter: {
+            serial_number: {
+              _eq: serialNumber,
+            }
+          },
+        })
+      )) || [];
+      const checksStatus = checks[0]
+      if (checksStatus.status === 'ชำรุด') {
+        warningPopup.value.showWarningBroken();
+        formItem.serialNumber = "";
+      } else if (checksStatus.stock_id !== null) {
+        warningPopup.value.showWarningAlreadyUse();
+        formItem.serialNumber = "";
+      }
+      
+      if (Array.isArray(checks) && checks.length == 0) {
+        warningPopup.value.showWarning();
+        formItem.serialNumber = "";
+      }
+    }
+    
+  } catch (error) {
+    console.error("Error generating preparation number:", error);
+  }
+  
+}
 const updateSerialId = (formItem) => {
+  
   const selectedSerial = serialNumbers.value.find(
     (serial) => serial.serial_number === formItem.serialNumber
   );

@@ -245,7 +245,7 @@ async function switchEquipment(selectedSerialNumber, item) {
     await directus.request(
       updateItem('stock', item.id, { 
         status: 'ชำรุด',
-        description: brokenDescription.value,
+        broken_description: brokenDescription.value,
         broken_category: brokenCategory.value,
       })
     );

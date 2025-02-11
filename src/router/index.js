@@ -7,7 +7,7 @@ import addProductRequestPage from "@/components/addProductRequest.vue";
 import receiptProductPage from "@/components/receiptProduct.vue";
 import ListStockPage from "@/components/ListStock.vue";
 import listPreparationPage from "@/components/listPreparation.vue";
-import DocumentPreparationPage from "@/components/DocumentPreparation.vue";
+import DocumentPreparationPage from "@/components/documentPreparation.vue";
 import LoginPage from "@/components/Login.vue";
 import productOrderPage from "@/components/productOrder.vue";
 import stickerOrderPage from "@/components/stickerOrder.vue";
