@@ -13,7 +13,10 @@
             <label>ชื่อ supplier <label style="color: red;">*</label></label>
             <input type="text" v-model="formData.supplierName" required :disabled="disabledField" class="disable-form"/>
           </div>
-          <br>
+          <div class="form-row">
+            <label>เลข PO <label style="color: red;">*</label></label>
+            <input type="text" v-model="formData.poNumber" :disabled="disabledField" class="disable-form"/>
+          </div>
           <div class="form-row">
             <label>เลขที่ใบส่งสินค้า</label>
             <input type="text" v-model="formData.deliveryNoteNumber" :disabled="disabledField" class="disable-form"/>
@@ -123,6 +126,7 @@ const formData = ref({
   dueDate: "",
   itemCode: "",
   supplierProductName: "",
+  poNumber: "",
 });
 
 const formatDate = (dateString) => {
@@ -162,7 +166,8 @@ const fetchData = async () => {
         productNameOfficeDesign: data.product_name_office_design || "",
         group_product: data.group_product || "",
         model: data.model || "",
-        serial_number: data.serial_number || ""
+        serial_number: data.serial_number || "",
+        poNumber: data.po_number || "",
       };
       disabledField.value = true;
       console.log("Fetched data:", data);
