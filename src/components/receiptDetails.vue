@@ -221,7 +221,6 @@ onMounted(() => {
 
 async function deleteForm() {
   const confirmDeleteResult = await warningPopup.value.confirmDelete();
-  console.log(confirmDeleteResult);
   
   if (!confirmDeleteResult.isConfirmed) return;
 
