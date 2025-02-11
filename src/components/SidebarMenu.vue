@@ -8,7 +8,7 @@
       <li @click="navigate('list')">แสดงรายการทั้งหมด</li> -->
       <li @click="navigate('receiptProduct')">เพิ่มสินค้านำเข้า</li>
       <li @click="navigate('listStock')">คลังสินค้า</li>
-      <li @click="navigate('listStockDefective')">คลังสินค่าชำรุด</li>
+      <li @click="navigate('listStockDefective')">อุปกรณ์ชำรุด</li>
       <li @click="navigate('DocumentPreparation')">เพิ่มรายการจัดของ</li>
       <li @click="navigate('listPreparationPage')">แสดงรายการจัดของ</li>
       <li @click="navigate('productOrder')">ใบส่งสินค้า</li>
