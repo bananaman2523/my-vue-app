@@ -51,5 +51,16 @@ const showWarningAlreadyUse = () => {
     });
 };
 
-defineExpose({ showWarningNoFullField , showWarning , showWarningDuplicate , showWarningBroken, showWarningAlreadyUse});
+const confirmDelete = () => {
+    return Swal.fire({
+        title: "ยืนยันการอัปเดต",
+        text: "คุณแน่ใจหรือไม่ว่าต้องการอัปเดตรายการนี้?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "ใช่, อัปเดตเลย!",
+        cancelButtonText: "ยกเลิก",
+    });
+};
+
+defineExpose({ showWarningNoFullField , showWarning , showWarningDuplicate , showWarningBroken, showWarningAlreadyUse , confirmDelete});
 </script>

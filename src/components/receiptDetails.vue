@@ -121,6 +121,9 @@
       </div>
     </main>
   </div>
+  <ApprovePopup ref="approvePopup"/>
+  <ErrorPopup ref="errorPopup" />
+  <WarningPopup ref="warningPopup"/>
 </template>
 
 <script setup>
@@ -129,6 +132,12 @@ import { directus } from "@/services/directus";
 import { readItems, deleteItem , updateItem } from "@directus/sdk";
 import SidebarMenu from "@/components/SidebarMenu.vue";
 import { useRoute , useRouter} from "vue-router";
+import ApprovePopup from "@/components/popup/ApprovePopup.vue";
+import ErrorPopup from "@/components/popup/ErrorPopup.vue";
+import WarningPopup from "@/components/popup/WarningPopup.vue";
+const warningPopup = ref(null);
+const approvePopup = ref(null);
+const errorPopup = ref(null);
 
 const route = useRoute();
 const router = useRouter();
@@ -226,16 +235,17 @@ async function deleteForm() {
 }
 
 async function updateForm() {
-  const confirmDelete = window.confirm("Are you sure you want to update this item?");
-  if (!confirmDelete) return;
+  const confirmDeleteResult = await warningPopup.value.confirmDelete();
 
+  if (!confirmDeleteResult) return;
+  
   try {
     const update = await directus.request(
       updateItem('stock', route.params.id, {
         device_status: formData.value.statusProduct,
       })
     );
-    alert("Item update successfully!");
+    approvePopup.value.showSuccessUpdate()
   } catch (error) {
     alert("Failed to update item: " + error.message);
   }

@@ -18,7 +18,16 @@ const showSuccess = () => {
         window.location.reload();
     });
 };
+const showSuccessUpdate = () => {
+    Swal.fire({
+        title: "อัปเดตข้อมูลสำเร็จ!",
+        icon: "success",
+        confirmButtonText: "OK",
+    }).then(() => {
+        window.scrollTo(0, 0);
+        window.location.reload();
+    });
+};
 
-
-defineExpose({ showSuccess });
+defineExpose({ showSuccess , showSuccessUpdate });
 </script>
