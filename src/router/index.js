@@ -82,7 +82,7 @@ const routes = [
   },
   {
     path: "/listPreparation",
-    name: "listPreparationPage",
+    name: "listPreparation",
     component: listPreparationPage,
   },
   {

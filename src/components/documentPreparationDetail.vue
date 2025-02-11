@@ -143,7 +143,7 @@
 <script setup>
 import { ref } from 'vue';
 import { directus } from "@/services/directus";
-import { updateItems , readItems , updateItem } from "@directus/sdk";
+import { updateItems , readItems , updateItem , deleteItem} from "@directus/sdk";
 import SidebarMenu from "@/components/SidebarMenu.vue";
 import { useRoute , useRouter} from "vue-router";
 import axios from 'axios';
@@ -207,7 +207,7 @@ const formatDate = (dateString) => {
 };
 const serialNumbers = ref([])
 const route = useRoute();
-
+const router = useRouter();
 const form = ref({
   customerName: '',
   companyName: '',
@@ -368,7 +368,6 @@ const downloadReport = async () => {
     );
     
     const payload = packing_sheet[0]
-    console.log(payload);
 
     const response = await axios.post('http://localhost:3000/downloadProduct', payload, {
       headers: {
@@ -385,6 +384,27 @@ const downloadReport = async () => {
     console.error('Error exporting report:', error);
   }
 };
+
+async function deleteForm() {
+  const confirmDelete = window.confirm("Are you sure you want to delete this item?");
+  if (!confirmDelete) return;
+
+  try {
+    const ids = formData.value.stock.map(item => item.id);
+    const updateStock = await directus.request(
+        updateItems('stock', ids, {
+          status: null,
+      })
+    )
+    await directus.request(
+      deleteItem("packing_sheet", route.params.id)
+    );
+    router.push({ name: 'listPreparation' });
+    alert("Item deleted successfully!");
+  } catch (error) {
+    alert("Failed to delete item: " + error.message);
+  }
+}
 </script>
 
 <style scoped>
