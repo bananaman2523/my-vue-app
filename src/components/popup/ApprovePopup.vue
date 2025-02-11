@@ -1,0 +1,24 @@
+<template>
+    <div></div>
+</template>
+
+<script setup>
+import Swal from "sweetalert2";
+import { defineEmits } from "vue";
+
+const emit = defineEmits(["confirmed", "cancelled"]);
+
+const showSuccess = () => {
+    Swal.fire({
+        title: "บันทึกข้อมูลสำเร็จ!",
+        icon: "success",
+        confirmButtonText: "OK",
+    }).then(() => {
+        window.scrollTo(0, 0);
+        window.location.reload();
+    });
+};
+
+
+defineExpose({ showSuccess });
+</script>

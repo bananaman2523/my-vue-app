@@ -68,7 +68,7 @@
             <input type="text" v-model="formData.supplierProductName" required :disabled="disabledField" class="disable-form"/>
           </div>
           <br>
-          <div class="form-row">
+          <div class="form-row" v-if="formData.status === 'ชำรุด'">
             <label>สถานะอุปกรณ์</label>
             <input type="text" v-model="formData.status" required :disabled="disabledField" class="disable-form"/>
           </div>

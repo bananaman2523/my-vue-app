@@ -14,6 +14,7 @@ import stickerOrderPage from "@/components/stickerOrder.vue";
 import receiptDetailsPage from "@/components/receiptDetails.vue";
 import DocumentPreparationDetailPage from "@/components/DocumentPreparationDetail.vue";
 import ListStockDefectivePage from "@/components/ListStockDefective.vue";
+import BackupStockPage from "@/components/BackupStock.vue";
 
 const routes = [
   {
@@ -94,6 +95,11 @@ const routes = [
     path: "/listStockDefective",
     name: "listStockDefective",
     component: ListStockDefectivePage
+  },
+  {
+    path: "/backupStock",
+    name: "backupStock",
+    component: BackupStockPage
   }
 ];
 

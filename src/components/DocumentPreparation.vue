@@ -96,7 +96,7 @@ import { ref } from 'vue';
 import { directus } from "@/services/directus";
 import { createItem, readItems , updateItems } from "@directus/sdk";
 import SidebarMenu from "@/components/SidebarMenu.vue";
-import WarningPopup from "@/components/WarningPopup.vue";
+import WarningPopup from "@/components/popup/WarningPopup.vue";
 const warningPopup = ref(null);
 
 const getUser = JSON.parse(localStorage.getItem('user'))

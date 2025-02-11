@@ -9,7 +9,7 @@
       <li @click="navigate('receiptProduct')">เพิ่มสินค้านำเข้า</li>
       <li @click="navigate('listStock')">คลังสินค้าขาย</li>
       <li @click="navigate('listStockDefective')">อุปกรณ์ชำรุด</li>
-      <li>อุปกรณ์สำรอง</li>
+      <li @click="navigate('backupStock')">อุปกรณ์สำรอง</li>
       <li @click="navigate('DocumentPreparation')">เพิ่มรายการจัดของ</li>
       <li @click="navigate('listPreparation')">แสดงรายการจัดของ</li>
       <li @click="navigate('productOrder')">ใบส่งสินค้า</li>

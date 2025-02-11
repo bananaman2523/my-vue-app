@@ -8,6 +8,15 @@ import { defineEmits } from "vue";
 
 const emit = defineEmits(["confirmed", "cancelled"]);
 
+const showWarningNoFullField = () => {
+    Swal.fire({
+        title: "กรุณาใส่ข้อมูลที่จำเป็นให้ครบ!",
+        icon: "warning",
+        confirmButtonText: "OK",
+    });
+
+};
+
 const showWarning = () => {
     Swal.fire({
         title: "ไม่พบ Serial number อยู่ในสต๊อก!",
@@ -42,5 +51,5 @@ const showWarningAlreadyUse = () => {
     });
 };
 
-defineExpose({ showWarning , showWarningDuplicate , showWarningBroken, showWarningAlreadyUse});
+defineExpose({ showWarningNoFullField , showWarning , showWarningDuplicate , showWarningBroken, showWarningAlreadyUse});
 </script>

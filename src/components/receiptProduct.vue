@@ -68,6 +68,9 @@
       </div>
       <h1>อุปกรณ์</h1>
       <addReceiptProduct v-model:products="receiptProducts"/>
+      <ApprovePopup ref="approvePopup"/>
+      <ErrorPopup ref="errorPopup" />
+      <WarningPopup ref="warningPopup"/>
       <div class="form-actions">
         <button type="button" @click="submitForm">บันทึก</button>
       </div>
@@ -82,6 +85,12 @@ import { createItems } from "@directus/sdk";
 import SidebarMenu from "@/components/SidebarMenu.vue";
 import addReceiptProduct from "./addReceiptProduct.vue";
 import axios from 'axios';
+import ApprovePopup from "@/components/popup/ApprovePopup.vue";
+import ErrorPopup from "@/components/popup/ErrorPopup.vue";
+import WarningPopup from "@/components/popup/WarningPopup.vue";
+const warningPopup = ref(null);
+const approvePopup = ref(null);
+const errorPopup = ref(null);
 
 const resetForm = () => {
   formData.value = {
@@ -147,7 +156,8 @@ const addStock = async () => {
         group_product: receiptProducts.value[i].selectedCategory || null,
         model: receiptProducts.value[i].selectedModel || null,
         po_number: formData.value.poNumber || null,
-        statusProduct: formData.value.statusProduct
+        device_status: formData.value.statusProduct,
+        status: 'รอตรวจสอบอุปกรณ์',
       };
       stockItems.push(stockItem);
     }
@@ -157,12 +167,10 @@ const addStock = async () => {
   }
   try {
     const result = await directus.request(createItems('stock', stockItems));
-    alert("บันทึกข้อมูลสำเร็จ!");
-    resetForm();
-    window.scrollTo(0, 0);
-    window.location.reload();
+    approvePopup.value.showSuccess();
 
   } catch (error) {
+    errorPopup.value.showError();
     console.error('Error creating article:', error);
   }
 };
@@ -196,7 +204,7 @@ const submitForm = () => {
     !formData.value.supplierProductName ||
     !formData.value.poNumber
   ) {
-    alert("กรุณากรอกข้อมูลให้ครบทุกช่อง!");
+    warningPopup.value.showWarningNoFullField();
     return;
   }
 
