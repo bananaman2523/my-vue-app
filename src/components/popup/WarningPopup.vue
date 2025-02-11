@@ -73,6 +73,13 @@ const confirmDelete = () => {
     });
 };
 
+const showWarningBackupDevice = () => {
+    return Swal.fire({
+        title: "Serial number นี้เป็นเครื่องสำรอง!",
+        icon: "warning",
+        confirmButtonText: "OK",
+    });
+};
 
-defineExpose({ showWarningNoFullField , showWarning , showWarningDuplicate , showWarningBroken, showWarningAlreadyUse , confirmDelete , confirmUpdate});
+defineExpose({ showWarningNoFullField , showWarning , showWarningDuplicate , showWarningBroken, showWarningAlreadyUse , confirmDelete , confirmUpdate , showWarningBackupDevice });
 </script>

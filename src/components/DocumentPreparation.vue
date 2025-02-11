@@ -190,6 +190,9 @@ async function cheakSerialNumberInStock(serialNumber, formItem) {
         } else if (checksStatus.stock_id !== null) {
           warningPopup.value.showWarningAlreadyUse();
           formItem.serialNumber = "";
+        }  else if (checksStatus.device_status === 'เครื่องสำรอง') {
+          warningPopup.value.showWarningBackupDevice();
+          formItem.serialNumber = "";
         }
         
         if (Array.isArray(checks) && checks.length == 0) {
@@ -327,19 +330,30 @@ const addStock = async () => {
         quotation_number_office_design: form.value.quotationNumber,
         customer_order_number: form.value.customerOrderNumber,
         prepared_by: user,
-        status: 'รอตรวจเช็ก',
-        stock: form.value.items.map(item => ({
-          id: item.serialNumberId,
-        }))
+        status: 'รอตรวจเช็ก'
       })
     )
+    console.log(create.id);
+    
     const stockIds = form.value.items
-      .map(item => item.serialNumberId)
-      .filter(id => id !== undefined);
-      
+      .map(item => item.serialNumber)
+    
+    const readStock = await directus.request(
+      readItems("stock", {
+        fields: ['*'],
+        filter: {
+          serial_number: {
+            _in: stockIds,
+          },
+        },
+      })
+    );
+    const stock = readStock.map(item => item.id);
+
     const updateStock = await directus.request(
-      updateItems('stock', stockIds, {
+      updateItems('stock', stock, {
         status: 'รอตรวจเช็ก',
+        stock_id: create.id,
       })
     )
     window.scrollTo(0, 0);
