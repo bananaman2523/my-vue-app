@@ -7,10 +7,11 @@
       <!-- <li @click="navigate('addReceipt')">เพิ่มข้อมูลการแจ้งซ่อม</li>
       <li @click="navigate('list')">แสดงรายการทั้งหมด</li> -->
       <li @click="navigate('receiptProduct')">เพิ่มสินค้านำเข้า</li>
-      <li @click="navigate('listStock')">คลังสินค้า</li>
+      <li @click="navigate('listStock')">คลังสินค้าขาย</li>
       <li @click="navigate('listStockDefective')">อุปกรณ์ชำรุด</li>
+      <li>อุปกรณ์สำรอง</li>
       <li @click="navigate('DocumentPreparation')">เพิ่มรายการจัดของ</li>
-      <li @click="navigate('listPreparationPage')">แสดงรายการจัดของ</li>
+      <li @click="navigate('listPreparation')">แสดงรายการจัดของ</li>
       <li @click="navigate('productOrder')">ใบส่งสินค้า</li>
       <!-- <li @click="navigate('stickerOrder')">ใบสติ๊กเกอร์ติดอุปกรณ์</li> -->
       <!-- <li @click="navigate('completed')">รายการที่เสร็จสิ้นแล้ว</li>

@@ -25,7 +25,10 @@
             <label>วันเลขที่ใบส่งสินค้า</label>
             <input type="date" v-model="formData.deliveryNoteDate" />
           </div>
-          <br>
+          <div class="form-row">
+            <label>สถานะสินค้า</label>
+            <input type="text" v-model="formData.statusProduct" disabled class="disable-form">
+          </div>
           <div class="form-row">
             <label>เลขที่ใบกำกับภาษี <label style="color: red;">*</label></label>
             <input type="text" v-model="formData.taxInvoiceNumber" required/>
@@ -144,6 +147,7 @@ const addStock = async () => {
         group_product: receiptProducts.value[i].selectedCategory || null,
         model: receiptProducts.value[i].selectedModel || null,
         po_number: formData.value.poNumber || null,
+        statusProduct: formData.value.statusProduct
       };
       stockItems.push(stockItem);
     }
@@ -177,6 +181,7 @@ const formData = ref({
   itemCode: "",
   supplierProductName: "",
   poNumber: "",
+  statusProduct: "สินค้าขาย",
 });
 
 const receiptProducts = ref([]);

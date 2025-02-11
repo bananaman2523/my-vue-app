@@ -2,8 +2,8 @@
   <div class="repair-form">
     <SidebarMenu />
     <main>
-      <h1>คลังสินค้า</h1>
-      <div v-show="isFilterVisible" class="input-container">
+      <h1>อุปกรณ์ชำรุด</h1>
+      <!-- <div v-show="isFilterVisible" class="input-container">
         <div class="form-row">
           <label>ค้นหาด้วย วันที่รับ เริ่มต้น</label>
           <input type="date" v-model="filterData.receive_date_from" placeholder="From Date">
@@ -63,7 +63,7 @@
         <div style="text-align: right; padding: 25px;">
           <button @click="downloadReport()" style="border-radius: 16px;padding: 10px 20px; min-width: 120px; height: 40px;">Export</button>
         </div>    
-      </div>
+      </div> -->
       <!-- <button @click="toggleFilterVisibility" class="toggle-btn">
         {{ isFilterVisible ? 'ซ่อน Filter' : 'แสดง Filter' }}
       </button> -->

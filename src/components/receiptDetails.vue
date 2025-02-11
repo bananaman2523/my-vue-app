@@ -25,7 +25,13 @@
             <label>วันเลขที่ใบส่งสินค้า</label>
             <input type="date" v-model="formData.deliveryNoteDate" :disabled="disabledField" class="disable-form"/>
           </div>
-          <br>
+          <div class="form-row">
+            <label>สถานะสินค้า</label>
+            <select v-model="formData.statusProduct">
+              <option value="สินค้าขาย">สินค้าขาย</option>
+              <option value="เครื่องสำรอง">เครื่องสำรอง</option>
+            </select>
+          </div>
           <div class="form-row">
             <label>เลขที่ใบกำกับภาษี <label style="color: red;">*</label></label>
             <input type="text" v-model="formData.taxInvoiceNumber" required :disabled="disabledField" class="disable-form"/>
@@ -61,6 +67,20 @@
             <label>ชื่อสินค้า (Supplier) <label style="color: red;">*</label></label>
             <input type="text" v-model="formData.supplierProductName" required :disabled="disabledField" class="disable-form"/>
           </div>
+          <br>
+          <div class="form-row">
+            <label>สถานะอุปกรณ์</label>
+            <input type="text" v-model="formData.status" required :disabled="disabledField" class="disable-form"/>
+          </div>
+          <div class="form-row" v-if="formData.status === 'ชำรุด'">
+            <label>ประเภทชำรุด</label>
+            <input type="text" v-model="formData.broken_category" required :disabled="disabledField" class="disable-form"/>
+          </div>
+          <br>
+          <div class="form-row" v-if="formData.status === 'ชำรุด'">
+            <label>รายละเอียดชำรุด</label>
+            <input type="text" v-model="formData.broken_description" required :disabled="disabledField" class="disable-form"/>
+          </div>
         </form>
       </div>
       <h1>อุปกรณ์</h1>
@@ -92,8 +112,9 @@
               <label>S/N <label style="color: red;">*</label></label>
               <input type="text" v-model="formData.serial_number" required :disabled="disabledField" class="disable-form"/>
             </div>
-            <div class="form-delete">
-              <button type="button" @click="deleteForm">ลบ</button>
+            <div class="form">
+              <button type="button" class="update-button" @click="updateForm">บันทึก</button>
+              <button type="button" class="delete-button" @click="deleteForm">ลบ</button>
             </div>
           </div>
         </form>
@@ -105,7 +126,7 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import { directus } from "@/services/directus";
-import { readItems, deleteItem } from "@directus/sdk";
+import { readItems, deleteItem , updateItem } from "@directus/sdk";
 import SidebarMenu from "@/components/SidebarMenu.vue";
 import { useRoute , useRouter} from "vue-router";
 
@@ -127,6 +148,10 @@ const formData = ref({
   itemCode: "",
   supplierProductName: "",
   poNumber: "",
+  statusProduct: "",
+  status: "",
+  broken_category: "",
+  broken_description: ""
 });
 
 const formatDate = (dateString) => {
@@ -147,7 +172,6 @@ const fetchData = async () => {
 
     if (response.length > 0) {
       const data = response[0];
-      console.log(data);
       
       formData.value = {
         receive_date: formatDate(data.receive_date),
@@ -168,9 +192,12 @@ const fetchData = async () => {
         model: data.model || "",
         serial_number: data.serial_number || "",
         poNumber: data.po_number || "",
+        statusProduct: data.device_status || "",
+        status: data.status || "",
+        broken_category: data.broken_category || "",
+        broken_description: data.broken_description || "",
       };
       disabledField.value = true;
-      console.log("Fetched data:", data);
     }
   } catch (error) {
     console.error("Error fetching stock data:", error);
@@ -198,6 +225,21 @@ async function deleteForm() {
   }
 }
 
+async function updateForm() {
+  const confirmDelete = window.confirm("Are you sure you want to update this item?");
+  if (!confirmDelete) return;
+
+  try {
+    const update = await directus.request(
+      updateItem('stock', route.params.id, {
+        device_status: formData.value.statusProduct,
+      })
+    );
+    alert("Item update successfully!");
+  } catch (error) {
+    alert("Failed to update item: " + error.message);
+  }
+}
 
 </script>
 
@@ -310,13 +352,17 @@ button:disabled {
   cursor: not-allowed;
 }
 
-.form-delete {
+.form {
   grid-column: span 3;
   text-align: right;
   margin: 20px;
 }
-.form-delete button {
+.form .delete-button {
+  margin-left: 16px;
   background-color: red;
+}
+.form .update-button {
+  background-color: #f8c344;
 }
 
 @media (max-width: 768px) {

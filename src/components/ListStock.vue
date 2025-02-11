@@ -177,6 +177,11 @@ const fetchData = async () => {
     const response = await directus.request(
       readItems("stock", {
         fields: ["*.*"],
+        filter: {
+          device_status:{
+            _eq: 'สินค้าขาย'
+          }
+        }
       })
     );
     data.value = response;

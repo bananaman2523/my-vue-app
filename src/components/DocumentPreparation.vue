@@ -181,19 +181,27 @@ async function cheakSerialNumberInStock(serialNumber, formItem) {
           },
         })
       )) || [];
+
       const checksStatus = checks[0]
-      if (checksStatus.status === 'ชำรุด') {
-        warningPopup.value.showWarningBroken();
-        formItem.serialNumber = "";
-      } else if (checksStatus.stock_id !== null) {
-        warningPopup.value.showWarningAlreadyUse();
-        formItem.serialNumber = "";
-      }
-      
-      if (Array.isArray(checks) && checks.length == 0) {
+      if (checks.length != 0) {
+        if (checksStatus.status === 'ชำรุด') {
+          warningPopup.value.showWarningBroken();
+          formItem.serialNumber = "";
+        } else if (checksStatus.stock_id !== null) {
+          warningPopup.value.showWarningAlreadyUse();
+          formItem.serialNumber = "";
+        }
+        
+        if (Array.isArray(checks) && checks.length == 0) {
+          warningPopup.value.showWarning();
+          formItem.serialNumber = "";
+        }  
+      }else{
         warningPopup.value.showWarning();
         formItem.serialNumber = "";
       }
+      
+      
     }
     
   } catch (error) {

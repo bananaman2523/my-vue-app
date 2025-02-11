@@ -19,7 +19,7 @@ const showWarning = () => {
 
 const showWarningDuplicate = () => {
     Swal.fire({
-        title: "Serial number นี้มีอยู่ในสต๊อกแล้ว!",
+        title: "Serial number นี้มีอยู่ในใบจัดสินค้าแล้ว!",
         icon: "warning",
         confirmButtonText: "OK",
     });
