@@ -220,24 +220,26 @@ onMounted(() => {
 });
 
 async function deleteForm() {
-  const confirmDelete = window.confirm("Are you sure you want to delete this item?");
-  if (!confirmDelete) return;
+  const confirmDeleteResult = await warningPopup.value.confirmDelete();
+  console.log(confirmDeleteResult);
+  
+  if (!confirmDeleteResult.isConfirmed) return;
 
   try {
     await directus.request(
       deleteItem("stock", route.params.id)
     );
+    approvePopup.value.showSuccessDelete()
     router.push({ name: 'listStock' });
-    alert("Item deleted successfully!");
   } catch (error) {
     alert("Failed to delete item: " + error.message);
   }
 }
 
 async function updateForm() {
-  const confirmDeleteResult = await warningPopup.value.confirmDelete();
+  const confirmUpdateResult = await warningPopup.value.confirmUpdate();
 
-  if (!confirmDeleteResult) return;
+  if (!confirmUpdateResult.isConfirmed) return;
   
   try {
     const update = await directus.request(

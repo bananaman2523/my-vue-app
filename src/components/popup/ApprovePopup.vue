@@ -28,6 +28,16 @@ const showSuccessUpdate = () => {
         window.location.reload();
     });
 };
-
-defineExpose({ showSuccess , showSuccessUpdate });
+const showSuccessDelete = () => {
+    Swal.fire({
+        title: "ลบข้อมูลสำเร็จ!",
+        icon: "success",
+        confirmButtonText: "OK",
+    })
+    // .then(() => {
+    //     window.scrollTo(0, 0);
+    //     window.location.reload();
+    // });
+};
+defineExpose({ showSuccess , showSuccessUpdate , showSuccessDelete});
 </script>

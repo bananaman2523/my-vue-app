@@ -51,7 +51,7 @@ const showWarningAlreadyUse = () => {
     });
 };
 
-const confirmDelete = () => {
+const confirmUpdate = () => {
     return Swal.fire({
         title: "ยืนยันการอัปเดต",
         text: "คุณแน่ใจหรือไม่ว่าต้องการอัปเดตรายการนี้?",
@@ -62,5 +62,17 @@ const confirmDelete = () => {
     });
 };
 
-defineExpose({ showWarningNoFullField , showWarning , showWarningDuplicate , showWarningBroken, showWarningAlreadyUse , confirmDelete});
+const confirmDelete = () => {
+    return Swal.fire({
+        title: "ยืนยันการลบข้อมูล",
+        text: "คุณแน่ใจหรือไม่ว่าต้องการลบรายการนี้?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "ใช่, ลบเลย!",
+        cancelButtonText: "ยกเลิก",
+    });
+};
+
+
+defineExpose({ showWarningNoFullField , showWarning , showWarningDuplicate , showWarningBroken, showWarningAlreadyUse , confirmDelete , confirmUpdate});
 </script>
