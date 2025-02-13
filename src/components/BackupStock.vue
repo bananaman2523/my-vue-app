@@ -198,7 +198,7 @@ const paginatedData = computed(() => {
     );
   });
 
-  return filteredData.slice(start, start + itemsPerPage);
+  return (filteredData.slice(start, start + itemsPerPage)).reverse();
 });
 
 const paginatedDataExport = computed(() => {
