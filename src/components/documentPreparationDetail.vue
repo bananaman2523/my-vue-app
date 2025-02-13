@@ -2,7 +2,7 @@
   <div class="repair-form">
     <SidebarMenu/>
     <main>
-      <h1>เพิ่มรายการจัดของ</h1>
+      <h1>ตรวจสอบรายการจัดของ</h1>
       <div class="container">
         <form @submit.prevent="submitForm">
           <div class="form-row">
@@ -56,76 +56,70 @@
         </form>
       </div>
       <h1>อุปกรณ์</h1>
-      <div>
-        <table class="stock-table">
-          <thead>
-            <tr>
-              <th>รหัสสินค้า</th>
-              <th>ชื่อสินค้า</th>
-              <th>รุ่น</th>
-              <th>S/N</th>
-              <th style="text-align: center;">คุณภาพสินค้า</th>
-            </tr>
-          </thead>
-          <tbody>
-            <template v-for="item in formData.stock" :key="item.id">
-              <tr>
-                <td>{{ item.product_code_office_design }}</td>
-                <td>{{ item.product_name_office_design }}</td>
-                <td>{{ item.model }}</td>
-                <td>{{ item.serial_number }}</td>
-                <td style="display: flex; justify-content: center; align-items: center;">
-                  <select v-model="item.status" :disabled="formData.status === 'ผ่าน'">
-                    <option>ระบุ</option>
-                    <option style="color: white; background-color: greenyellow;">ผ่าน</option>
-                    <option style="color: white; background-color: red;">ชำรุด</option>
-                  </select>
-                </td>
-              </tr>
-              <tr v-if="item.status === 'ชำรุด'">
-                <td colspan="6" style="background-color: #f8d7da; color: #721c24; text-align: center;">
-                  กรุณาระบุรายละเอียดเพิ่มเติมเกี่ยวกับความเสียหาย
-                </td>
-              </tr>
-              <tr v-if="item.status === 'ชำรุด'">
-                <td>
-                  <input type="text" v-model="selectedItem.product_code_office_design" disabled/>
-                </td>
-                <td>
-                  <input type="text" v-model="selectedItem.product_name_office_design" disabled/>
-                </td>
-                <td>
-                  <input type="text" v-model="selectedItem.model" disabled />
-                </td>
-                <td>
-                  <select v-model="selectedSerialNumber" @change="updateSelectedItem">
-                    <option value="">S/N</option>
-                    <option v-for="serial in serialNumbers" :key="serial.id" :value="serial.serial_number">
-                      {{ serial.serial_number }}
-                    </option>
-                  </select>
-                </td>
-                <td>
-                  <button @click="switchEquipment(selectedSerialNumber, item)">สับเปลี่ยน</button>
-                </td>
-              </tr>
-              <tr v-if="item.status === 'ชำรุด'">
-                <td style="text-align: left;">
-                  <label>ประเภทชำรุด</label>
-                  <select v-model="brokenCategory" style="display: flex;">
-                    <option value="">เลือกประเภทชำรุด</option>
-                    <option value="hardware">hardware</option>
-                    <option value="software">software</option>
-                  </select>
-                </td>
-                <td colspan="4" style="text-align: left;">
-                  <label>เหตุผล</label>
-                  <input v-model="brokenDescription" type="text" style="display: flex;width: 85%;" />
-                </td>
-              </tr>
-            </template>
-          </tbody>
-        </table>
+      <div v-for="(item, index) in formData.stock" :key="index" class="container-product">
+        <form>
+          <div class="form-row">
+            <label>รหัสสินค้าของ Office Design</label>
+            <input type="text" v-model="item.product_code_office_design" disabled/>
+          </div>
+          <div class="form-row">
+            <label>รหัสสินค้าของ Office Design</label>
+            <input type="text" v-model="item.product_code_office_design" disabled/>
+          </div>
+          <div class="form-row">
+            <label>ชื่อสินค้าของ Office Design</label>
+            <input type="text" v-model="item.product_name_office_design" disabled/>
+          </div>
+          <div class="form-row">
+            <label>อุปกรณ์</label>
+            <input type="text" v-model="item.model" disabled/>
+          </div>
+          <div class="form-row">
+            <label>รุ่น/แบรนด์</label>
+            <input type="text" v-model="item.product_name_office_design" disabled/>
+          </div>
+          <div class="form-row">
+            <label>Serial Number</label>
+            <input type="text" v-model="item.serial_number" disabled/>
+          </div>
+          <div class="form-row" style="grid-column: 1 / span 3; width: 345px;">
+            <label>คุณภาพสินค้า</label>
+            <select v-model="item.status" :disabled="formData.status === 'ผ่าน'">
+              <option>ระบุ</option>
+              <option>ผ่าน</option>
+              <option>ชำรุด</option>
+            </select>
+          </div>
+          <div v-if="item.status === 'ชำรุด'" style="display: contents;">
+            <div class="form-row">
+              <label>รหัสสินค้าของ Office Design</label>
+              <select v-model="item.productCode" @change="updateProduct(index)">
+                <option value="">Select a category</option>
+                <option v-for="productCode in productConfig" :key="productCode.product_code" :value="productCode.product_code">
+                  {{ productCode.product_code }}
+                </option>
+              </select>
+            </div>
+            <div class="form-row">
+              <label>ชื่อสินค้าของ Office Design</label>
+              <input v-model="item.productName" type="text" disabled class="disable-form"/>
+            </div>
+            <div class="form-row">
+              <label>อุปกรณ์</label>
+              <input v-model="item.productModel" type="text" disabled class="disable-form"/>
+            </div>
+            <div class="form-row">
+              <label>รุ่น/แบรนด์</label>
+              <input v-model="item.productBrand" type="text" disabled class="disable-form"/>
+            </div>
+            <div class="form-row">
+              <label>Serial Number</label>
+              <input v-model="item.serialNumber" @change="cheakSerialNumberInStock(item.serialNumber, formData.stock[index])" type="text" :disabled="!item.productCode" :class="!item.productCode ? 'disable-form' : ''"/>
+            </div>
+            <button @click="switchEquipment(selectedSerialNumber, item)">สับเปลี่ยน</button>
+          </div>
+          
+        </form>
       </div>
       <div class="form-actions">
         <label style="padding-right: 8px;">ผู้ตรวจสอบ</label>
@@ -138,6 +132,9 @@
       </div>
     </main>
   </div>
+  <WarningPopup ref="warningPopup"/>
+  <ApprovePopup ref="approvePopup"/>
+  <ErrorPopup ref="errorPopup" />
 </template>
 
 <script setup>
@@ -147,6 +144,11 @@ import { updateItems , readItems , updateItem , deleteItem} from "@directus/sdk"
 import SidebarMenu from "@/components/SidebarMenu.vue";
 import { useRoute , useRouter} from "vue-router";
 import axios from 'axios';
+import ApprovePopup from "@/components/popup/ApprovePopup.vue";
+import ErrorPopup from "@/components/popup/ErrorPopup.vue";
+import WarningPopup from "@/components/popup/WarningPopup.vue";
+const warningPopup = ref(null);
+const approvePopup = ref(null);
 
 const getUser = JSON.parse(localStorage.getItem('user'))
 const user = `${getUser.first_name} ${getUser.last_name}`
@@ -190,6 +192,8 @@ const form = ref({
     { productCode: '', productName: '', selectedCategory: '', selectedModel: '', serialNumber: '' }
   ]
 });
+const productConfig = ref({ product: [] });
+
 
 async function submitForm() {
   try {
@@ -265,13 +269,9 @@ async function switchEquipment(selectedSerialNumber, item) {
       throw new Error("Stock item not found with the given serial number.");
     }
 
-    console.log("New stock ID:", newStockItem.id);
-
     const updatePackingStock = await directus.request(
       updateItem('packing_sheet', packingID, { stock: [newStockItem.id] })
     );
-
-    console.log("Packing sheet updated:", updatePackingStock);
 
     await directus.request(
       updateItem('stock', newStockItem.id, { status: 'รอตรวจสอบ' })
@@ -315,6 +315,15 @@ const fetchData = async () => {
         }
       })
     );  
+
+    const config = await directus.request(
+      readItems("config", {
+        fields: [
+          "product_code"
+        ],
+      })
+    );
+    productConfig.value = config[0].product_code
 
     serialNumbers.value = stock.map(item => ({
       id: item.id,
@@ -406,6 +415,90 @@ async function deleteForm() {
   } catch (error) {
     alert("Failed to delete item: " + error.message);
   }
+}
+
+const updateProduct = (index) => {
+  const formItem = formData.value.stock[index];
+  const selectedProduct = productConfig.value.find(
+    (product) => product.product_code === formItem.productCode
+  );
+
+  if (selectedProduct) {
+    formItem.productName = selectedProduct.product_name || '';
+    formItem.productModel = selectedProduct.equipment.model || '';
+    formItem.productBrand = selectedProduct.equipment.brand || '';
+  }else{
+    formItem.productName = '';
+    formItem.productModel = '';
+    formItem.productBrand = '';
+  }
+};
+
+async function cheakSerialNumberInStock(serialNumber, formItem) {
+  try {
+    if (serialNumber) {
+      const isDuplicateInForm = form.value.items.some(
+        (item) => item !== formItem && item.serialNumber === serialNumber
+      );
+
+      if (isDuplicateInForm) {
+        warningPopup.value.showWarningDuplicate();
+        formItem.serialNumber = "";
+        return;
+      }
+
+      const checks = (await directus.request(
+        readItems("stock", {
+          filter: {
+            serial_number: {
+              _eq: serialNumber,
+            },
+            model: {
+              _eq: formItem.productBrand,
+            },
+            group_product: {
+              _eq: formItem.productModel,
+            },
+            product_name_office_design: {
+              _eq: formItem.productName,
+            },
+            product_code_office_design: {
+              _eq: formItem.productCode,
+            },
+          },
+        })
+      )) || [];
+
+      const checksStatus = checks[0]
+
+      if (checks.length != 0) {
+        if (checksStatus.status === 'ชำรุด') {
+          warningPopup.value.showWarningBroken();
+          formItem.serialNumber = "";
+        } else if (checksStatus.stock_id !== null) {
+          warningPopup.value.showWarningAlreadyUse();
+          formItem.serialNumber = "";
+        }  else if (checksStatus.device_status === 'เครื่องสำรอง') {
+          warningPopup.value.showWarningBackupDevice();
+          formItem.serialNumber = "";
+        }
+        
+        if (Array.isArray(checks) && checks.length == 0) {
+          warningPopup.value.showWarning();
+          formItem.serialNumber = "";
+        }  
+      }else{
+        warningPopup.value.showWarning();
+        formItem.serialNumber = "";
+      }
+      
+      
+    }
+    
+  } catch (error) {
+    console.error("Error generating preparation number:", error);
+  }
+  
 }
 </script>
 
