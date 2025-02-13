@@ -81,5 +81,13 @@ const showWarningBackupDevice = () => {
     });
 };
 
-defineExpose({ showWarningNoFullField , showWarning , showWarningDuplicate , showWarningBroken, showWarningAlreadyUse , confirmDelete , confirmUpdate , showWarningBackupDevice });
+const showWarningSerailNumberDuplicated = () => {
+    return Swal.fire({
+        title: "Serial number นี้ซ้ำ!",
+        icon: "warning",
+        confirmButtonText: "OK",
+    });
+};
+
+defineExpose({ showWarningNoFullField , showWarning , showWarningDuplicate , showWarningBroken, showWarningAlreadyUse , confirmDelete , confirmUpdate , showWarningBackupDevice , showWarningSerailNumberDuplicated});
 </script>

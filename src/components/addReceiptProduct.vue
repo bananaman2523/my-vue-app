@@ -37,12 +37,13 @@
             </div>
             <div class="form-row" v-for="(sn, snIndex) in form.serialNumbers" :key="snIndex">
               <label>S/N {{ snIndex + 1 }} <label style="color: red;">*</label></label>
-              <input type="text" v-model="form.serialNumbers[snIndex]" />
+              <input type="text" v-model="form.serialNumbers[snIndex]" @change="cheakSerialNumberInStock(form.serialNumbers[snIndex], form)"/>
             </div>
           </div>
         </form>
       </div>
       <button @click="addForm" class="add-button">+ Add New</button>
+      <WarningPopup ref="warningPopup"/>
     </main>
   </div>
 </template>
@@ -51,6 +52,8 @@
 import { ref, watch } from 'vue';
 import { directus } from "@/services/directus";
 import { readItems } from "@directus/sdk";
+import WarningPopup from "@/components/popup/WarningPopup.vue";
+const warningPopup = ref(null);
 
 const emit = defineEmits(['update:products']);
 const data = ref({ product: [] });
@@ -102,6 +105,49 @@ const updateProduct = (index) => {
   }
 };
 fetchData();
+
+function findDuplicatePosition(arr, num) {
+  let lastIndex = -1;
+  
+  for (let i = 0; i < arr.length; i++) {
+    if (arr[i] === num) {
+      lastIndex = i;
+    }
+  }
+
+  return lastIndex;
+}
+async function cheakSerialNumberInStock(serialNumber, formItem) {
+  try {
+    if (serialNumber) {
+
+      const checks = (await directus.request(
+        readItems("stock", {
+          fields:["*.*"]
+        })
+      )) || [];
+
+      const isDuplicateInStock = checks.some(check => check.serial_number === serialNumber);
+      if (isDuplicateInStock) {
+        warningPopup.value.showWarningSerailNumberDuplicated();
+        formItem.serialNumbers[formItem.serialNumbers.indexOf(serialNumber)] = "";
+        return;
+      }
+      
+      const isDuplicateInCurrentForm = formItem.serialNumbers.filter(sn => sn === serialNumber).length > 1;
+      if (isDuplicateInCurrentForm) {
+        warningPopup.value.showWarningDuplicate();
+        const position = findDuplicatePosition(formItem.serialNumbers, serialNumber);
+        formItem.serialNumbers[position] = "";
+        return;
+      }
+      
+    }
+    
+  } catch (error) {
+    console.error("Error generating preparation number:", error);
+  } 
+}
 </script>
 
 <style scoped>

@@ -153,8 +153,8 @@ const addStock = async () => {
         product_code_office_design: receiptProducts.value[i].productCode || null,
         product_name_office_design: receiptProducts.value[i].productName || null,
         serial_number: receiptProducts.value[i].serialNumbers[j] || null,
-        group_product: receiptProducts.value[i].selectedCategory || null,
-        model: receiptProducts.value[i].selectedModel || null,
+        group_product: receiptProducts.value[i].productModel || null,
+        model: receiptProducts.value[i].productBrand|| null,
         po_number: formData.value.poNumber || null,
         device_status: formData.value.statusProduct,
         status: 'รอตรวจสอบอุปกรณ์',
@@ -195,18 +195,18 @@ const formData = ref({
 const receiptProducts = ref([]);
 
 const submitForm = () => {
-  if (
-    !formData.value.receivedDate ||
-    !formData.value.supplierName ||
-    !formData.value.taxInvoiceNumber ||
-    !formData.value.invoiceDate ||
-    !formData.value.itemCode ||
-    !formData.value.supplierProductName ||
-    !formData.value.poNumber
-  ) {
-    warningPopup.value.showWarningNoFullField();
-    return;
-  }
+  // if (
+  //   !formData.value.receivedDate ||
+  //   !formData.value.supplierName ||
+  //   !formData.value.taxInvoiceNumber ||
+  //   !formData.value.invoiceDate ||
+  //   !formData.value.itemCode ||
+  //   !formData.value.supplierProductName ||
+  //   !formData.value.poNumber
+  // ) {
+  //   warningPopup.value.showWarningNoFullField();
+  //   return;
+  // }
 
   addStock();
 };
