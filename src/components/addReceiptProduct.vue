@@ -6,32 +6,27 @@
           <div style="display: contents;">
             <div class="form-row">
               <label>รหัสสินค้า Office Design <label style="color: red;">*</label></label>
-              <input type="text" v-model="form.productCode" required/>
+              <select v-model="form.productCode" @change="updateProduct(index)">
+                <option value="">Select a category</option>
+                <option v-for="productCode in data" :key="productCode.product_code" :value="productCode.product_code">
+                  {{ productCode.product_code }}
+                </option>
+              </select>
             </div>
             <div class="form-row">
               <label>ชื่อสินค้า Office Design <label style="color: red;">*</label></label>
-              <input type="text" v-model="form.productName" required/>
+              <input type="text" v-model="form.productName" disabled class="disable-form"/>
             </div>
             <div style="display: flex; justify-content: end;">
               <button type="button" @click="removeForm(index)" class="delete-button">X</button>
             </div>
             <div class="form-row">
-              <label>หมวดหมู่สินค้า <label style="color: red;">*</label></label>
-              <select v-model="form.selectedCategory">
-                <option value="">Select a category</option>
-                <option v-for="product in data.product" :key="product.productGroup" :value="product.productGroup">
-                  {{ product.productGroup }}
-                </option>
-              </select>
-            </div>            
+              <label>อุปกรณ์ <label style="color: red;">*</label></label>
+              <input type="text" v-model="form.productModel" disabled class="disable-form"/>
+            </div>
             <div class="form-row">
-              <label>model <label style="color: red;">*</label></label>
-              <select v-model="form.selectedModel" :disabled="!form.selectedCategory">
-                <option value="">Select a model</option>
-                <option v-for="model in models(form.selectedCategory)" :key="model" :value="model">
-                  {{ model }}
-                </option>
-              </select>
+              <label>รุ่น/แบรนด์ <label style="color: red;">*</label></label>
+              <input type="text" v-model="form.productBrand" disabled class="disable-form"/>
             </div>
             <div class="form-row">
               <label>จำนวนสินค้า <label style="color: red;">*</label></label>
@@ -61,16 +56,11 @@ const emit = defineEmits(['update:products']);
 const data = ref({ product: [] });
 
 const forms = ref([
-  { productCode: '', productName: '', selectedCategory: '', selectedModel: '', quantity: 1, serialNumbers: [] }
+  { productCode: '', productName: '', productBrand: '', productModel: '', quantity: 1, serialNumbers: [] }
 ]);
 
-const models = (category) => {
-  const productGroup = category ? data.value.product.find(item => item.productGroup === category) : null;
-  return category ? productGroup?.productCodes || [] : [];
-};
-
 const addForm = () => {
-  forms.value.push({ productCode: '', productName: '', selectedCategory: '', selectedModel: '', quantity: 1, serialNumbers: [] });
+  forms.value.push({ productCode: '', productName: '', productBrand: '', productModel: '', serialNumbers: [] });
 };
 
 const removeForm = (index) => {
@@ -92,24 +82,33 @@ const fetchData = async () => {
     const response = await directus.request(
       readItems("config", {
         fields: [
-          "product.product_group",
-          "product.product_list.product_list_id.product_code",
+          "product_code"
         ],
       })
     );
-    data.value.product = response[0].product.map(item => ({
-      productGroup: item.product_group,
-      productCodes: item.product_list.map(p => p.product_list_id.product_code)
-    }));
+    data.value = response[0].product_code
   } catch (error) {
     console.error("Error fetching data:", error);
   }
 };
 
+const updateProduct = (index) => {
+  const form = forms.value[index];
+  const selectedProduct = data.value.find(product => product.product_code === form.productCode);
+  if (selectedProduct) {
+    form.productName = selectedProduct.product_name || '';
+    form.productModel = selectedProduct.equipment.model || ''
+    form.productBrand = selectedProduct.equipment.brand || ''
+  }
+};
 fetchData();
 </script>
 
 <style scoped>
+.disable-form{
+  background-color: #D9D9D9;
+}
+
 .add-button {
   margin-top: 10px;
   padding: 8px 12px;
