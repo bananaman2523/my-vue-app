@@ -26,6 +26,15 @@ const showWarning = () => {
 
 };
 
+const showWarningInStock = () => {
+    Swal.fire({
+        title: "ไม่พบ Serial number อยู่ในสต๊อก หรือ ไม่มีอยู่ในรหัสสินค้าที่เลือก!",
+        icon: "warning",
+        confirmButtonText: "OK",
+    });
+
+};
+
 const showWarningDuplicate = () => {
     Swal.fire({
         title: "Serial number นี้มีอยู่ในใบจัดสินค้าแล้ว!",
@@ -89,5 +98,5 @@ const showWarningSerailNumberDuplicated = () => {
     });
 };
 
-defineExpose({ showWarningNoFullField , showWarning , showWarningDuplicate , showWarningBroken, showWarningAlreadyUse , confirmDelete , confirmUpdate , showWarningBackupDevice , showWarningSerailNumberDuplicated});
+defineExpose({ showWarningNoFullField , showWarning , showWarningDuplicate , showWarningBroken, showWarningAlreadyUse , confirmDelete , confirmUpdate , showWarningBackupDevice , showWarningSerailNumberDuplicated, showWarningInStock});
 </script>

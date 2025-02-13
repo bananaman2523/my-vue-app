@@ -62,7 +62,12 @@
         <form @submit.prevent="submitForm">
           <div class="form-row">
             <label>รหัสสินค้าของ Office Design</label>
-            <input v-model="formItem.productCode" type="text" disabled class="disable-form"/>
+            <select v-model="formItem.productCode" @change="updateProduct(index)">
+              <option value="">Select a category</option>
+              <option v-for="productCode in productConfig" :key="productCode.product_code" :value="productCode.product_code">
+                {{ productCode.product_code }}
+              </option>
+            </select>
           </div>
           <div class="form-row">
             <label>ชื่อสินค้าของ Office Design</label>
@@ -72,8 +77,12 @@
             <button type="button" @click="removeForm(index)" class="delete-button">X</button>
           </div>
           <div class="form-row">
-            <label>ชื่อกลุ่มสินค้าของ Office Design</label>
-            <input v-model="formItem.selectedCategory" type="text" disabled class="disable-form"/>
+            <label>อุปกรณ์</label>
+            <input v-model="formItem.productModel" type="text" disabled class="disable-form"/>
+          </div>
+          <div class="form-row">
+            <label>รุ่น/แบรนด์</label>
+            <input type="text" v-model="formItem.productBrand" disabled class="disable-form"/>
           </div>
           <div class="form-row">
             <label>Serial Number</label>  
@@ -86,7 +95,8 @@
         <button type="button" @click="submitForm">บันทึก</button>
       </div>
       <WarningPopup ref="warningPopup"/>
-
+      <ApprovePopup ref="approvePopup"/>
+      <ErrorPopup ref="errorPopup" />
     </main>
   </div>
 </template>
@@ -96,11 +106,15 @@ import { ref } from 'vue';
 import { directus } from "@/services/directus";
 import { createItem, readItems , updateItems } from "@directus/sdk";
 import SidebarMenu from "@/components/SidebarMenu.vue";
+import ApprovePopup from "@/components/popup/ApprovePopup.vue";
+import ErrorPopup from "@/components/popup/ErrorPopup.vue";
 import WarningPopup from "@/components/popup/WarningPopup.vue";
 const warningPopup = ref(null);
+const approvePopup = ref(null);
 
 const getUser = JSON.parse(localStorage.getItem('user'))
 const user = `${getUser.first_name} ${getUser.last_name}`
+const productConfig = ref({ product: [] });
 const data = ref({
   companies: [],
   equipments: [],
@@ -117,12 +131,12 @@ const form = ref({
   preparedDate: '',
   deliveryDate: '',
   items: [
-    { productCode: '', productName: '', selectedCategory: '', selectedModel: '', serialNumber: '' }
+    { productCode: '', productName: '', productModel: '', productBrand: '', serialNumber: '' }
   ]
 });
 
 const addForm = () => {
-  form.value.items.push({ productCode: '', productName: '', selectedCategory: '', selectedModel: '', serialNumber: '' });
+  form.value.items.push({ productCode: '', productName: '', productModel: '', productBrand: '', serialNumber: '' });
 };
 
 const removeForm = (index) => {
@@ -149,16 +163,6 @@ function simplifyInput(input) {
   return result;
 }
 
-const availableSerialNumbers = (index) => {
-  const selectedSerialNumbers = form.value.items
-    .filter((_, i) => i !== index)
-    .map((item) => item.serialNumber);
-  
-  return serialNumbers.value.filter((serialNumber) => {
-    return !selectedSerialNumbers.includes(serialNumber.serial_number);
-  });
-};
-
 async function cheakSerialNumberInStock(serialNumber, formItem) {
   try {
     if (serialNumber) {
@@ -177,7 +181,19 @@ async function cheakSerialNumberInStock(serialNumber, formItem) {
           filter: {
             serial_number: {
               _eq: serialNumber,
-            }
+            },
+            model: {
+              _eq: formItem.productBrand,
+            },
+            group_product: {
+              _eq: formItem.productModel,
+            },
+            product_name_office_design: {
+              _eq: formItem.productName,
+            },
+            product_code_office_design: {
+              _eq: formItem.productCode,
+            },
           },
         })
       )) || [];
@@ -212,24 +228,6 @@ async function cheakSerialNumberInStock(serialNumber, formItem) {
   }
   
 }
-const updateSerialId = (formItem) => {
-  
-  const selectedSerial = serialNumbers.value.find(
-    (serial) => serial.serial_number === formItem.serialNumber
-  );
-  
-  if (selectedSerial) {
-    formItem.serialNumberId = selectedSerial.id;
-    formItem.productCode = selectedSerial.product_code_office_design;
-    formItem.productName = selectedSerial.product_name_office_design;
-    formItem.selectedCategory = selectedSerial.group_product;
-  } else {
-    formItem.serialNumberId = null;
-    formItem.productCode = '';
-    formItem.productName = '';
-    formItem.selectedCategory = '';
-  }
-};
 
 const fetchData = async () => {
   try {
@@ -270,6 +268,17 @@ const fetchData = async () => {
     }));
 
     Object.assign(data.value, simplifyInput(response));
+
+    const config = await directus.request(
+      readItems("config", {
+        fields: [
+          "product_code"
+        ],
+      })
+    );
+    productConfig.value = config[0].product_code
+    console.log(productConfig.value);
+    
 
   } catch (error) {
     console.error("Error fetching activities:", error);
@@ -356,9 +365,7 @@ const addStock = async () => {
         stock_id: create.id,
       })
     )
-    window.scrollTo(0, 0);
-    window.location.reload();
-    
+    approvePopup.value.showSuccess();
   } catch (error) {
     console.error('Error creating article:', error);
   }
@@ -367,6 +374,20 @@ const addStock = async () => {
 const submitForm = () => {
   addStock();
 };
+
+const updateProduct = (index) => {
+  const formItem = form.value.items[index];
+  const selectedProduct = productConfig.value.find(
+    (product) => product.product_code === formItem.productCode
+  );
+
+  if (selectedProduct) {
+    formItem.productName = selectedProduct.product_name || '';
+    formItem.productModel = selectedProduct.equipment.model || '';
+    formItem.productBrand = selectedProduct.equipment.brand || '';
+  }
+};
+
 </script>
 
 <style scoped>

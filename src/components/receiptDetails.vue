@@ -68,18 +68,25 @@
             <input type="text" v-model="formData.supplierProductName" required :disabled="disabledField" class="disable-form"/>
           </div>
           <br>
-          <div class="form-row" v-if="formData.status === 'ชำรุด'">
+          <div class="form-row">
             <label>สถานะอุปกรณ์</label>
-            <input type="text" v-model="formData.status" required :disabled="disabledField" class="disable-form"/>
+            <select v-model="formData.status">
+              <option value="รอตรวจสอบอุปกรณ์">รอตรวจสอบอุปกรณ์</option>
+              <option value="ชำรุด">ชำรุด</option>
+              <option value="พร้อมใช้งาน">พร้อมใช้งาน</option>
+            </select>
           </div>
           <div class="form-row" v-if="formData.status === 'ชำรุด'">
             <label>ประเภทชำรุด</label>
-            <input type="text" v-model="formData.broken_category" required :disabled="disabledField" class="disable-form"/>
+            <select v-model="formData.broken_category">
+              <option value="software">software</option>
+              <option value="hardware">hardware</option>
+            </select>
           </div>
           <br>
           <div class="form-row" v-if="formData.status === 'ชำรุด'">
             <label>รายละเอียดชำรุด</label>
-            <input type="text" v-model="formData.broken_description" required :disabled="disabledField" class="disable-form"/>
+            <input type="text" v-model="formData.broken_description" class="description"/>
           </div>
         </form>
       </div>
@@ -97,16 +104,12 @@
             </div>
             <br>
             <div class="form-row">
-              <label>หมวดหมู่สินค้า <label style="color: red;">*</label></label>
-              <select v-model="formData.group_product" required :disabled="disabledField" class="disable-form">
-                <option :value="formData.group_product">{{formData.group_product}}</option> 
-              </select>
+              <label>อุปกรณ์ <label style="color: red;">*</label></label>
+              <input type="text" v-model="formData.group_product" required :disabled="disabledField" class="disable-form"/>
             </div>
             <div class="form-row">
-              <label>model <label style="color: red;">*</label></label>
-              <select v-model="formData.model" required :disabled="disabledField" class="disable-form">
-                <option :value="formData.model">{{formData.model}}</option> 
-              </select>
+              <label>รุ่น/แบรนด์ <label style="color: red;">*</label></label>
+              <input type="text" v-model="formData.model" required :disabled="disabledField" class="disable-form"/>
             </div>
             <div class="form-row">
               <label>S/N <label style="color: red;">*</label></label>
@@ -244,6 +247,9 @@ async function updateForm() {
     const update = await directus.request(
       updateItem('stock', route.params.id, {
         device_status: formData.value.statusProduct,
+        status: formData.value.status,
+        broken_category: formData.value.status === 'พร้อมใช้งาน' ? null : formData.value.broken_category || '',
+        broken_description: formData.value.status === 'พร้อมใช้งาน' ? null : formData.value.broken_description || '',
       })
     );
     approvePopup.value.showSuccessUpdate()
@@ -255,6 +261,9 @@ async function updateForm() {
 </script>
 
 <style scoped>
+.description {
+  width: 715px;
+}
 .disable-form{
   background-color: #D9D9D9;
 }
