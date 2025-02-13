@@ -63,7 +63,7 @@ const forms = ref([
 ]);
 
 const addForm = () => {
-  forms.value.push({ productCode: '', productName: '', productBrand: '', productModel: '', serialNumbers: [] });
+  forms.value.push({ productCode: '', productName: '', productBrand: '', productModel: '', quantity: 1 , serialNumbers: [] });
 };
 
 const removeForm = (index) => {
@@ -73,7 +73,10 @@ const removeForm = (index) => {
 const generateSerialNumbers = (index) => {
   const form = forms.value[index];
   const newQuantity = form.quantity || 1;
-  form.serialNumbers = Array.from({ length: newQuantity }, () => '');
+  form.serialNumbers = [
+    ...form.serialNumbers.slice(0, newQuantity),
+    ...Array(newQuantity - form.serialNumbers.length).fill('')
+  ];
 };
 
 watch(forms, (newForms) => {

@@ -195,18 +195,18 @@ const formData = ref({
 const receiptProducts = ref([]);
 
 const submitForm = () => {
-  // if (
-  //   !formData.value.receivedDate ||
-  //   !formData.value.supplierName ||
-  //   !formData.value.taxInvoiceNumber ||
-  //   !formData.value.invoiceDate ||
-  //   !formData.value.itemCode ||
-  //   !formData.value.supplierProductName ||
-  //   !formData.value.poNumber
-  // ) {
-  //   warningPopup.value.showWarningNoFullField();
-  //   return;
-  // }
+  if (
+    !formData.value.receivedDate ||
+    !formData.value.supplierName ||
+    !formData.value.taxInvoiceNumber ||
+    !formData.value.invoiceDate ||
+    !formData.value.itemCode ||
+    !formData.value.supplierProductName ||
+    !formData.value.poNumber
+  ) {
+    warningPopup.value.showWarningNoFullField();
+    return;
+  }
 
   addStock();
 };
