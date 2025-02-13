@@ -150,6 +150,46 @@ import axios from 'axios';
 
 const getUser = JSON.parse(localStorage.getItem('user'))
 const user = `${getUser.first_name} ${getUser.last_name}`
+const selectedSerialNumber = ref("");
+const brokenCategory = ref("");
+const brokenDescription = ref("");
+const selectedItem = ref({
+  product_code_office_design: "",
+  product_name_office_design: "",
+  group_product: "",
+  model: "",
+});
+const formData = ref({
+  id: "",
+  customer_name: "",
+  branch_name: "",
+  branch_code: "",
+  quotation_number_office_design: "",
+  customer_order_number: "",
+  plan_delivery_date: "",
+  product_preparation_date: "",
+  company_name: "",
+  prepared_by: "",
+  status: "",
+  document_preparation_number: "",
+  stock: [],
+});
+const serialNumbers = ref([])
+const route = useRoute();
+const router = useRouter();
+const form = ref({
+  customerName: '',
+  companyName: '',
+  branchName: '',
+  branchCode: '',
+  quotationNumber: '',
+  customerOrderNumber: '',
+  preparedDate: '',
+  deliveryDate: '',
+  items: [
+    { productCode: '', productName: '', selectedCategory: '', selectedModel: '', serialNumber: '' }
+  ]
+});
 
 async function submitForm() {
   try {
@@ -177,16 +217,8 @@ async function submitForm() {
     console.error('Error updating stock:', error);
   }
 }
-const selectedSerialNumber = ref("");
-const brokenCategory = ref("");
-const brokenDescription = ref("");
 
-const selectedItem = ref({
-  product_code_office_design: "",
-  product_name_office_design: "",
-  group_product: "",
-  model: "",
-});
+
 const updateSelectedItem = () => {
   const found = serialNumbers.value.find((s) => s.serial_number === selectedSerialNumber.value);
   if (found) {
@@ -205,38 +237,8 @@ const formatDate = (dateString) => {
   if (!dateString) return "";
   return dateString.split("T")[0];
 };
-const serialNumbers = ref([])
-const route = useRoute();
-const router = useRouter();
-const form = ref({
-  customerName: '',
-  companyName: '',
-  branchName: '',
-  branchCode: '',
-  quotationNumber: '',
-  customerOrderNumber: '',
-  preparedDate: '',
-  deliveryDate: '',
-  items: [
-    { productCode: '', productName: '', selectedCategory: '', selectedModel: '', serialNumber: '' }
-  ]
-});
 
-const formData = ref({
-  id: "",
-  customer_name: "",
-  branch_name: "",
-  branch_code: "",
-  quotation_number_office_design: "",
-  customer_order_number: "",
-  plan_delivery_date: "",
-  product_preparation_date: "",
-  company_name: "",
-  prepared_by: "",
-  status: "",
-  document_preparation_number: "",
-  stock: [],
-});
+
 
 async function switchEquipment(selectedSerialNumber, item) {
   try {
