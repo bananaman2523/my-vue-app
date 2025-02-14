@@ -58,39 +58,7 @@
         </form>
       </div>
       <h1>อุปกรณ์</h1>
-      <div v-for="(formItem, index) in form.items" :key="index" class="container-product">
-        <form @submit.prevent="submitForm">
-          <div class="form-row">
-            <label>รหัสสินค้าของ Office Design</label>
-            <select v-model="formItem.productCode" @change="updateProduct(index)">
-              <option value="">Select a category</option>
-              <option v-for="productCode in productConfig" :key="productCode.product_code" :value="productCode.product_code">
-                {{ productCode.product_code }}
-              </option>
-            </select>
-          </div>
-          <div class="form-row">
-            <label>ชื่อสินค้าของ Office Design</label>
-            <input v-model="formItem.productName" type="text" disabled class="disable-form"/>
-          </div>
-          <div style="display: flex;justify-content: end;">
-            <button type="button" @click="removeForm(index)" class="delete-button">X</button>
-          </div>
-          <div class="form-row">
-            <label>อุปกรณ์</label>
-            <input v-model="formItem.productModel" type="text" disabled class="disable-form"/>
-          </div>
-          <div class="form-row">
-            <label>รุ่น/แบรนด์</label>
-            <input type="text" v-model="formItem.productBrand" disabled class="disable-form"/>
-          </div>
-          <div class="form-row">
-            <label>Serial Number</label>  
-            <input v-model="formItem.serialNumber" @change="cheakSerialNumberInStock(formItem.serialNumber, formItem)">
-          </div>
-        </form>
-      </div>
-      <button @click="addForm" class="add-button">+ Add New</button>
+      <addReceiptProduct v-model:products="receiptProducts"/>
       <div class="form-actions">
         <button type="button" @click="submitForm">บันทึก</button>
       </div>
@@ -109,9 +77,11 @@ import SidebarMenu from "@/components/SidebarMenu.vue";
 import ApprovePopup from "@/components/popup/ApprovePopup.vue";
 import ErrorPopup from "@/components/popup/ErrorPopup.vue";
 import WarningPopup from "@/components/popup/WarningPopup.vue";
+import addReceiptProduct from "./addReceiptProduct.vue";
+
 const warningPopup = ref(null);
 const approvePopup = ref(null);
-
+const receiptProducts = ref([]);
 const getUser = JSON.parse(localStorage.getItem('user'))
 const user = `${getUser.first_name} ${getUser.last_name}`
 const productConfig = ref({ product: [] });
@@ -135,14 +105,6 @@ const form = ref({
   ]
 });
 
-const addForm = () => {
-  form.value.items.push({ productCode: '', productName: '', productModel: '', productBrand: '', serialNumber: '' });
-};
-
-const removeForm = (index) => {
-  form.value.items.splice(index, 1);
-};
-
 function simplifyInput(input) {
   const result = {
     companies: [],
@@ -163,71 +125,6 @@ function simplifyInput(input) {
   return result;
 }
 
-async function cheakSerialNumberInStock(serialNumber, formItem) {
-  try {
-    if (serialNumber) {
-      const isDuplicateInForm = form.value.items.some(
-        (item) => item !== formItem && item.serialNumber === serialNumber
-      );
-
-      if (isDuplicateInForm) {
-        warningPopup.value.showWarningDuplicate();
-        formItem.serialNumber = "";
-        return;
-      }
-
-      const checks = (await directus.request(
-        readItems("stock", {
-          filter: {
-            serial_number: {
-              _eq: serialNumber,
-            },
-            model: {
-              _eq: formItem.productBrand,
-            },
-            group_product: {
-              _eq: formItem.productModel,
-            },
-            product_name_office_design: {
-              _eq: formItem.productName,
-            },
-            product_code_office_design: {
-              _eq: formItem.productCode,
-            },
-          },
-        })
-      )) || [];
-
-      const checksStatus = checks[0]
-      if (checks.length != 0) {
-        if (checksStatus.status === 'ชำรุด') {
-          warningPopup.value.showWarningBroken();
-          formItem.serialNumber = "";
-        } else if (checksStatus.stock_id !== null) {
-          warningPopup.value.showWarningAlreadyUse();
-          formItem.serialNumber = "";
-        }  else if (checksStatus.device_status === 'เครื่องสำรอง') {
-          warningPopup.value.showWarningBackupDevice();
-          formItem.serialNumber = "";
-        }
-        
-        if (Array.isArray(checks) && checks.length == 0) {
-          warningPopup.value.showWarning();
-          formItem.serialNumber = "";
-        }  
-      }else{
-        warningPopup.value.showWarning();
-        formItem.serialNumber = "";
-      }
-      
-      
-    }
-    
-  } catch (error) {
-    console.error("Error generating preparation number:", error);
-  }
-  
-}
 
 const fetchData = async () => {
   try {
@@ -277,7 +174,6 @@ const fetchData = async () => {
       })
     );
     productConfig.value = config[0].product_code
-    console.log(productConfig.value);
     
 
   } catch (error) {
@@ -326,6 +222,7 @@ async function generatePreparationNumber() {
 
 const addStock = async () => {
   const docNumber = await generatePreparationNumber()
+  console.log(receiptProducts.value);
   try {
     const create = await directus.request(
       createItem('packing_sheet', {
@@ -342,10 +239,8 @@ const addStock = async () => {
         status: 'รอตรวจเช็ก'
       })
     )
-    console.log(create.id);
     
-    const stockIds = form.value.items
-      .map(item => item.serialNumber)
+    const stockIds = receiptProducts.value.flatMap(item => item.serialNumbers);
     
     const readStock = await directus.request(
       readItems("stock", {
@@ -357,8 +252,10 @@ const addStock = async () => {
         },
       })
     );
+    console.log(readStock);
+    
     const stock = readStock.map(item => item.id);
-
+      
     const updateStock = await directus.request(
       updateItems('stock', stock, {
         status: 'รอตรวจเช็ก',
@@ -373,19 +270,6 @@ const addStock = async () => {
 
 const submitForm = () => {
   addStock();
-};
-
-const updateProduct = (index) => {
-  const formItem = form.value.items[index];
-  const selectedProduct = productConfig.value.find(
-    (product) => product.product_code === formItem.productCode
-  );
-
-  if (selectedProduct) {
-    formItem.productName = selectedProduct.product_name || '';
-    formItem.productModel = selectedProduct.equipment.model || '';
-    formItem.productBrand = selectedProduct.equipment.brand || '';
-  }
 };
 
 </script>

@@ -92,38 +92,6 @@ const warningPopup = ref(null);
 const approvePopup = ref(null);
 const errorPopup = ref(null);
 
-const resetForm = () => {
-  formData.value = {
-    receivedDate: new Date().toISOString().split("T")[0],
-    supplierName: "",
-    deliveryNoteNumber: "",
-    deliveryNoteDate: "",
-    taxInvoiceNumber: "",
-    invoiceDate: "",
-    receiptNumber: "",
-    receiptDate: "",
-    billingNoteNumber: "",
-    dueDate: "",
-    itemCode: "",
-    supplierProductName: "",
-  };
-  receiptProducts.value = [];
-};
-
-function objectToArray(obj) {
-    return Object.values(obj);
-}
-
-function formatDate(dateString) {
-    if (!dateString) return null;
-    const date = new Date(dateString);
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const year = date.getFullYear();
-
-    return `${day}/${month}/${year}`;
-}
-
 // function formatObjectDates(obj) {
 //     Object.keys(obj).forEach(key => {
 //         if (obj[key] && typeof obj[key] === 'string' && !isNaN(Date.parse(obj[key]))) {

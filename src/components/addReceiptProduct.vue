@@ -53,6 +53,8 @@ import { ref, watch } from 'vue';
 import { directus } from "@/services/directus";
 import { readItems } from "@directus/sdk";
 import WarningPopup from "@/components/popup/WarningPopup.vue";
+import { useRoute } from 'vue-router';
+const route = useRoute();
 const warningPopup = ref(null);
 
 const emit = defineEmits(['update:products']);
@@ -131,7 +133,7 @@ async function cheakSerialNumberInStock(serialNumber, formItem) {
       )) || [];
 
       const isDuplicateInStock = checks.some(check => check.serial_number === serialNumber);
-      if (isDuplicateInStock) {
+      if (isDuplicateInStock && route.name !== 'DocumentPreparation') {
         warningPopup.value.showWarningSerailNumberDuplicated();
         formItem.serialNumbers[formItem.serialNumbers.indexOf(serialNumber)] = "";
         return;
@@ -144,7 +146,26 @@ async function cheakSerialNumberInStock(serialNumber, formItem) {
         formItem.serialNumbers[position] = "";
         return;
       }
-      
+
+      if(route.name === 'DocumentPreparation'){
+        const stock = (await directus.request(
+          readItems("stock", {
+            filter: {
+              serial_number: {
+                _eq: serialNumber,
+              },
+            },
+          })
+        )) || [];
+        
+        if (stock.length === 0 ) {
+          warningPopup.value.showWarning();
+          const position = findDuplicatePosition(formItem.serialNumbers, serialNumber);
+          formItem.serialNumbers[position] = "";
+          return;   
+        }
+      }
+
     }
     
   } catch (error) {

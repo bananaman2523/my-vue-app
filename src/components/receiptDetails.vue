@@ -116,6 +116,8 @@
               <input type="text" v-model="formData.serial_number" required :disabled="disabledField" class="disable-form"/>
             </div>
             <div class="form">
+              <label style="margin-right: 16px;">ตรวจสอบโดย</label>
+              <input type="text" v-model="formData.checked_by" required :disabled="disabledField" class="disable-form" style="margin-right: 16px;"/>
               <button type="button" class="update-button" @click="updateForm">บันทึก</button>
               <button type="button" class="delete-button" @click="deleteForm">ลบ</button>
             </div>
@@ -141,7 +143,8 @@ import WarningPopup from "@/components/popup/WarningPopup.vue";
 const warningPopup = ref(null);
 const approvePopup = ref(null);
 const errorPopup = ref(null);
-
+const getUser = JSON.parse(localStorage.getItem('user'))
+const user = `${getUser.first_name} ${getUser.last_name}`
 const route = useRoute();
 const router = useRouter();
 const disabledField = ref(false);
@@ -163,7 +166,8 @@ const formData = ref({
   statusProduct: "",
   status: "",
   broken_category: "",
-  broken_description: ""
+  broken_description: "",
+  checked_by: "",
 });
 
 const formatDate = (dateString) => {
@@ -208,6 +212,7 @@ const fetchData = async () => {
         status: data.status || "",
         broken_category: data.broken_category || "",
         broken_description: data.broken_description || "",
+        checked_by: user || "",
       };
       disabledField.value = true;
     }
@@ -250,6 +255,7 @@ async function updateForm() {
         status: formData.value.status,
         broken_category: formData.value.status === 'พร้อมใช้งาน' ? null : formData.value.broken_category || '',
         broken_description: formData.value.status === 'พร้อมใช้งาน' ? null : formData.value.broken_description || '',
+        checked_by: formData.value.status === 'พร้อมใช้งาน' ? null : user || '',
       })
     );
     approvePopup.value.showSuccessUpdate()
