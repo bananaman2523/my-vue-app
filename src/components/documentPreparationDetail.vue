@@ -63,20 +63,16 @@
             <input type="text" v-model="item.product_code_office_design" disabled/>
           </div>
           <div class="form-row">
-            <label>รหัสสินค้าของ Office Design</label>
-            <input type="text" v-model="item.product_code_office_design" disabled/>
-          </div>
-          <div class="form-row">
             <label>ชื่อสินค้าของ Office Design</label>
             <input type="text" v-model="item.product_name_office_design" disabled/>
           </div>
           <div class="form-row">
             <label>อุปกรณ์</label>
-            <input type="text" v-model="item.model" disabled/>
+            <input type="text" v-model="item.group_product" disabled/>
           </div>
           <div class="form-row">
             <label>รุ่น/แบรนด์</label>
-            <input type="text" v-model="item.product_name_office_design" disabled/>
+            <input type="text" v-model="item.model" disabled/>
           </div>
           <div class="form-row">
             <label>Serial Number</label>
@@ -116,7 +112,23 @@
               <label>Serial Number</label>
               <input v-model="item.serialNumber" @change="cheakSerialNumberInStock(item.serialNumber, formData.stock[index])" type="text" :disabled="!item.productCode" :class="!item.productCode ? 'disable-form' : ''"/>
             </div>
-            <button @click="switchEquipment(selectedSerialNumber, item)">สับเปลี่ยน</button>
+            <br>
+            <div class="form-row">
+              <label>ประเภทชำรุด</label>
+              <select v-model="item.brokenCategory" :disabled="!item.serialNumber" :class="!item.serialNumber ? 'disable-form' : ''">
+                <option>ระบุ</option>
+                <option>software</option>
+                <option>hardware</option>
+              </select>
+            </div>
+            <div class="form-row">
+              <label>รายละเอียด</label>
+              <input v-model="item.brokenDescription" type="text" style="width: 320px;" :disabled="!item.serialNumber" :class="!item.serialNumber ? 'disable-form' : ''"/>
+            </div>
+            <div style="display: flex; align-items: flex-end;">
+              <button type="button" @click="switchEquipment(item)">สับเปลี่ยน</button>
+            </div>
+            
           </div>
           
         </form>
@@ -152,15 +164,6 @@ const approvePopup = ref(null);
 
 const getUser = JSON.parse(localStorage.getItem('user'))
 const user = `${getUser.first_name} ${getUser.last_name}`
-const selectedSerialNumber = ref("");
-const brokenCategory = ref("");
-const brokenDescription = ref("");
-const selectedItem = ref({
-  product_code_office_design: "",
-  product_name_office_design: "",
-  group_product: "",
-  model: "",
-});
 const formData = ref({
   id: "",
   customer_name: "",
@@ -222,21 +225,6 @@ async function submitForm() {
   }
 }
 
-
-const updateSelectedItem = () => {
-  const found = serialNumbers.value.find((s) => s.serial_number === selectedSerialNumber.value);
-  if (found) {
-    selectedItem.value = { ...found };
-  } else {
-    selectedItem.value = {
-      product_code_office_design: "",
-      product_name_office_design: "",
-      group_product: "",
-      model: "",
-    };
-  }
-};
-
 const formatDate = (dateString) => {
   if (!dateString) return "";
   return dateString.split("T")[0];
@@ -244,15 +232,17 @@ const formatDate = (dateString) => {
 
 
 
-async function switchEquipment(selectedSerialNumber, item) {
+async function switchEquipment(item) {
   try {
+    console.log(item)
+    
     const packingID = route.params.id;
     
     await directus.request(
       updateItem('stock', item.id, { 
         status: 'ชำรุด',
-        broken_description: brokenDescription.value,
-        broken_category: brokenCategory.value,
+        broken_description: item.brokenDescription,
+        broken_category: item.brokenCategory,
       })
     );
 
@@ -260,10 +250,11 @@ async function switchEquipment(selectedSerialNumber, item) {
       readItems("stock", {
         fields: ["*"],
         filter: {
-          serial_number: { _eq: selectedSerialNumber }
+          serial_number: { _eq: item.serialNumber }
         }
       })
-    );  
+    );
+    console.log(newStockItem)
 
     if (!newStockItem) {
       throw new Error("Stock item not found with the given serial number.");
