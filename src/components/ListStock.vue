@@ -332,6 +332,16 @@ const toggleFilterVisibility = () => {
 </script>
 
 <style scoped>
+select {
+  padding: 12px;
+  margin-top: 4px;
+  border: 1px solid #d0d0d0;
+  border-radius: 8px;
+  font-size: 16px;
+  background-color: #f7f7f7;
+  color: #333;
+  transition: all 0.3s ease;
+}
 .form-row {
   display: flex;
   flex-direction: column;
