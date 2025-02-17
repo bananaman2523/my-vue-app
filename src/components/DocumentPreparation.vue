@@ -222,7 +222,6 @@ async function generatePreparationNumber() {
 
 const addStock = async () => {
   const docNumber = await generatePreparationNumber()
-  console.log(receiptProducts.value);
   try {
     const create = await directus.request(
       createItem('packing_sheet', {
@@ -236,7 +235,7 @@ const addStock = async () => {
         quotation_number_office_design: form.value.quotationNumber,
         customer_order_number: form.value.customerOrderNumber,
         prepared_by: user,
-        status: 'รอตรวจเช็ก'
+        status: 'รอเช็คก่อนส่ง'
       })
     )
     
@@ -258,7 +257,7 @@ const addStock = async () => {
       
     const updateStock = await directus.request(
       updateItems('stock', stock, {
-        status: 'รอตรวจเช็ก',
+        status: 'รอเช็คก่อนส่ง',
         stock_id: create.id,
       })
     )

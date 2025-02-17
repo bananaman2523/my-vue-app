@@ -88,17 +88,17 @@
           </div>
           <div v-if="item.status === 'ชำรุด'" style="display: contents;">
             <div class="form-row">
-              <label>รหัสสินค้าของ Office Design</label>
-              <select v-model="item.productCode" @change="updateProduct(index)">
+              <label>ชื่อสินค้าของ Office Design</label>
+              <select v-model="item.productName" @change="updateProduct(index)">
                 <option value="">Select a category</option>
-                <option v-for="productCode in productConfig" :key="productCode.product_code" :value="productCode.product_code">
-                  {{ productCode.product_code }}
+                <option v-for="productName in productConfig" :key="productName.product_name" :value="productName.product_name">
+                  {{ productName.product_name }}
                 </option>
               </select>
             </div>
             <div class="form-row">
-              <label>ชื่อสินค้าของ Office Design</label>
-              <input v-model="item.productName" type="text" disabled class="disable-form"/>
+              <label>รหัสสินค้าของ Office Design</label>
+              <input v-model="item.productCode" type="text" disabled class="disable-form"/>
             </div>
             <div class="form-row">
               <label>อุปกรณ์</label>
@@ -215,8 +215,9 @@ async function submitForm() {
           status: 'ผ่าน',
       })
       )
-      window.scrollTo(0, 0);
-      window.location.reload();
+      // window.scrollTo(0, 0);
+      // window.location.reload();
+      approvePopup.value.showSuccess();
     } else {
       console.warn('Not all items are marked as "ผ่าน". Update skipped.');
     }
@@ -234,8 +235,6 @@ const formatDate = (dateString) => {
 
 async function switchEquipment(item) {
   try {
-    console.log(item)
-    
     const packingID = route.params.id;
     
     await directus.request(
@@ -265,7 +264,7 @@ async function switchEquipment(item) {
     );
 
     await directus.request(
-      updateItem('stock', newStockItem.id, { status: 'รอตรวจสอบ' })
+      updateItem('stock', newStockItem.id, { status: 'รอเช็คก่อนส่ง' })
     );
 
     window.location.reload();
@@ -411,15 +410,15 @@ async function deleteForm() {
 const updateProduct = (index) => {
   const formItem = formData.value.stock[index];
   const selectedProduct = productConfig.value.find(
-    (product) => product.product_code === formItem.productCode
+    (product) => product.product_name === formItem.productName
   );
 
   if (selectedProduct) {
-    formItem.productName = selectedProduct.product_name || '';
+    formItem.productCode = selectedProduct.product_code || '';
     formItem.productModel = selectedProduct.equipment.model || '';
     formItem.productBrand = selectedProduct.equipment.brand || '';
   }else{
-    formItem.productName = '';
+    formItem.productCode = '';
     formItem.productModel = '';
     formItem.productBrand = '';
   }

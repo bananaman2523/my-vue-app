@@ -64,6 +64,11 @@
           <button @click="downloadReport()" style="border-radius: 16px;padding: 10px 20px; min-width: 120px; height: 40px;">Export</button>
         </div>    
       </div>
+      <div class="info-container">
+        <div class="form-row">
+          <label>จำนวนสถานะ พร้อมใช้งาน , ชำรุด , รอเช็คก่อนส่ง , รอตรวจสอบอุปกรณ์</label>
+        </div>
+      </div>
       <!-- <button @click="toggleFilterVisibility" class="toggle-btn">
         {{ isFilterVisible ? 'ซ่อน Filter' : 'แสดง Filter' }}
       </button> -->
@@ -429,6 +434,17 @@ table tbody tr:hover {
   background-color: #e9ecef;
   color: #bbb;
   cursor: not-allowed;
+}
+
+.info-container{
+  display: grid;
+  gap: 20px;
+  padding: 25px;
+  max-width: 100%;
+  box-sizing: border-box;
+  background-color: #f4f4f9; 
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .input-container {

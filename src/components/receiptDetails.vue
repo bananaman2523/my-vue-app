@@ -95,12 +95,12 @@
         <form>
           <div style="display: contents;">
             <div class="form-row">
-              <label>รหัสสินค้า Office Design <label style="color: red;">*</label></label>
-              <input type="text" v-model="formData.productCodeOfficeDesign" required :disabled="disabledField" class="disable-form"/>
-            </div>
-            <div class="form-row">
               <label>ชื่อสินค้า Office Design <label style="color: red;">*</label></label>
               <input type="text" v-model="formData.productNameOfficeDesign" required :disabled="disabledField" class="disable-form"/>
+            </div>
+            <div class="form-row">
+              <label>รหัสสินค้า Office Design <label style="color: red;">*</label></label>
+              <input type="text" v-model="formData.productCodeOfficeDesign" required :disabled="disabledField" class="disable-form"/>
             </div>
             <br>
             <div class="form-row">

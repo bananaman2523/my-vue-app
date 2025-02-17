@@ -5,17 +5,17 @@
         <form @submit.prevent="submitForm">
           <div style="display: contents;">
             <div class="form-row">
-              <label>รหัสสินค้า Office Design <label style="color: red;">*</label></label>
-              <select v-model="form.productCode" @change="updateProduct(index)">
+              <label>ชื่อสินค้า Office Design <label style="color: red;">*</label></label>
+              <select v-model="form.productName" @change="updateProduct(index)">
                 <option value="">Select a category</option>
-                <option v-for="productCode in data" :key="productCode.product_code" :value="productCode.product_code">
-                  {{ productCode.product_code }}
+                <option v-for="productName in data" :key="productName.product_name" :value="productName.product_name">
+                  {{ productName.product_name }}
                 </option>
               </select>
             </div>
             <div class="form-row">
-              <label>ชื่อสินค้า Office Design <label style="color: red;">*</label></label>
-              <input type="text" v-model="form.productName" disabled class="disable-form"/>
+              <label>รหัสสินค้า Office Design <label style="color: red;">*</label></label>
+              <input type="text" v-model="form.productCode" disabled class="disable-form"/>
             </div>
             <div style="display: flex; justify-content: end;">
               <button type="button" @click="removeForm(index)" class="delete-button">X</button>
@@ -102,9 +102,9 @@ const fetchData = async () => {
 
 const updateProduct = (index) => {
   const form = forms.value[index];
-  const selectedProduct = data.value.find(product => product.product_code === form.productCode);
+  const selectedProduct = data.value.find(product => product.product_name === form.productName);
   if (selectedProduct) {
-    form.productName = selectedProduct.product_name || '';
+    form.productCode = selectedProduct.product_code || '';
     form.productModel = selectedProduct.equipment.model || ''
     form.productBrand = selectedProduct.equipment.brand || ''
   }
@@ -163,6 +163,11 @@ async function cheakSerialNumberInStock(serialNumber, formItem) {
           const position = findDuplicatePosition(formItem.serialNumbers, serialNumber);
           formItem.serialNumbers[position] = "";
           return;   
+        }else if (stock[0].status === 'ชำรุด') {
+          warningPopup.value.showWarningBroken();
+          const position = findDuplicatePosition(formItem.serialNumbers, serialNumber);
+          formItem.serialNumbers[position] = "";
+          return;
         }
       }
 
