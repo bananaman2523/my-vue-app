@@ -60,9 +60,19 @@
           <label class="label-filter">ค้นหาด้วย S/N</label>
           <input v-model="filterData.sn" type="text" class="input-field" placeholder="S/N">
         </div>
-        <div style="text-align: right; padding: 25px;">
+        <div class="form-row">
+          <label class="label-filter">สถานะ</label>
+          <select v-model="filterData.status">
+            <option value=""></option>
+            <option value="ชำรุด">ชำรุด</option>
+            <option value="รอตรวจสอบอุปกรณ์">รอตรวจสอบอุปกรณ์</option>
+            <option value="พร้อมใช้งาน">พร้อมใช้งาน</option>
+            <option value="รอเช็คก่อนส่ง">รอเช็คก่อนส่ง</option>
+          </select>
+        </div>
+        <div style="text-align: left; padding: 25px;">
           <button @click="downloadReport()" style="border-radius: 16px;padding: 10px 20px; min-width: 120px; height: 40px;">Export</button>
-        </div>    
+        </div>
       </div>
       <div class="info-container">
         <div class="form-row">
@@ -155,6 +165,7 @@ const filterData = ref({
   product_category: "",
   model: "",
   sn: "",
+  status: "",
 });
 
 const downloadReport = async () => {
@@ -254,7 +265,8 @@ const paginatedData = computed(() => {
       (!filterData.value.product_name_office_design || (item.product_name_office_design && item.product_name_office_design.includes(filterData.value.product_name_office_design))) &&
       (!filterData.value.product_category || (item.product_category && item.product_category.includes(filterData.value.product_category))) &&
       (!filterData.value.model || (item.model && item.model.includes(filterData.value.model))) &&
-      (!filterData.value.sn || (item.sn && item.sn.includes(filterData.value.sn)))
+      (!filterData.value.sn || (item.sn && item.sn.includes(filterData.value.sn))) && 
+      (!filterData.value.status || (item.status && item.status.includes(filterData.value.status)))
     );
   });
 
@@ -282,7 +294,8 @@ const paginatedDataExport = computed(() => {
       (!filterData.value.product_name_office_design || (item.product_name_office_design && item.product_name_office_design.includes(filterData.value.product_name_office_design))) &&
       (!filterData.value.product_category || (item.product_category && item.product_category.includes(filterData.value.product_category))) &&
       (!filterData.value.model || (item.model && item.model.includes(filterData.value.model))) &&
-      (!filterData.value.sn || (item.sn && item.sn.includes(filterData.value.sn)))
+      (!filterData.value.sn || (item.sn && item.sn.includes(filterData.value.sn))) && 
+      (!filterData.value.status || (item.status && item.status.includes(filterData.value.status)))
     );
   });
 

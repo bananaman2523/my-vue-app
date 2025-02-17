@@ -1,18 +1,23 @@
 const XLSX = require('xlsx-js-style');
 
+function formatDate(date) {
+    if (!date) return ''; // Handle null or undefined dates
+    return new Date(date).toLocaleDateString('en-GB'); // Format to 'DD/MM/YYYY' or adjust as needed
+}
+
 function writeFileAndDownload(filename = 'data.xlsx', data) {
     const transformedData = data.map(item => ({
         id: item.id,
-        'วันที่รับ': item.receive_date,
+        'วันที่รับ': formatDate(item.receive_date),
         'ชื่อ supplier': item.name_supplier,
         'เลขที่ใบส่งสินค้า': item.bill_lading_number,
-        'วันเลขที่ใบส่งสินค้า': item.bill_lading_number_date,
+        'วันเลขที่ใบส่งสินค้า': formatDate(item.bill_lading_number_date),
         'เลขที่ใบกำกับภาษี': item.invoice_number,
-        'Invoice date': item.invoice_number_date,
+        'Invoice date': formatDate(item.invoice_number_date),
         'เลขที่ใบเสร็จ': item.receipt_number,
-        'วันที่ใบเสร็จ': item.receipt_number_date,
+        'วันที่ใบเสร็จ': formatDate(item.receipt_number_date),
         'เลขที่ใบวางบิล': item.bill_number,
-        'วันที่ due ชำระ': item.due_date,
+        'วันที่ due ชำระ': formatDate(item.due_date),
         'Item code': item.item_code,
         'ชื่อสินค้า (Supplier)': item.product_name_supplier,
         'รหัสสินค้า Office Design': item.product_code_office_design,
