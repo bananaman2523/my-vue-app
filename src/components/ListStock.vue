@@ -66,7 +66,7 @@
       </div>
       <div class="info-container">
         <div class="form-row">
-          <label>จำนวนสถานะ พร้อมใช้งาน , ชำรุด , รอเช็คก่อนส่ง , รอตรวจสอบอุปกรณ์</label>
+          <label>จำนวนสถานะ พร้อมใช้งาน {{ countReadyUse }} , ชำรุด {{ countBroken }} , รอเช็คก่อนส่ง {{ countWaitCheck }}, รอตรวจสอบอุปกรณ์ {{ countWaitCheckEquipment }}</label>
         </div>
       </div>
       <!-- <button @click="toggleFilterVisibility" class="toggle-btn">
@@ -196,6 +196,38 @@ const fetchData = async () => {
 };
 
 fetchData();
+
+countStatus()
+const countBroken = ref(0);
+const countWaitCheck = ref(0);
+const countWaitCheckEquipment = ref(0);
+const countReadyUse = ref(0);
+async function countStatus(input) {
+  try {
+    const response = await directus.request(
+      readItems("stock", {
+        aggregate: {
+          count: "*",
+        },
+        groupBy: ["status"],
+        filter: {
+          status: {
+            _in: ["ชำรุด","รอเช็คก่อนส่ง","รอตรวจสอบอุปกรณ์","พร้อมใช้งาน"],
+          },
+        },
+      })
+    );
+    
+    countBroken.value = response.find(item => item.status === "ชำรุด")?.count;
+    countWaitCheck.value = response.find(item => item.status === "รอเช็คก่อนส่ง")?.count;
+    countWaitCheckEquipment.value = response.find(item => item.status === "รอตรวจสอบอุปกรณ์")?.count;
+    countReadyUse.value = response.find(item => item.status === "พร้อมใช้งาน")?.count;
+    
+  } catch (error) {
+    console.error("Error fetching count:", error);
+    return 0;
+  }
+}
 
 const totalPages = computed(() => Math.ceil(data.value.length / itemsPerPage));
 
