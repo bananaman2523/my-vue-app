@@ -3,7 +3,7 @@
     <SidebarMenu />
     <main>
       <h1>อุปกรณ์ชำรุด</h1>
-      <!-- <div v-show="isFilterVisible" class="input-container">
+      <div v-show="isFilterVisible" class="input-container">
         <div class="form-row">
           <label>ค้นหาด้วย วันที่รับ เริ่มต้น</label>
           <input type="date" v-model="filterData.receive_date_from" placeholder="From Date">
@@ -60,10 +60,20 @@
           <label class="label-filter">ค้นหาด้วย S/N</label>
           <input v-model="filterData.sn" type="text" class="input-field" placeholder="S/N">
         </div>
-        <div style="text-align: right; padding: 25px;">
+        <div class="form-row">
+          <label class="label-filter">สถานะ</label>
+          <select v-model="filterData.status">
+            <option value=""></option>
+            <option value="ชำรุด">ชำรุด</option>
+            <option value="รอตรวจสอบอุปกรณ์">รอตรวจสอบอุปกรณ์</option>
+            <option value="พร้อมใช้งาน">พร้อมใช้งาน</option>
+            <option value="รอเช็คก่อนส่ง">รอเช็คก่อนส่ง</option>
+          </select>
+        </div>
+        <div style="text-align: left; padding: 25px;">
           <button @click="downloadReport()" style="border-radius: 16px;padding: 10px 20px; min-width: 120px; height: 40px;">Export</button>
-        </div>    
-      </div> -->
+        </div>
+      </div>
       <!-- <button @click="toggleFilterVisibility" class="toggle-btn">
         {{ isFilterVisible ? 'ซ่อน Filter' : 'แสดง Filter' }}
       </button> -->
@@ -194,7 +204,8 @@ const paginatedData = computed(() => {
       (!filterData.value.product_name_office_design || (item.product_name_office_design && item.product_name_office_design.includes(filterData.value.product_name_office_design))) &&
       (!filterData.value.product_category || (item.product_category && item.product_category.includes(filterData.value.product_category))) &&
       (!filterData.value.model || (item.model && item.model.includes(filterData.value.model))) &&
-      (!filterData.value.sn || (item.sn && item.sn.includes(filterData.value.sn)))
+      (!filterData.value.sn || (item.sn && item.sn.includes(filterData.value.sn))) && 
+      (!filterData.value.status || (item.status && item.status.includes(filterData.value.status)))
     );
   });
 
@@ -224,7 +235,8 @@ const paginatedDataExport = computed(() => {
       (!filterData.value.product_name_office_design || (item.product_name_office_design && item.product_name_office_design.includes(filterData.value.product_name_office_design))) &&
       (!filterData.value.product_category || (item.product_category && item.product_category.includes(filterData.value.product_category))) &&
       (!filterData.value.model || (item.model && item.model.includes(filterData.value.model))) &&
-      (!filterData.value.sn || (item.sn && item.sn.includes(filterData.value.sn)))
+      (!filterData.value.sn || (item.sn && item.sn.includes(filterData.value.sn))) && 
+      (!filterData.value.status || (item.status && item.status.includes(filterData.value.status)))
     );
   });
 
@@ -261,6 +273,16 @@ const toggleFilterVisibility = () => {
 </script>
 
 <style scoped>
+select {
+  padding: 12px;
+  margin-top: 4px;
+  border: 1px solid #d0d0d0;
+  border-radius: 8px;
+  font-size: 16px;
+  background-color: #f7f7f7;
+  color: #333;
+  transition: all 0.3s ease;
+}
 .form-row {
   display: flex;
   flex-direction: column;
