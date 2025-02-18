@@ -4,18 +4,48 @@
       <img src="@/assets/office-design-logo-blue.png" alt="Office Design Logo" />
     </div>
     <ul>
-      <!-- <li @click="navigate('addReceipt')">เพิ่มข้อมูลการแจ้งซ่อม</li>
-      <li @click="navigate('list')">แสดงรายการทั้งหมด</li> -->
-      <li @click="navigate('receiptProduct')">เพิ่มสินค้านำเข้า</li>
-      <li @click="navigate('listStock')">คลังสินค้าขาย</li>
-      <li @click="navigate('listStockDefective')">อุปกรณ์ชำรุด</li>
-      <li @click="navigate('backupStock')">อุปกรณ์สำรอง</li>
-      <li @click="navigate('DocumentPreparation')">เพิ่มรายการจัดของ</li>
-      <li @click="navigate('listPreparation')">แสดงรายการจัดของ</li>
-      <li @click="navigate('documentShipping')">ใบจัดส่งสินค้า</li>
-      <!-- <li @click="navigate('stickerOrder')">ใบสติ๊กเกอร์ติดอุปกรณ์</li> -->
-      <!-- <li @click="navigate('completed')">รายการที่เสร็จสิ้นแล้ว</li>
-      <li @click="navigate('in-progress')">รายการที่กำลังดำเนินการ</li> -->
+      <li 
+        @click="navigate('receiptProduct')" 
+        :class="{ active: activeMenu === 'receiptProduct' }"
+      >
+        เพิ่มสินค้านำเข้า
+      </li>
+      <li 
+        @click="navigate('listStock')" 
+        :class="{ active: activeMenu === 'listStock' }"
+      >
+        คลังสินค้าขาย
+      </li>
+      <li 
+        @click="navigate('listStockDefective')" 
+        :class="{ active: activeMenu === 'listStockDefective' }"
+      >
+        อุปกรณ์ชำรุด
+      </li>
+      <li 
+        @click="navigate('backupStock')" 
+        :class="{ active: activeMenu === 'backupStock' }"
+      >
+        อุปกรณ์สำรอง
+      </li>
+      <li 
+        @click="navigate('DocumentPreparation')" 
+        :class="{ active: activeMenu === 'DocumentPreparation' }"
+      >
+        เพิ่มรายการจัดของ
+      </li>
+      <li 
+        @click="navigate('listPreparation')" 
+        :class="{ active: activeMenu === 'listPreparation' }"
+      >
+        แสดงรายการจัดของ
+      </li>
+      <li 
+        @click="navigate('documentShipping')" 
+        :class="{ active: activeMenu === 'documentShipping' }"
+      >
+        ใบจัดส่งสินค้า
+      </li>
     </ul>
     <div class="login">
       <div>
@@ -30,13 +60,15 @@
 
 <script setup>
 import { directus } from '@/services/directus';
-import { useRouter } from 'vue-router';
+import { useRouter , useRoute } from 'vue-router';
 import { readUsers } from "@directus/sdk";
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 
 const router = useRouter();
+const route = useRoute();
 const user = ref();
 const emit = defineEmits(['navigate']);
+const activeMenu = ref('');
 const navigate = (route) => {
   router.push({ name: route });
 };
@@ -73,6 +105,10 @@ const handleLogout = () => {
   
   router.push({ name: 'login' });
 };
+
+onMounted(() => {
+  activeMenu.value = route.name;
+});
 </script>
 
 <style scoped>
@@ -110,10 +146,11 @@ li {
   color: #333;
   font-size: 18px;
   font-weight: 600;
-  border-radius: 8px;
+  /* border-radius: 8px; */
   text-align: left;
   transition: background-color 0.3s, transform 0.2s ease;
   cursor: pointer;
+  width: 100%;
   margin-bottom: 16px;
   display: flex;
   align-items: center;
@@ -122,12 +159,11 @@ li {
 li:hover {
   background-color: #004080;
   color: #fff;
-  transform: translateX(4px);
 }
 
-li:active {
-  background-color: #003366;
-  transform: translateX(2px);
+li.active {
+  background-color: #004080;
+  color: #fff;
 }
 
 li svg {
