@@ -138,6 +138,7 @@
         <input v-model="user" type="text" disabled class="disable-form-user"/>
         <button v-if="formData.status !== 'ผ่าน'" type="button" @click="submitForm()">บันทึก</button>
         <button v-if="formData.status === 'ผ่าน'" style="margin-left: 16px;" type="button" @click="downloadReport">Export</button>
+        <button v-if="formData.status === 'ผ่าน' && formData.packing_sheet_id === null" style="margin-left: 16px;" type="button" @click="createShippingDocument()">สร้างใบจัดส่งสินค้า</button>
       </div>
       <div class="form-delete">
         <button type="button" @click="deleteForm">ลบ</button>
@@ -252,6 +253,7 @@ async function createShippingDocument() {
         packing_sheet: [packing.id]
       })
     );
+    window.location.reload();
   } catch (error) {
     console.error('Error updating stock:', error);
   }
@@ -365,7 +367,8 @@ const fetchData = async () => {
         prepared_by: data.prepared_by || "",
         status: data.status || "",
         document_preparation_number: data.document_preparation_number || "",
-        stock: data.stock || []
+        stock: data.stock || [],
+        packing_sheet_id: data.packing_sheet_id || null
       };
     }
       
@@ -411,9 +414,8 @@ const downloadReport = async () => {
 };
 
 async function deleteForm() {
-  const confirmDelete = window.confirm("Are you sure you want to delete this item?");
-  if (!confirmDelete) return;
-
+  const confirmDeleteResult = await warningPopup.value.confirmDelete();
+  if (!confirmDeleteResult.isConfirmed) return;
   try {
     const ids = formData.value.stock.map(item => item.id);
     const updateStock = await directus.request(
@@ -424,8 +426,13 @@ async function deleteForm() {
     await directus.request(
       deleteItem("packing_sheet", route.params.id)
     );
+    if (formData.value.packing_sheet_id != null) {
+      await directus.request(
+        deleteItem("delivery_sheet", formData.value.packing_sheet_id.id)
+      );
+    }
+    approvePopup.value.showSuccessDelete()
     router.push({ name: 'listPreparation' });
-    alert("Item deleted successfully!");
   } catch (error) {
     alert("Failed to delete item: " + error.message);
   }
