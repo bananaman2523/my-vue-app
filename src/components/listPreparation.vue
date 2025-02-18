@@ -138,7 +138,9 @@ const paginatedData = computed(() => {
     );
   });
 
-  return (filteredData.slice(start, start + itemsPerPage)).reverse();
+  const reverseData = filteredData.reverse()
+
+  return reverseData.slice(start, start + itemsPerPage);
 });
 
 const goToFirstPage = () => {

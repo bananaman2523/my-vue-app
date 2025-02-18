@@ -62,7 +62,7 @@ async function writeExcelShipping(filename, data) {
 
     // Merge A6:Q8 for "เอกสารจัดเตรียมสินค้า"
     worksheet.mergeCells("A6:Q8");
-    worksheet.getCell("A6").value = "เอกสารการส่งมอบสินค้า ปี 2025";
+    worksheet.getCell("A6").value = "เอกสารจัดส่งสินค้า";
     worksheet.getCell("A6").font = { bold: true, size: 22 };
     worksheet.getCell("A6").alignment = { horizontal: "center", vertical: "middle" };
 
