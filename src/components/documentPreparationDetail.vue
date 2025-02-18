@@ -152,7 +152,7 @@
 <script setup>
 import { ref } from 'vue';
 import { directus } from "@/services/directus";
-import { updateItems , readItems , updateItem , deleteItem} from "@directus/sdk";
+import { updateItems , readItems , updateItem , deleteItem , createItem } from "@directus/sdk";
 import SidebarMenu from "@/components/SidebarMenu.vue";
 import { useRoute , useRouter} from "vue-router";
 import axios from 'axios';
@@ -202,11 +202,13 @@ async function submitForm() {
   try {
     const packingID = route.params.id
     const allPassed = formData.value.stock.every(item => item.status === 'ผ่าน');
+    const timestamp = new Date().toISOString().split('.')[0];
     if (allPassed) {
       const updatePacking = await directus.request(
         updateItem('packing_sheet', packingID, {
           status: 'ผ่าน',
-          checked_by: user
+          checked_by: user,
+          checked_date: timestamp,
         })
       );
       const ids = formData.value.stock.map(item => item.id);      
@@ -217,6 +219,7 @@ async function submitForm() {
       )
       // window.scrollTo(0, 0);
       // window.location.reload();
+      createShippingDocument();
       approvePopup.value.showSuccess();
     } else {
       console.warn('Not all items are marked as "ผ่าน". Update skipped.');
@@ -231,7 +234,28 @@ const formatDate = (dateString) => {
   return dateString.split("T")[0];
 };
 
-
+async function createShippingDocument() {
+  try {
+    const packing_sheet = await directus.request(
+      readItems("packing_sheet", {
+        fields: ['*.*'],
+        filter: {
+          id: { _eq: route.params.id }
+        }
+      })
+    );
+    const packing = packing_sheet[0]
+    const result = await directus.request(
+      createItem('delivery_sheet', {
+        document_delivery_number: packing.document_preparation_number,
+        delivery_date: packing.plan_delivery_date,
+        packing_sheet: [packing.id]
+      })
+    );
+  } catch (error) {
+    console.error('Error updating stock:', error);
+  }
+}
 
 async function switchEquipment(item) {
   try {

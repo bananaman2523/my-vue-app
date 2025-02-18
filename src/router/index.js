@@ -15,6 +15,8 @@ import receiptDetailsPage from "@/components/receiptDetails.vue";
 import DocumentPreparationDetailPage from "@/components/documentPreparationDetail.vue";
 import ListStockDefectivePage from "@/components/ListStockDefective.vue";
 import BackupStockPage from "@/components/BackupStock.vue";
+import DocumentShippingPage from "@/components/DocumentShipping.vue";
+import DocumentShippingDetailPage from "@/components/DocumentShippingDetail.vue";
 const routes = [
   {
     path: "/addReceipt",
@@ -99,7 +101,17 @@ const routes = [
     path: "/backupStock",
     name: "backupStock",
     component: BackupStockPage
-  }
+  },
+  {
+    path: "/documentShipping",
+    name: "documentShipping",
+    component: DocumentShippingPage
+  },
+  {
+    path: "/documentShippingDetail/:id",
+    name: "documentShippingDetail",
+    component: DocumentShippingDetailPage,
+  },
 ];
 
 const router = createRouter({

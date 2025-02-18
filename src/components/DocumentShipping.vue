@@ -2,8 +2,8 @@
   <div class="repair-form">
     <SidebarMenu />
     <main>
-      <h1>อุปกรณ์ชำรุด</h1>
-      <div v-show="isFilterVisible" class="input-container">
+      <h1>ใบจัดเตรียมสินค้า</h1>
+      <!-- <div v-show="isFilterVisible" class="input-container">
         <div class="form-row">
           <label>ค้นหาด้วย วันที่รับ เริ่มต้น</label>
           <input type="date" v-model="filterData.receive_date_from" placeholder="From Date">
@@ -18,11 +18,13 @@
         </div>
         <div class="form-row">
           <label class="label-filter">ค้นหาด้วย เลขที่ใบส่งสินค้า</label>
-          <input v-model="filterData.bill_lading_number" type="text" class="input-field" placeholder="เลขที่ใบส่งสินค้า">
+          <input v-model="filterData.bill_lading_number" type="text" class="input-field"
+            placeholder="เลขที่ใบส่งสินค้า">
         </div>
         <div class="form-row">
           <label class="label-filter">ค้นหาด้วย เลขที่ใบกำกับภาษี</label>
-          <input v-model="filterData.bill_lading_number_date" type="text" class="input-field" placeholder="เลขที่ใบกำกับภาษี">
+          <input v-model="filterData.bill_lading_number_date" type="text" class="input-field"
+            placeholder="เลขที่ใบกำกับภาษี">
         </div>
         <div class="form-row">
           <label class="label-filter">ค้นหาด้วย เลขที่ใบเสร็จ</label>
@@ -38,15 +40,18 @@
         </div>
         <div class="form-row">
           <label class="label-filter">ค้นหาด้วย ชื่อ supplier</label>
-          <input v-model="filterData.product_name_supplier" type="text" class="input-field" placeholder="ชื่อสินค้า (Supplier)">
+          <input v-model="filterData.product_name_supplier" type="text" class="input-field"
+            placeholder="ชื่อสินค้า (Supplier)">
         </div>
         <div class="form-row">
           <label class="label-filter">ค้นหาด้วย รหัสสินค้า office design</label>
-          <input v-model="filterData.product_code_office_design" type="text" class="input-field" placeholder="รหัสสินค้า Office Design">
+          <input v-model="filterData.product_code_office_design" type="text" class="input-field"
+            placeholder="รหัสสินค้า Office Design">
         </div>
         <div class="form-row">
           <label class="label-filter">ค้นหาด้วย ชื่อสินค้า office design</label>
-          <input v-model="filterData.product_name_office_design" type="text" class="input-field" placeholder="ชื่อสินค้า Office Design">
+          <input v-model="filterData.product_name_office_design" type="text" class="input-field"
+            placeholder="ชื่อสินค้า Office Design">
         </div>
         <div class="form-row">
           <label class="label-filter">ค้นหาด้วย รหัสสินค้า</label>
@@ -62,21 +67,24 @@
         </div>
         <div class="form-row">
           <label class="label-filter">สถานะ</label>
-          <input v-model="filterData.status" type="text" class="input-field disable-form" placeholder="ชำรุด" disabled>
+          <select v-model="filterData.status">
+            <option value=""></option>
+            <option value="ชำรุด">ชำรุด</option>
+            <option value="รอตรวจสอบอุปกรณ์">รอตรวจสอบอุปกรณ์</option>
+            <option value="พร้อมใช้งาน">พร้อมใช้งาน</option>
+            <option value="รอเช็คก่อนส่ง">รอเช็คก่อนส่ง</option>
+          </select>
         </div>
-        <div style="text-align: left; padding: 25px;">
-          <button @click="downloadReport()" style="border-radius: 16px;padding: 10px 20px; min-width: 120px; height: 40px;">Export</button>
-        </div>
-      </div>
+      </div> -->
       <!-- <button @click="toggleFilterVisibility" class="toggle-btn">
-        {{ isFilterVisible ? 'ซ่อน Filter' : 'แสดง Filter' }}
-      </button> -->
+          {{ isFilterVisible ? 'ซ่อน Filter' : 'แสดง Filter' }}
+        </button> -->
       <div class="table-container">
         <table>
           <thead>
             <tr>
-              <th>วันที่รับ</th>
-              <th>ชื่อ supplier</th>
+              <th>วันส่งสินค้า</th>
+              <th>เลขที่ใบส่งสินค้า</th>
               <th>เลขที่ใบส่งสินค้า</th>
               <th>เลขที่ใบกำกับภาษี</th>
               <th>เลขที่ใบเสร็จ</th>
@@ -89,13 +97,15 @@
               <th>model</th>
               <th>S/N</th>
               <th>สถานะ</th>
-              <th>หมวดหมู่</th>
+              <th>เลขที่ใบจัดสินค้า</th>
+              <th>เลขที่ใบส่งสินค้า</th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(item, index) in paginatedData" :key="index" :id="item.id" @click="navigate('receiptDetail',item.id)">
-              <td>{{ item.receive_date }}</td>
-              <td>{{ item.name_supplier }}</td>
+            <tr v-for="(item, index) in paginatedData" :key="index" :id="item.id"
+              @click="navigate('documentShippingDetail', item.id)">
+              <td>{{ item.delivery_date }}</td>
+              <td>{{ item.document_delivery_number }}</td>
               <td>{{ item.bill_lading_number }}</td>
               <td>{{ item.invoice_number }}</td>
               <td>{{ item.receipt_number }}</td>
@@ -107,8 +117,9 @@
               <td>{{ item.group_product }}</td>
               <td>{{ item.model }}</td>
               <td>{{ item.serial_number }}</td>
-              <td>{{ item.status}}</td>
-              <td>{{ item.broken_category }}</td>
+              <td>{{ item.status }}</td>
+              <td>{{ item.stock_id?.document_preparation_number || '-' }}</td>
+              <td></td>
             </tr>
           </tbody>
         </table>
@@ -130,7 +141,6 @@ import { ref, computed } from "vue";
 import { readItems } from "@directus/sdk";
 import SidebarMenu from "@/components/SidebarMenu.vue";
 import { useRouter } from 'vue-router';
-import axios from 'axios';
 
 const isFilterVisible = ref(true);
 const router = useRouter();
@@ -152,38 +162,14 @@ const filterData = ref({
   product_category: "",
   model: "",
   sn: "",
+  status: "",
 });
-
-const downloadReport = async () => {
-  try {
-    const payload = paginatedDataExport.value
-    
-    const response = await axios.post('http://localhost:3000/download', payload, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      responseType: 'blob'
-    });
-    
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(response.data);
-    link.download = 'report stock สินค้า.xlsx';
-    link.click();
-  } catch (error) {
-    console.error('Error exporting report:', error);
-  }
-};
 
 const fetchData = async () => {
   try {
     const response = await directus.request(
-      readItems("stock", {
+      readItems("delivery_sheet", {
         fields: ["*.*"],
-        filter: {
-          status:{
-            _eq: 'ชำรุด'
-          }
-        }
       })
     );
     data.value = response;
@@ -219,7 +205,7 @@ const paginatedData = computed(() => {
       (!filterData.value.product_name_office_design || (item.product_name_office_design && item.product_name_office_design.includes(filterData.value.product_name_office_design))) &&
       (!filterData.value.product_category || (item.product_category && item.product_category.includes(filterData.value.product_category))) &&
       (!filterData.value.model || (item.model && item.model.includes(filterData.value.model))) &&
-      (!filterData.value.sn || (item.sn && item.sn.includes(filterData.value.sn))) && 
+      (!filterData.value.sn || (item.sn && item.sn.includes(filterData.value.sn))) &&
       (!filterData.value.status || (item.status && item.status.includes(filterData.value.status)))
     );
   });
@@ -248,7 +234,7 @@ const paginatedDataExport = computed(() => {
       (!filterData.value.product_name_office_design || (item.product_name_office_design && item.product_name_office_design.includes(filterData.value.product_name_office_design))) &&
       (!filterData.value.product_category || (item.product_category && item.product_category.includes(filterData.value.product_category))) &&
       (!filterData.value.model || (item.model && item.model.includes(filterData.value.model))) &&
-      (!filterData.value.sn || (item.sn && item.sn.includes(filterData.value.sn))) && 
+      (!filterData.value.sn || (item.sn && item.sn.includes(filterData.value.sn))) &&
       (!filterData.value.status || (item.status && item.status.includes(filterData.value.status)))
     );
   });
@@ -277,7 +263,7 @@ const goToLastPage = () => {
 };
 
 const navigate = (route, itemId) => {
-  router.push({ name: route , params: { id: itemId }});
+  router.push({ name: route, params: { id: itemId } });
 };
 
 const toggleFilterVisibility = () => {
@@ -302,12 +288,14 @@ select {
   flex-direction: column;
   gap: 8px;
 }
-.toggle-btn{
+
+.toggle-btn {
   margin: 16px;
   border-radius: 16px;
   font-size: 16px;
   align-content: flex-end;
 }
+
 .repair-form {
   display: flex;
   justify-content: center;
@@ -446,6 +434,17 @@ table tbody tr:hover {
   cursor: not-allowed;
 }
 
+.info-container {
+  display: grid;
+  gap: 20px;
+  padding: 25px;
+  max-width: 100%;
+  box-sizing: border-box;
+  background-color: #f4f4f9;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
 .input-container {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -453,7 +452,7 @@ table tbody tr:hover {
   padding: 25px;
   max-width: 100%;
   box-sizing: border-box;
-  background-color: #f4f4f9; 
+  background-color: #f4f4f9;
   border-radius: 8px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
@@ -483,7 +482,8 @@ input[type="date"] {
 }
 
 .input-button {
-  background: linear-gradient(90deg, #4CAF50, #66BB6A); /* Gradient green */
+  background: linear-gradient(90deg, #4CAF50, #66BB6A);
+  /* Gradient green */
   color: white;
   padding: 12px 20px;
   border: none;

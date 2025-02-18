@@ -12,7 +12,7 @@
       <li @click="navigate('backupStock')">อุปกรณ์สำรอง</li>
       <li @click="navigate('DocumentPreparation')">เพิ่มรายการจัดของ</li>
       <li @click="navigate('listPreparation')">แสดงรายการจัดของ</li>
-      <!-- <li @click="navigate('productOrder')">ใบส่งสินค้า</li> -->
+      <li @click="navigate('documentShipping')">ใบจัดส่งสินค้า</li>
       <!-- <li @click="navigate('stickerOrder')">ใบสติ๊กเกอร์ติดอุปกรณ์</li> -->
       <!-- <li @click="navigate('completed')">รายการที่เสร็จสิ้นแล้ว</li>
       <li @click="navigate('in-progress')">รายการที่กำลังดำเนินการ</li> -->
