@@ -2,7 +2,7 @@
   <div class="repair-form">
     <SidebarMenu />
     <main>
-      <h1>อุปกรณ์ชำรุด</h1>
+      <h1>อุปกรณ์สำรอง</h1>
       <div v-show="isFilterVisible" class="input-container">
         <div class="form-row">
           <label>ค้นหาด้วย วันที่รับ เริ่มต้น</label>
