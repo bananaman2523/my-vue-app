@@ -15,11 +15,21 @@
                     <span>1. ใบจัดส่งสินค้า (กรุณากรอกรายละเอียดเพื่อจัดทำเอกสาร)</span>
                     <div class="activity">
                         <button class="btn btn-upload" @click="fileInputShippingPDF.click()">อัปโหลด</button>
-                        <input type="file" ref="fileInputShippingPDF" accept="application/pdf" @change="uploadFile('ใบจัดส่งสินค้า', $event)" hidden />
+                        <input type="file" ref="fileInputShippingPDF" accept="application/pdf" @change="handleFileChange('ใบจัดส่งสินค้า', $event)" hidden/>
+                        <button class="btn btn-save" @click="saveFilesToDirectus('shipping')">บันทึก</button>
                         <button class="btn btn-print" @click="handlePrint('ใบจัดส่งสินค้า',doc)">
                             ดูไฟล์
                         </button>
                     </div>
+                </div>
+                <div v-if="uploadedFilesShippingPDF.length > 0">
+                    <h4>ไฟล์ที่อัปโหลด</h4>
+                    <ul>
+                        <li v-for="(file, index) in uploadedFilesShippingPDF" :key="index">
+                        {{ file.name }}
+                        <button class="delete-file" @click="deleteFile(index)">X</button>
+                        </li>
+                    </ul>
                 </div>
             </div>
             <div class="document-item">
@@ -27,23 +37,41 @@
                     <span>2. ใบรายงานติดตั้ง (กรุณากรอกรายละเอียดเพื่อจัดทำเอกสาร)</span>
                     <div class="activity">
                         <button class="btn btn-upload" @click="fileInputInstallPDF.click()">อัปโหลด</button>
-                        <input type="file" ref="fileInputInstallPDF" accept="application/pdf" @change="uploadFile('ใบรายงานติดตั้ง', $event)" hidden />
+                        <input type="file" ref="fileInputInstallPDF" accept="application/pdf" @change="handleFileChange('ใบรายงานติดตั้ง', $event)" hidden/>
+                        <button class="btn btn-save" @click="saveFilesToDirectus('install')">บันทึก</button>
                         <button class="btn btn-print" @click="handlePrint('ใบรายงานติดตั้ง',doc)">
                             ดูไฟล์
                         </button>
                     </div>
+                </div>
+                <div v-if="uploadedFilesInstallPDF.length > 0">
+                    <h4>ไฟล์ที่อัปโหลด</h4>
+                    <ul>
+                        <li v-for="(file, index) in uploadedFilesInstallPDF" :key="index">
+                        {{ file.name }}
+                        <button class="delete-file" @click="deleteFile(index)">X</button>
+                        </li>
+                    </ul>
                 </div>
             </div>
             <div class="document-item">
                 <div class="document-header">
                     <span>3. ใบ Checklist (กรุณากรอกรายละเอียดเพื่อจัดทำเอกสาร)</span>
                     <div class="activity">
-                        <button class="btn btn-upload" @click="fileInputCheckListPDF.click()">อัปโหลด</button>
-                        <input type="file" ref="fileInputCheckListPDF" accept="application/pdf" @change="uploadFile('ใบ CheckList', $event)" hidden multiple />
-                        <button class="btn btn-print" @click="handlePrint('ใบ CheckList',doc)">
-                            ดูไฟล์
-                        </button>
+                    <button class="btn btn-upload" @click="fileInputCheckListPDF.click()">อัปโหลด</button>
+                    <input type="file" ref="fileInputCheckListPDF" accept="application/pdf" @change="handleFileChange('ใบ CheckList', $event)" hidden multiple />
+                    <button class="btn btn-save" @click="saveFilesToDirectus('checklist')">บันทึก</button>
+                    <button class="btn btn-print" @click="handlePrint('ใบ CheckList',doc)">ดูไฟล์</button>
                     </div>
+                </div>
+                <div v-if="uploadedFilesCheckListPDF.length > 0">
+                    <h4>ไฟล์ที่อัปโหลด</h4>
+                    <ul>
+                    <li v-for="(file, index) in uploadedFilesCheckListPDF" :key="index">
+                        {{ file.name }}
+                        <button class="delete-file" @click="deleteFile(index, 'checklist')">X</button>
+                    </li>
+                    </ul>
                 </div>
             </div>
             <div class="document-item">
@@ -102,6 +130,9 @@ const router = useRouter();
 const fileInputShippingPDF = ref(null);
 const fileInputInstallPDF = ref(null);
 const fileInputCheckListPDF = ref(null);
+const uploadedFilesShippingPDF = ref([]);
+const uploadedFilesInstallPDF = ref([]);
+const uploadedFilesCheckListPDF = ref([]);
 
 const fetchData = async () => {
   try {
@@ -175,54 +206,105 @@ const processFiles = (files) => {
     }));
 };
 
-const uploadFile = async (filename, event) => {
-    const selectedFiles = event.target.files;
-    if (!selectedFiles || selectedFiles.length === 0) return;
+const handleFileChange = (filename, event) => {
+  const selectedFiles = event.target.files;
+  if (!selectedFiles || selectedFiles.length === 0) return;
 
-    try {
-        const formData = new FormData();
-        for (let index = 0; index < selectedFiles.length; index++) {
-            if (selectedFiles[index].type !== "application/pdf") {
-                errorPopup.value.showErrorUpload('PDF')
-                return;
-            }
-            const selectedFile = selectedFiles[index];
-            // const newFileName = `${filename}_${new Date().toISOString().slice(0, 10)}_${index + 1}.pdf`;
-            // const renamedFile = new File([selectedFile], newFileName, { type: selectedFile.type });
-            formData.append("file", selectedFile);
-        }
-        const fileResponse = await directus.request(uploadFiles(formData));
-        if (typeof fileResponse === 'object' && fileResponse !== null && fileResponse.length > 1) {
-            const ids = processFiles(fileResponse);
-            await directus.request(
-                updateItem('delivery_sheet', route.params.id, {
-                    checklist_pdf: ids
-                })
-            );
-        }else{
-            const fileId = fileResponse.id;
-            const fieldMapping = {
-                'ใบรายงานติดตั้ง': 'install_report_pdf',
-                'ใบจัดส่งสินค้า': 'shipping_pdf',
-                'ใบ CheckList': 'checklist_pdf',
-            };
-            const fieldToUpdate = fieldMapping[filename] || 'default_field';
-            await directus.request(
-                updateItem('delivery_sheet', route.params.id, {
-                    [fieldToUpdate]: fileId
-                })
-            );
-        }
-        fetchData()
-
-        approvePopup.value.showSuccessUpload(filename)
-        fileInputShippingPDF.value.value = "";
-        fileInputInstallPDF.value.value = "";
-        fileInputCheckListPDF.value.value = "";
-    } catch (error) {
-        console.error("Error uploading file:", error);
-        errorPopup.value.showErrorUpload(filename)
+  for (let index = 0; index < selectedFiles.length; index++) {
+    if (selectedFiles[index].type !== "application/pdf") {
+      errorPopup.value.showErrorUpload('PDF');
+      return;
     }
+
+    if (filename === 'ใบจัดส่งสินค้า') {
+      uploadedFilesShippingPDF.value.push(selectedFiles[index]);
+    } else if (filename === 'ใบรายงานติดตั้ง') {
+      uploadedFilesInstallPDF.value.push(selectedFiles[index]);
+    } else if (filename === 'ใบ CheckList') {
+      uploadedFilesCheckListPDF.value.push(selectedFiles[index]);
+    }
+  }
+};
+
+const deleteFile = (index, type) => {
+  if (type === 'shipping') {
+    uploadedFilesShippingPDF.value.splice(index, 1);
+  } else if (type === 'install') {
+    uploadedFilesInstallPDF.value.splice(index, 1);
+  } else if (type === 'checklist') {
+    uploadedFilesCheckListPDF.value.splice(index, 1);
+  }
+};
+
+const saveFilesToDirectus = async (type) => {
+  let uploadedFiles;
+  let fieldKey;
+
+  if (type === 'shipping') {
+    uploadedFiles = uploadedFilesShippingPDF.value;
+    fieldKey = 'shipping_pdf';
+  } else if (type === 'install') {
+    uploadedFiles = uploadedFilesInstallPDF.value;
+    fieldKey = 'install_report_pdf';
+  } else if (type === 'checklist') {
+    uploadedFiles = uploadedFilesCheckListPDF.value;
+    fieldKey = 'checklist_pdf';
+  }
+
+  if (!uploadedFiles || uploadedFiles.length === 0) {
+    errorPopup.value.showErrorUpload('กรุณาอัปโหลดไฟล์');
+    return;
+  }
+
+  try {
+    const formData = new FormData();
+    uploadedFiles.forEach(file => {
+      formData.append("file", file);
+    });
+
+    const fileResponse = await directus.request(uploadFiles(formData));
+
+    if (Array.isArray(fileResponse) && fileResponse.length > 1) {
+      const ids = processFiles(fileResponse);
+      await directus.request(
+        updateItem('delivery_sheet', route.params.id, {
+          [fieldKey]: ids
+        })
+      );
+    } else {
+      await directus.request(
+        updateItem('delivery_sheet', route.params.id, {
+          [fieldKey]: fileResponse.id
+        })
+      );
+    }
+
+    fetchData();
+    approvePopup.value.showSuccessUpload(
+      type === 'shipping'
+        ? 'ใบจัดส่งสินค้า'
+        : type === 'install'
+        ? 'ใบรายงานติดตั้ง'
+        : 'ใบ CheckList'
+    );
+
+    if (type === 'shipping') {
+      uploadedFilesShippingPDF.value = [];
+    } else if (type === 'install') {
+      uploadedFilesInstallPDF.value = [];
+    } else if (type === 'checklist') {
+      uploadedFilesCheckListPDF.value = [];
+    }
+  } catch (error) {
+    console.error("Error uploading files:", error);
+    errorPopup.value.showErrorUpload(
+      type === 'shipping'
+        ? 'ใบจัดส่งสินค้า'
+        : type === 'install'
+        ? 'ใบรายงานติดตั้ง'
+        : 'ใบ CheckList'
+    );
+  }
 };
 </script>
 
