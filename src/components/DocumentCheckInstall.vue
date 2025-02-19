@@ -8,6 +8,73 @@
                 </div>
             </form>
         </div>
+        <div class="documents-section">
+            <h2>เอกสารประกอบการติดตั้ง</h2>
+            <div class="document-item">
+                <div class="document-header">
+                    <span>1. ใบจัดส่งสินค้า (กรุณากรอกรายละเอียดเพื่อจัดทำเอกสาร)</span>
+                    <div class="activity">
+                        <button class="btn btn-upload" @click="fileInput.click()">อัปโหลด</button>
+                        <input type="file" ref="fileInput" accept="application/pdf" @change="uploadFile('ใบจัดส่งสินค้า', $event)" hidden />
+                        <button class="btn btn-print" @click="handlePrint(doc)">
+                            พิมพ์
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="document-item">
+                <div class="document-header">
+                    <span>2. ใบรายงานติดตั้ง (กรุณากรอกรายละเอียดเพื่อจัดทำเอกสาร)</span>
+                    <div class="activity">
+                        <button class="btn btn-upload">
+                            อัปโหลด
+                        </button>
+                        <button class="btn btn-print" @click="handlePrint(doc)">
+                            พิมพ์
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="document-item">
+                <div class="document-header">
+                    <span>3. ใบ CheckList (กรุณากรอกรายละเอียดเพื่อจัดทำเอกสาร)</span>
+                    <div class="activity">
+                        <button class="btn btn-upload">
+                            อัปโหลด
+                        </button>
+                        <button class="btn btn-print" @click="handlePrint(doc)">
+                            พิมพ์
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="document-item">
+                <div class="document-header">
+                    <span>4. รูปภาพการจัดส่งสินค้า (กรุณากรอกรายละเอียดเพื่อจัดทำเอกสาร)</span>
+                    <div class="activity">
+                        <button class="btn btn-upload">
+                            อัปโหลด
+                        </button>
+                        <button class="btn btn-print" @click="handlePrint(doc)">
+                            พิมพ์
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="document-item">
+                <div class="document-header">
+                    <span>5. รูปภาพการติดตั้งสินค้า (กรุณากรอกรายละเอียดเพื่อจัดทำเอกสาร)</span>
+                    <div class="activity">
+                        <button class="btn btn-upload">
+                            อัปโหลด
+                        </button>
+                        <button class="btn btn-print" @click="handlePrint(doc)">
+                            พิมพ์
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="form-actions">
             <label style="padding-right: 8px;">ผู้ติดตั้ง</label>
             <input v-model="user" type="text" disabled class="disable-form-user" />
@@ -21,7 +88,7 @@
 <script setup>
 import { ref } from 'vue';
 import { directus } from "@/services/directus";
-import { updateItems, readItems, updateItem, deleteItem, createItem } from "@directus/sdk";
+import { readItems, uploadFiles , updateItem } from "@directus/sdk";
 import { useRoute , useRouter} from "vue-router";
 import ApprovePopup from "@/components/popup/ApprovePopup.vue";
 import ErrorPopup from "@/components/popup/ErrorPopup.vue";
@@ -33,7 +100,7 @@ const user = `${getUser.first_name} ${getUser.last_name}`
 const formData = ref({})
 const route = useRoute();
 const router = useRouter();
-
+const fileInput = ref(null);
 
 const fetchData = async () => {
   try {
@@ -62,9 +129,114 @@ const fetchData = async () => {
 };
 
 fetchData();
+
+const handlePrint = async (doc) => {
+    try {
+        const response = await directus.request(readFile());
+
+        if (response) {
+            const fileUrl = `http://localhost:8055/assets/${response.filename_disk}`;
+
+            const printWindow = window.open();
+            const iframe = printWindow.document.createElement('iframe');
+            iframe.src = fileUrl;
+            iframe.width = "100%";
+            iframe.height = "100%";
+            printWindow.document.body.appendChild(iframe);
+
+            iframe.onload = () => {
+                printWindow.focus();
+                printWindow.document.close();
+            };
+        } else {
+            console.error("No file URL returned from Directus");
+            alert("ไม่สามารถพิมพ์เอกสารได้");
+        }
+    } catch (error) {
+        console.error("Error fetching or printing file:", error);
+        alert("ไม่สามารถพิมพ์เอกสารได้");
+    }
+};
+
+const uploadFile = async (filename, event) => {
+    const selectedFile = event.target.files[0];
+    if (!selectedFile) return;
+
+    if (selectedFile.type !== "application/pdf") {
+        alert("กรุณาเลือกไฟล์ PDF เท่านั้น");
+        return;
+    }
+
+    const newFileName = `${filename}_${new Date().toISOString().slice(0, 10)}.pdf`;
+    
+    try {
+        const formData = new FormData();
+        const renamedFile = new File([selectedFile], newFileName, { type: selectedFile.type });
+
+        formData.append("file", renamedFile);
+        formData.append("title", newFileName); 
+        
+        const fileResponse = await directus.request(uploadFiles(formData));
+        const fileId = fileResponse.id;
+
+        await directus.request(
+            updateItem('delivery_sheet', route.params.id, {
+                shipping_pdf: fileId
+            })
+        );
+
+        alert("อัปโหลดไฟล์สำเร็จ!");
+        fileInput.value.value = "";
+    } catch (error) {
+        console.error("Error uploading file:", error);
+        alert("เกิดข้อผิดพลาดในการอัปโหลดไฟล์");
+    }
+};
 </script>
 
 <style scoped>
+.activity {
+    display: flex;
+    margin-left: auto;
+}
+.document-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.documents-section {
+    font-family: "Prompt", sans-serif;
+    border-radius: 8px;
+    margin: 20px;
+}
+.document-item {
+    background-color: #fff;
+    padding: 20px;
+    border-top: 1px solid #e0e0e0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.btn {
+    padding: 10px 15px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin: 8px;
+}
+.btn-print {
+    background-color: #003566;
+    color: #fff;
+}
+.btn-print:hover {
+    background-color: #003d80;
+}
 .disable-form{
   background-color: #D9D9D9;
 }
