@@ -155,7 +155,7 @@ const fetchData = async () => {
         status: data.status || "",
         shipping_pdf: data.shipping_pdf.id || "",
         install_report_pdf: data.install_report_pdf.id || "",
-        checklist_pdf: data.checklist_pdf.id || [],
+        checklist_pdf: data.checklist_pdf.map(item => item.directus_files_id.id) || [],
       };
     }
   } catch (error) {
