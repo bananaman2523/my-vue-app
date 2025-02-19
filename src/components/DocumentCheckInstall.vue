@@ -17,7 +17,7 @@
                         <button class="btn btn-upload" @click="fileInputShippingPDF.click()">อัปโหลด</button>
                         <input type="file" ref="fileInputShippingPDF" accept="application/pdf" @change="uploadFile('ใบจัดส่งสินค้า', $event)" hidden />
                         <button class="btn btn-print" @click="handlePrint('ใบจัดส่งสินค้า',doc)">
-                            พิมพ์
+                            ดูไฟล์
                         </button>
                     </div>
                 </div>
@@ -29,19 +29,19 @@
                         <button class="btn btn-upload" @click="fileInputInstallPDF.click()">อัปโหลด</button>
                         <input type="file" ref="fileInputInstallPDF" accept="application/pdf" @change="uploadFile('ใบรายงานติดตั้ง', $event)" hidden />
                         <button class="btn btn-print" @click="handlePrint('ใบรายงานติดตั้ง',doc)">
-                            พิมพ์
+                            ดูไฟล์
                         </button>
                     </div>
                 </div>
             </div>
             <div class="document-item">
                 <div class="document-header">
-                    <span>3. ใบ CheckList (กรุณากรอกรายละเอียดเพื่อจัดทำเอกสาร)</span>
+                    <span>3. ใบ Checklist (กรุณากรอกรายละเอียดเพื่อจัดทำเอกสาร)</span>
                     <div class="activity">
                         <button class="btn btn-upload" @click="fileInputCheckListPDF.click()">อัปโหลด</button>
                         <input type="file" ref="fileInputCheckListPDF" accept="application/pdf" @change="uploadFile('ใบ CheckList', $event)" hidden multiple />
-                        <button class="btn btn-print" @click="handlePrint(doc)">
-                            พิมพ์
+                        <button class="btn btn-print" @click="handlePrint('ใบ CheckList',doc)">
+                            ดูไฟล์
                         </button>
                     </div>
                 </div>
@@ -54,7 +54,7 @@
                             อัปโหลด
                         </button>
                         <button class="btn btn-print" @click="handlePrint(doc)">
-                            พิมพ์
+                            ดูไฟล์
                         </button>
                     </div>
                 </div>
@@ -67,7 +67,7 @@
                             อัปโหลด
                         </button>
                         <button class="btn btn-print" @click="handlePrint(doc)">
-                            พิมพ์
+                            ดูไฟล์
                         </button>
                     </div>
                 </div>
@@ -123,7 +123,7 @@ const fetchData = async () => {
       formData.value = {
         status: data.status || "",
         shipping_pdf: data.shipping_pdf.id || "",
-        packing_sheet: data.packing_sheet.id || "",
+        install_report_pdf: data.install_report_pdf.id || "",
         checklist_pdf: data.checklist_pdf.id || [],
       };
     }
@@ -136,7 +136,13 @@ fetchData();
 
 const handlePrint = async (filename, doc) => {
     try {
-        const response = await directus.request(readFile(formData.value.shipping_pdf));
+        const fieldMapping = {
+            'ใบรายงานติดตั้ง': 'install_report_pdf',
+            'ใบจัดส่งสินค้า': 'shipping_pdf',
+        };
+        const fieldToUpdate = fieldMapping[filename] || 'default_field';
+        
+        const response = await directus.request(readFile(formData.value[fieldToUpdate]));
         if (response) {
             const fileUrl = `http://localhost:8055/assets/${response.filename_disk}`;
 
@@ -153,11 +159,11 @@ const handlePrint = async (filename, doc) => {
             };
         } else {
             console.error("No file URL returned from Directus");
-            errorPopup.value.showErrorOpenPDF('ไม่สามารถพิมพ์เอกสารได้')
+            errorPopup.value.showErrorOpenPDF('ไม่สามารถดูเอกสารได้')
         }
     } catch (error) {
         console.error("Error fetching or printing file:", error);
-        errorPopup.value.showErrorOpenPDF('ไม่สามารถพิมพ์เอกสารได้')
+        errorPopup.value.showErrorOpenPDF('ไม่สามารถดูเอกสารได้')
     }
 };
 
