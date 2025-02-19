@@ -14,9 +14,9 @@
                 <div class="document-header">
                     <span>1. ใบจัดส่งสินค้า (กรุณากรอกรายละเอียดเพื่อจัดทำเอกสาร)</span>
                     <div class="activity">
-                        <button class="btn btn-upload" @click="fileInput.click()">อัปโหลด</button>
-                        <input type="file" ref="fileInput" accept="application/pdf" @change="uploadFile('ใบจัดส่งสินค้า', $event)" hidden />
-                        <button class="btn btn-print" @click="handlePrint(doc)">
+                        <button class="btn btn-upload" @click="fileInputShippingPDF.click()">อัปโหลด</button>
+                        <input type="file" ref="fileInputShippingPDF" accept="application/pdf" @change="uploadFile('ใบจัดส่งสินค้า', $event)" hidden />
+                        <button class="btn btn-print" @click="handlePrint('ใบจัดส่งสินค้า',doc)">
                             พิมพ์
                         </button>
                     </div>
@@ -26,10 +26,9 @@
                 <div class="document-header">
                     <span>2. ใบรายงานติดตั้ง (กรุณากรอกรายละเอียดเพื่อจัดทำเอกสาร)</span>
                     <div class="activity">
-                        <button class="btn btn-upload">
-                            อัปโหลด
-                        </button>
-                        <button class="btn btn-print" @click="handlePrint(doc)">
+                        <button class="btn btn-upload" @click="fileInputInstallPDF.click()">อัปโหลด</button>
+                        <input type="file" ref="fileInputInstallPDF" accept="application/pdf" @change="uploadFile('ใบรายงานติดตั้ง', $event)" hidden />
+                        <button class="btn btn-print" @click="handlePrint('ใบรายงานติดตั้ง',doc)">
                             พิมพ์
                         </button>
                     </div>
@@ -39,9 +38,8 @@
                 <div class="document-header">
                     <span>3. ใบ CheckList (กรุณากรอกรายละเอียดเพื่อจัดทำเอกสาร)</span>
                     <div class="activity">
-                        <button class="btn btn-upload">
-                            อัปโหลด
-                        </button>
+                        <button class="btn btn-upload" @click="fileInputInstallPDF.click()">อัปโหลด</button>
+                        <input type="file" ref="fileInputInstallPDF" accept="application/pdf" @change="uploadFile('ใบ CheckList', $event)" hidden multiple />
                         <button class="btn btn-print" @click="handlePrint(doc)">
                             พิมพ์
                         </button>
@@ -88,19 +86,21 @@
 <script setup>
 import { ref } from 'vue';
 import { directus } from "@/services/directus";
-import { readItems, uploadFiles , updateItem } from "@directus/sdk";
+import { readItems, uploadFiles , updateItem , readFile} from "@directus/sdk";
 import { useRoute , useRouter} from "vue-router";
 import ApprovePopup from "@/components/popup/ApprovePopup.vue";
 import ErrorPopup from "@/components/popup/ErrorPopup.vue";
 import WarningPopup from "@/components/popup/WarningPopup.vue";
 const warningPopup = ref(null);
 const approvePopup = ref(null);
+const errorPopup = ref(null);
 const getUser = JSON.parse(localStorage.getItem('user'))
 const user = `${getUser.first_name} ${getUser.last_name}`
 const formData = ref({})
 const route = useRoute();
 const router = useRouter();
-const fileInput = ref(null);
+const fileInputShippingPDF = ref(null);
+const fileInputInstallPDF = ref(null);
 
 const fetchData = async () => {
   try {
@@ -120,7 +120,8 @@ const fetchData = async () => {
     if (delivery_sheet.length > 0) {
       const data = delivery_sheet[0];
       formData.value = {
-        status: data.status || ""
+        status: data.status || "",
+        shipping_pdf: data.shipping_pdf.id || ""
       };
     }
   } catch (error) {
@@ -130,10 +131,9 @@ const fetchData = async () => {
 
 fetchData();
 
-const handlePrint = async (doc) => {
+const handlePrint = async (filename, doc) => {
     try {
-        const response = await directus.request(readFile());
-
+        const response = await directus.request(readFile(formData.value.shipping_pdf));
         if (response) {
             const fileUrl = `http://localhost:8055/assets/${response.filename_disk}`;
 
@@ -160,6 +160,7 @@ const handlePrint = async (doc) => {
 
 const uploadFile = async (filename, event) => {
     const selectedFile = event.target.files[0];
+    
     if (!selectedFile) return;
 
     if (selectedFile.type !== "application/pdf") {
@@ -167,28 +168,34 @@ const uploadFile = async (filename, event) => {
         return;
     }
 
-    const newFileName = `${filename}_${new Date().toISOString().slice(0, 10)}.pdf`;
-    
     try {
-        const formData = new FormData();
-        const renamedFile = new File([selectedFile], newFileName, { type: selectedFile.type });
+        if (event.target.files.length == 1) {
+            const newFileName = `${filename}_${new Date().toISOString().slice(0, 10)}.pdf`;
+            const formData = new FormData();
+            const renamedFile = new File([selectedFile], newFileName, { type: selectedFile.type });
 
-        formData.append("file", renamedFile);
-        formData.append("title", newFileName); 
+            formData.append("file", renamedFile);
+            formData.append("title", newFileName); 
+            
+            const fileResponse = await directus.request(uploadFiles(formData));
+            const fileId = fileResponse.id;
+            if (filename === 'ใบรายงานติดตั้ง' || filename === 'ใบจัดส่งสินค้า') {
+                const fieldToUpdate = filename === 'ใบรายงานติดตั้ง' ? 'install_report_pdf' : 'shipping_pdf';
+                await directus.request(
+                    updateItem('delivery_sheet', route.params.id, {
+                        [fieldToUpdate]: fileId
+                    })
+                );
+                fetchData()
+            }
+            approvePopup.value.showSuccessUpload(filename)
+        }
         
-        const fileResponse = await directus.request(uploadFiles(formData));
-        const fileId = fileResponse.id;
-
-        await directus.request(
-            updateItem('delivery_sheet', route.params.id, {
-                shipping_pdf: fileId
-            })
-        );
-
-        alert("อัปโหลดไฟล์สำเร็จ!");
-        fileInput.value.value = "";
+        fileInputShippingPDF.value.value = "";
+        fileInputInstallPDF.value.value = "";
     } catch (error) {
         console.error("Error uploading file:", error);
+        errorPopup.value.showErrorUpload(filename)
         alert("เกิดข้อผิดพลาดในการอัปโหลดไฟล์");
     }
 };

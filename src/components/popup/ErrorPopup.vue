@@ -17,5 +17,13 @@ const showError = () => {
 
 };
 
-defineExpose({ showError });
+const showErrorUpload = (nameFile) => {
+    Swal.fire({
+        title: `อัปโหลดเอกสาร ${nameFile} ไม่สำเร็จ!`,
+        icon: "error",
+        confirmButtonText: "OK",
+    });
+};
+
+defineExpose({ showError , showErrorUpload});
 </script>

@@ -39,5 +39,13 @@ const showSuccessDelete = () => {
     //     window.location.reload();
     // });
 };
-defineExpose({ showSuccess , showSuccessUpdate , showSuccessDelete});
+
+const showSuccessUpload = (nameFile) => {
+    Swal.fire({
+        title: `อัปโหลดเอกสาร ${nameFile} สำเร็จ!`,
+        icon: "success",
+        confirmButtonText: "OK",
+    });
+};
+defineExpose({ showSuccess , showSuccessUpdate , showSuccessDelete , showSuccessUpload});
 </script>
