@@ -122,7 +122,9 @@ const fetchData = async () => {
       const data = delivery_sheet[0];
       formData.value = {
         status: data.status || "",
-        shipping_pdf: data.shipping_pdf.id || ""
+        shipping_pdf: data.shipping_pdf.id || "",
+        packing_sheet: data.packing_sheet.id || "",
+        checklist_pdf: data.checklist_pdf.id || [],
       };
     }
   } catch (error) {
@@ -151,11 +153,11 @@ const handlePrint = async (filename, doc) => {
             };
         } else {
             console.error("No file URL returned from Directus");
-            alert("ไม่สามารถพิมพ์เอกสารได้");
+            errorPopup.value.showErrorOpenPDF('ไม่สามารถพิมพ์เอกสารได้')
         }
     } catch (error) {
         console.error("Error fetching or printing file:", error);
-        alert("ไม่สามารถพิมพ์เอกสารได้");
+        errorPopup.value.showErrorOpenPDF('ไม่สามารถพิมพ์เอกสารได้')
     }
 };
 
@@ -175,7 +177,7 @@ const uploadFile = async (filename, event) => {
         const formData = new FormData();
         for (let index = 0; index < selectedFiles.length; index++) {
             if (selectedFiles[index].type !== "application/pdf") {
-                alert("กรุณาเลือกไฟล์ PDF เท่านั้น");
+                errorPopup.value.showErrorUpload('PDF')
                 return;
             }
             const selectedFile = selectedFiles[index];

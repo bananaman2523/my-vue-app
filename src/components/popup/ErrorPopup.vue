@@ -25,5 +25,22 @@ const showErrorUpload = (nameFile) => {
     });
 };
 
-defineExpose({ showError , showErrorUpload});
+const showErrorPDF = (typefile) => {
+    Swal.fire({
+        title: `อัปโหลดเอกสารเป็น ${typefile} เท่านั้น!`,
+        icon: "error",
+        confirmButtonText: "OK",
+    });
+};
+
+const showErrorOpenPDF = (text) => {
+    Swal.fire({
+        title: `เกิดข้อผิดพลาด ${text}!`,
+        icon: "error",
+        confirmButtonText: "OK",
+    });
+};
+
+
+defineExpose({ showError , showErrorUpload , showErrorPDF , showErrorOpenPDF});
 </script>
