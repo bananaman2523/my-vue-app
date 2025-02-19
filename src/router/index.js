@@ -63,8 +63,8 @@ const routes = [
     component: ListStockPage,
   },
   {
-    path: "/DocumentPreparation",
-    name: "DocumentPreparation",
+    path: "/documentPreparation",
+    name: "documentPreparation",
     component: DocumentPreparationPage,
   },
   {

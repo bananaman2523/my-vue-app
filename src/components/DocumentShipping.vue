@@ -84,21 +84,12 @@
           <thead>
             <tr>
               <th>วันส่งสินค้า</th>
-              <th>เลขที่ใบส่งสินค้า</th>
-              <th>เลขที่ใบส่งสินค้า</th>
-              <th>เลขที่ใบกำกับภาษี</th>
-              <th>เลขที่ใบเสร็จ</th>
-              <th>เลขที่ใบวางบิล</th>
-              <th>Item code</th>
-              <th>ชื่อสินค้า (Supplier)</th>
-              <th>รหัสสินค้า Office Design</th>
-              <th>ชื่อสินค้า Office Design</th>
-              <th>หมวดหมู่สินค้า</th>
-              <th>model</th>
-              <th>S/N</th>
+              <th>เลขที่ใบจัดส่งสินค้า</th>
+              <th>เลขที่ใบเสนอราคา</th>
+              <th>เลขที่ใบสั่งซื้อ</th>
+              <th>ชื่อลูกค้า</th>
+              <th>ชื่อสาขา</th>
               <th>สถานะ</th>
-              <th>เลขที่ใบจัดสินค้า</th>
-              <th>เลขที่ใบส่งสินค้า</th>
             </tr>
           </thead>
           <tbody>
@@ -106,20 +97,11 @@
               @click="navigate('documentShippingDetail', item.id)">
               <td>{{ item.delivery_date }}</td>
               <td>{{ item.document_delivery_number }}</td>
-              <td>{{ item.bill_lading_number }}</td>
-              <td>{{ item.invoice_number }}</td>
-              <td>{{ item.receipt_number }}</td>
-              <td>{{ item.bill_number }}</td>
-              <td>{{ item.item_code }}</td>
-              <td>{{ item.product_name_supplier }}</td>
-              <td>{{ item.product_code_office_design }}</td>
-              <td>{{ item.product_name_office_design }}</td>
-              <td>{{ item.group_product }}</td>
-              <td>{{ item.model }}</td>
-              <td>{{ item.serial_number }}</td>
+              <td>{{ item.packing_sheet[0].customer_order_number }}</td>
+              <td>{{ item.packing_sheet[0].quotation_number_office_design }}</td>
+              <td>{{ item.packing_sheet[0].customer_name }}</td>
+              <td>{{ item.packing_sheet[0].branch_name }}</td>
               <td>{{ item.status }}</td>
-              <td>{{ item.stock_id?.document_preparation_number || '-' }}</td>
-              <td></td>
             </tr>
           </tbody>
         </table>
@@ -209,8 +191,8 @@ const paginatedData = computed(() => {
       (!filterData.value.status || (item.status && item.status.includes(filterData.value.status)))
     );
   });
-
-  return (filteredData.slice(start, start + itemsPerPage)).reverse();
+  const reverseData = filteredData.reverse()
+  return reverseData.slice(start, start + itemsPerPage);
 });
 
 const paginatedDataExport = computed(() => {
@@ -238,8 +220,8 @@ const paginatedDataExport = computed(() => {
       (!filterData.value.status || (item.status && item.status.includes(filterData.value.status)))
     );
   });
-
-  return filteredData;
+  const reverseData = filteredData.reverse()
+  return reverseData.slice(start, start + itemsPerPage);
 });
 
 const goToFirstPage = () => {

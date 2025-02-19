@@ -29,8 +29,8 @@
         อุปกรณ์สำรอง
       </li>
       <li 
-        @click="navigate('DocumentPreparation')" 
-        :class="{ active: activeMenu === 'DocumentPreparation' }"
+        @click="navigate('documentPreparation')" 
+        :class="{ active: activeMenu === 'documentPreparation' }"
       >
         เพิ่มรายการจัดของ
       </li>

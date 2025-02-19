@@ -22,12 +22,12 @@
             <input v-model="formData.quotation_number_office_design" type="text" disabled class="disable-form"/>
           </div>
           <div class="form-row">
-            <label>เลขที่ใบแจ้งหนี้</label>
-            <input v-model="formData.invoice_number" type="text"/>
-          </div>
-          <div class="form-row">
             <label>เลขที่ใบสั่งซื้อ (ของลูกค้า)</label>
             <input v-model="formData.customer_order_number" type="text" disabled class="disable-form"/>
+          </div>
+          <div class="form-row">
+            <label>เลขที่ใบแจ้งหนี้</label>
+            <input v-model="formData.invoice_number" type="text"/>
           </div>
         </form>
       </div>
@@ -59,13 +59,14 @@
       <div class="form-actions">
         <label style="padding-right: 8px;">ผู้ตรวจสอบ</label>
         <input v-model="user" type="text" disabled class="disable-form-user"/>
-        <button v-if="formData.status !== 'ผ่าน'" type="button" @click="downloadReport()">Export</button>
+        <button v-if="formData.status !== 'ผ่าน'" type="button" @click="downloadReport()" style="margin-right: 8px;">Export</button>
         <button v-if="formData.status !== 'ผ่าน'" type="button" @click="submitForm()">บันทึก</button>
-        <button v-if="formData.status === 'ผ่าน'" style="margin-left: 16px;" type="button" @click="downloadReport">Export</button>
       </div>
       <div class="form-delete">
         <button type="button" @click="deleteForm">ลบ</button>
       </div>
+      <h1>ตรวจสอบการติดตั้ง</h1>
+      <DocumentCheckInstall />
     </main>
   </div>
   <WarningPopup ref="warningPopup"/>
@@ -78,6 +79,7 @@ import { ref } from 'vue';
 import { directus } from "@/services/directus";
 import { updateItems , readItems , updateItem , deleteItem , createItem } from "@directus/sdk";
 import SidebarMenu from "@/components/SidebarMenu.vue";
+import DocumentCheckInstall from './DocumentCheckInstall.vue';
 import { useRoute , useRouter} from "vue-router";
 import axios from 'axios';
 import ApprovePopup from "@/components/popup/ApprovePopup.vue";
