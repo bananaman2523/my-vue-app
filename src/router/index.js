@@ -1,9 +1,7 @@
 import { createRouter, createWebHistory } from "vue-router";
-import addReceiptPage from "@/components/addReceipt.vue";
 import updateReceiptPage from "@/components/updateReceipt.vue";
 import listPage from "@/components/List.vue";
 import detailPage from "@/components/Detail.vue";
-import addProductRequestPage from "@/components/addProductRequest.vue";
 import receiptProductPage from "@/components/receiptProduct.vue";
 import ListStockPage from "@/components/ListStock.vue";
 import listPreparationPage from "@/components/listPreparation.vue";
@@ -18,16 +16,6 @@ import BackupStockPage from "@/components/BackupStock.vue";
 import DocumentShippingPage from "@/components/DocumentShipping.vue";
 import DocumentShippingDetailPage from "@/components/DocumentShippingDetail.vue";
 const routes = [
-  {
-    path: "/addReceipt",
-    name: "addReceipt",
-    component: addReceiptPage,
-  },
-  {
-    path: "/addProductRequest",
-    name: "addProductRequest",
-    component: addProductRequestPage,
-  },
   {
     path: "/updateReceipt/:id",
     name: "updateReceipt",
