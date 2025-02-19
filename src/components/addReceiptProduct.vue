@@ -133,7 +133,7 @@ async function cheakSerialNumberInStock(serialNumber, formItem) {
       )) || [];
 
       const isDuplicateInStock = checks.some(check => check.serial_number === serialNumber);
-      if (isDuplicateInStock && route.name !== 'DocumentPreparation') {
+      if (isDuplicateInStock && route.name !== 'documentPreparation') {
         warningPopup.value.showWarningSerailNumberDuplicated();
         formItem.serialNumbers[formItem.serialNumbers.indexOf(serialNumber)] = "";
         return;
@@ -147,7 +147,7 @@ async function cheakSerialNumberInStock(serialNumber, formItem) {
         return;
       }
 
-      if(route.name === 'DocumentPreparation'){
+      if(route.name === 'documentPreparation'){
         const stock = (await directus.request(
           readItems("stock", {
             filter: {

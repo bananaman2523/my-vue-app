@@ -279,7 +279,6 @@ async function switchEquipment(item) {
         }
       })
     );
-    console.log(newStockItem)
 
     if (!newStockItem) {
       throw new Error("Stock item not found with the given serial number.");
@@ -420,7 +419,7 @@ async function deleteForm() {
     const ids = formData.value.stock.map(item => item.id);
     const updateStock = await directus.request(
         updateItems('stock', ids, {
-          status: null,
+          status: 'รอตรวจสอบอุปกรณ์',
       })
     )
     await directus.request(

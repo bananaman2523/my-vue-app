@@ -223,44 +223,44 @@ async function generatePreparationNumber() {
 const addStock = async () => {
   const docNumber = await generatePreparationNumber()
   try {
-    const create = await directus.request(
-      createItem('packing_sheet', {
-        document_preparation_number: docNumber,
-        customer_name: form.value.customerName,
-        company_name: form.value.companyName,
-        branch_name: form.value.branchName,
-        branch_code: form.value.branchCode,
-        product_preparation_date: form.value.preparedDate,
-        plan_delivery_date: form.value.deliveryDate,
-        quotation_number_office_design: form.value.quotationNumber,
-        customer_order_number: form.value.customerOrderNumber,
-        prepared_by: user,
-        status: 'รอเช็คก่อนส่ง'
-      })
-    )
-    
-    const stockIds = receiptProducts.value.flatMap(item => item.serialNumbers);
-    
-    const readStock = await directus.request(
-      readItems("stock", {
-        fields: ['*'],
-        filter: {
-          serial_number: {
-            _in: stockIds,
+    for (let index = 0; index < receiptProducts.value.length; index++) {
+      const create = await directus.request(
+        createItem('packing_sheet', {
+          document_preparation_number: docNumber,
+          customer_name: form.value.customerName,
+          company_name: form.value.companyName,
+          branch_name: form.value.branchName,
+          branch_code: form.value.branchCode,
+          product_preparation_date: form.value.preparedDate,
+          plan_delivery_date: form.value.deliveryDate,
+          quotation_number_office_design: form.value.quotationNumber,
+          customer_order_number: form.value.customerOrderNumber,
+          prepared_by: user,
+          status: 'รอเช็คก่อนส่ง'
+        })
+      )
+      const stockIds = receiptProducts.value[index].serialNumbers;
+      const readStock = await directus.request(
+        readItems("stock", {
+          fields: ['*'],
+          filter: {
+            serial_number: {
+              _in: stockIds,
+            },
           },
-        },
-      })
-    );
-    console.log(readStock);
-    
-    const stock = readStock.map(item => item.id);
+        })
+      );
+
+      const stock = readStock.map(item => item.id);
       
-    const updateStock = await directus.request(
-      updateItems('stock', stock, {
-        status: 'รอเช็คก่อนส่ง',
-        stock_id: create.id,
-      })
-    )
+      await directus.request(
+        updateItems('stock', stock, {
+          status: 'รอเช็คก่อนส่ง',
+          stock_id: create.id,
+        })
+      )
+      
+    }
     approvePopup.value.showSuccess();
   } catch (error) {
     console.error('Error creating article:', error);
