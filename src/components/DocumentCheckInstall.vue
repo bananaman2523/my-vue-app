@@ -38,8 +38,8 @@
                 <div class="document-header">
                     <span>3. ใบ CheckList (กรุณากรอกรายละเอียดเพื่อจัดทำเอกสาร)</span>
                     <div class="activity">
-                        <button class="btn btn-upload" @click="fileInputInstallPDF.click()">อัปโหลด</button>
-                        <input type="file" ref="fileInputInstallPDF" accept="application/pdf" @change="uploadFile('ใบ CheckList', $event)" hidden multiple />
+                        <button class="btn btn-upload" @click="fileInputCheckListPDF.click()">อัปโหลด</button>
+                        <input type="file" ref="fileInputCheckListPDF" accept="application/pdf" @change="uploadFile('ใบ CheckList', $event)" hidden multiple />
                         <button class="btn btn-print" @click="handlePrint(doc)">
                             พิมพ์
                         </button>
@@ -101,6 +101,7 @@ const route = useRoute();
 const router = useRouter();
 const fileInputShippingPDF = ref(null);
 const fileInputInstallPDF = ref(null);
+const fileInputCheckListPDF = ref(null);
 
 const fetchData = async () => {
   try {
@@ -158,45 +159,61 @@ const handlePrint = async (filename, doc) => {
     }
 };
 
-const uploadFile = async (filename, event) => {
-    const selectedFile = event.target.files[0];
-    
-    if (!selectedFile) return;
+const processFiles = (files) => {
+    return files.map(file => ({
+        directus_files_id: {
+            id: file.id
+        }
+    }));
+};
 
-    if (selectedFile.type !== "application/pdf") {
-        alert("กรุณาเลือกไฟล์ PDF เท่านั้น");
-        return;
-    }
+const uploadFile = async (filename, event) => {
+    const selectedFiles = event.target.files;
+    if (!selectedFiles || selectedFiles.length === 0) return;
 
     try {
-        if (event.target.files.length == 1) {
-            const newFileName = `${filename}_${new Date().toISOString().slice(0, 10)}.pdf`;
-            const formData = new FormData();
-            const renamedFile = new File([selectedFile], newFileName, { type: selectedFile.type });
-
-            formData.append("file", renamedFile);
-            formData.append("title", newFileName); 
-            
-            const fileResponse = await directus.request(uploadFiles(formData));
-            const fileId = fileResponse.id;
-            if (filename === 'ใบรายงานติดตั้ง' || filename === 'ใบจัดส่งสินค้า') {
-                const fieldToUpdate = filename === 'ใบรายงานติดตั้ง' ? 'install_report_pdf' : 'shipping_pdf';
-                await directus.request(
-                    updateItem('delivery_sheet', route.params.id, {
-                        [fieldToUpdate]: fileId
-                    })
-                );
-                fetchData()
+        const formData = new FormData();
+        for (let index = 0; index < selectedFiles.length; index++) {
+            if (selectedFiles[index].type !== "application/pdf") {
+                alert("กรุณาเลือกไฟล์ PDF เท่านั้น");
+                return;
             }
-            approvePopup.value.showSuccessUpload(filename)
+            const selectedFile = selectedFiles[index];
+            // const newFileName = `${filename}_${new Date().toISOString().slice(0, 10)}_${index + 1}.pdf`;
+            // const renamedFile = new File([selectedFile], newFileName, { type: selectedFile.type });
+            formData.append("file", selectedFile);
         }
-        
+        const fileResponse = await directus.request(uploadFiles(formData));
+        if (typeof fileResponse === 'object' && fileResponse !== null && fileResponse.length > 1) {
+            const ids = processFiles(fileResponse);
+            await directus.request(
+                updateItem('delivery_sheet', route.params.id, {
+                    checklist_pdf: ids
+                })
+            );
+        }else{
+            const fileId = fileResponse.id;
+            const fieldMapping = {
+                'ใบรายงานติดตั้ง': 'install_report_pdf',
+                'ใบจัดส่งสินค้า': 'shipping_pdf',
+                'ใบ CheckList': 'checklist_pdf',
+            };
+            const fieldToUpdate = fieldMapping[filename] || 'default_field';
+            await directus.request(
+                updateItem('delivery_sheet', route.params.id, {
+                    [fieldToUpdate]: fileId
+                })
+            );
+        }
+        fetchData()
+
+        approvePopup.value.showSuccessUpload(filename)
         fileInputShippingPDF.value.value = "";
         fileInputInstallPDF.value.value = "";
+        fileInputCheckListPDF.value.value = "";
     } catch (error) {
         console.error("Error uploading file:", error);
         errorPopup.value.showErrorUpload(filename)
-        alert("เกิดข้อผิดพลาดในการอัปโหลดไฟล์");
     }
 };
 </script>
