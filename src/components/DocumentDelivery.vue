@@ -17,9 +17,6 @@
                         <button class="btn btn-upload" @click="fileInputShippingPDF.click()">อัปโหลด</button>
                         <input type="file" ref="fileInputShippingPDF" accept="application/pdf" @change="handleFileChange('ใบจัดส่งสินค้า', $event)" hidden/>
                         <button class="btn btn-save" @click="saveFilesToDirectus('shipping')">บันทึก</button>
-                        <button class="btn btn-print" @click="handlePrint('ใบจัดส่งสินค้า',doc)">
-                            ดูไฟล์
-                        </button>
                     </div>
                 </div>
                 <div v-if="uploadedFilesShippingPDF.length > 0">
@@ -41,9 +38,6 @@
                         <button class="btn btn-upload" @click="fileInputProductDeliveryImages.click()">อัปโหลด</button>
                         <input type="file" ref="fileInputProductDeliveryImages" accept="image/png, image/gif, image/jpeg" @change="handleFileChange('delivery_image', $event)" hidden multiple/>
                         <button class="btn btn-save" @click="saveFilesToDirectus('delivery_image')">บันทึก</button>
-                        <button class="btn btn-print" @click="handlePrint(doc)">
-                            ดูไฟล์
-                        </button>
                     </div>
                 </div>
                 <div v-if="uploadedFilesProductDeliveryImages.length > 0">
@@ -105,10 +99,23 @@ const fetchData = async () => {
     );
     
     if (delivery_sheet.length > 0) {
-      const data = delivery_sheet[0];
-      formData.value = {
-        delivery_status: data.delivery_status || "",
-      };
+        const data = delivery_sheet[0];
+        formData.value = {
+            delivery_status: data.delivery_status || "",
+        };
+
+        uploadedFilesShippingPDF.value = data.shipping_pdf && data.shipping_pdf.id
+            ? [{ id: data.shipping_pdf.id, name: data.shipping_pdf.filename_download }]
+            : [];
+      
+        uploadedFilesProductDeliveryImages.value = Array.isArray(data.product_delivery_images)
+            ? data.product_delivery_images
+                .filter(file => file && file.directus_files_id)
+                .map(file => ({
+                id: file.directus_files_id.id,
+                name: file.directus_files_id.filename_download
+                }))
+            : [];
     }
   } catch (error) {
     console.error("Error fetching activities:", error);
@@ -122,39 +129,6 @@ const getFileUrl = (file) => {
         return URL.createObjectURL(file);
     }
     return `http://localhost:8055/assets/${file.id}`; 
-};
-
-const handlePrint = async (filename, doc) => {
-    try {
-        const fieldMapping = {
-            'ใบรายงานติดตั้ง': 'install_report_pdf',
-            'ใบจัดส่งสินค้า': 'shipping_pdf',
-        };
-        const fieldToUpdate = fieldMapping[filename] || 'default_field';
-        
-        const response = await directus.request(readFile(formData.value[fieldToUpdate]));
-        if (response) {
-            const fileUrl = `http://localhost:8055/assets/${response.filename_disk}`;
-
-            const printWindow = window.open();
-            const iframe = printWindow.document.createElement('iframe');
-            iframe.src = fileUrl;
-            iframe.width = "100%";
-            iframe.height = "100%";
-            printWindow.document.body.appendChild(iframe);
-
-            iframe.onload = () => {
-                printWindow.focus();
-                printWindow.document.close();
-            };
-        } else {
-            console.error("No file URL returned from Directus");
-            errorPopup.value.showErrorOpenPDF('ไม่สามารถดูเอกสารได้')
-        }
-    } catch (error) {
-        console.error("Error fetching or printing file:", error);
-        errorPopup.value.showErrorOpenPDF('ไม่สามารถดูเอกสารได้')
-    }
 };
 
 const processFiles = (files) => {
