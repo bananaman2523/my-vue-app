@@ -78,26 +78,44 @@
                 <div class="document-header">
                     <span>4. รูปภาพการจัดส่งสินค้า (กรุณากรอกรายละเอียดเพื่อจัดทำเอกสาร)</span>
                     <div class="activity">
-                        <button class="btn btn-upload">
-                            อัปโหลด
-                        </button>
+                        <button class="btn btn-upload" @click="fileInputProductDeliveryImages.click()">อัปโหลด</button>
+                        <input type="file" ref="fileInputProductDeliveryImages" accept="image/png, image/gif, image/jpeg" @change="handleFileChange('delivery_image', $event)" hidden multiple/>
+                        <button class="btn btn-save" @click="saveFilesToDirectus('delivery_image')">บันทึก</button>
                         <button class="btn btn-print" @click="handlePrint(doc)">
                             ดูไฟล์
                         </button>
                     </div>
+                </div>
+                <div v-if="uploadedFilesProductDeliveryImages.length > 0">
+                    <h4>ไฟล์ที่อัปโหลด</h4>
+                    <ul>
+                        <li v-for="(file, index) in uploadedFilesProductDeliveryImages" :key="index">
+                            {{ file.name }}
+                            <button class="delete-file" @click="deleteFile(index, 'delivery_image')">X</button>
+                        </li>
+                    </ul>
                 </div>
             </div>
             <div class="document-item">
                 <div class="document-header">
                     <span>5. รูปภาพการติดตั้งสินค้า (กรุณากรอกรายละเอียดเพื่อจัดทำเอกสาร)</span>
                     <div class="activity">
-                        <button class="btn btn-upload">
-                            อัปโหลด
-                        </button>
+                        <button class="btn btn-upload" @click="fileInputProductInstallImages.click()">อัปโหลด</button>
+                        <input type="file" ref="fileInputProductInstallImages" accept="image/png, image/gif, image/jpeg" @change="handleFileChange('install_image', $event)" hidden multiple/>
+                        <button class="btn btn-save" @click="saveFilesToDirectus('install_image')">บันทึก</button>
                         <button class="btn btn-print" @click="handlePrint(doc)">
                             ดูไฟล์
                         </button>
                     </div>
+                </div>
+                <div v-if="uploadedFilesProductInstallImages.length > 0">
+                    <h4>ไฟล์ที่อัปโหลด</h4>
+                    <ul>
+                        <li v-for="(file, index) in uploadedFilesProductInstallImages" :key="index">
+                            {{ file.name }}
+                            <button class="delete-file" @click="deleteFile(index, 'install_image')">X</button>
+                        </li>
+                    </ul>
                 </div>
             </div>
         </div>
@@ -130,9 +148,13 @@ const router = useRouter();
 const fileInputShippingPDF = ref(null);
 const fileInputInstallPDF = ref(null);
 const fileInputCheckListPDF = ref(null);
+const fileInputProductDeliveryImages = ref(null);
+const fileInputProductInstallImages = ref(null);
 const uploadedFilesShippingPDF = ref([]);
 const uploadedFilesInstallPDF = ref([]);
 const uploadedFilesCheckListPDF = ref([]);
+const uploadedFilesProductDeliveryImages = ref([]);
+const uploadedFilesProductInstallImages = ref([]);
 
 const fetchData = async () => {
   try {
@@ -211,10 +233,6 @@ const handleFileChange = (filename, event) => {
   if (!selectedFiles || selectedFiles.length === 0) return;
 
   for (let index = 0; index < selectedFiles.length; index++) {
-    if (selectedFiles[index].type !== "application/pdf") {
-      errorPopup.value.showErrorUpload('PDF');
-      return;
-    }
 
     if (filename === 'ใบจัดส่งสินค้า') {
       uploadedFilesShippingPDF.value.push(selectedFiles[index]);
@@ -222,6 +240,10 @@ const handleFileChange = (filename, event) => {
       uploadedFilesInstallPDF.value.push(selectedFiles[index]);
     } else if (filename === 'ใบ CheckList') {
       uploadedFilesCheckListPDF.value.push(selectedFiles[index]);
+    } else if (filename === 'delivery_image') {
+      uploadedFilesProductDeliveryImages.value.push(selectedFiles[index]);
+    } else if (filename === 'install_image') {
+      uploadedFilesProductInstallImages.value.push(selectedFiles[index]);
     }
   }
 };
@@ -233,6 +255,10 @@ const deleteFile = (index, type) => {
     uploadedFilesInstallPDF.value.splice(index, 1);
   } else if (type === 'checklist') {
     uploadedFilesCheckListPDF.value.splice(index, 1);
+  } else if (type === 'delivery_image') {
+    uploadedFilesProductDeliveryImages.value.splice(index, 1);
+  } else if (type === 'install_image') {
+    uploadedFilesProductInstallImages.value.splice(index, 1);
   }
 };
 
@@ -249,6 +275,12 @@ const saveFilesToDirectus = async (type) => {
   } else if (type === 'checklist') {
     uploadedFiles = uploadedFilesCheckListPDF.value;
     fieldKey = 'checklist_pdf';
+  } else if (type === 'delivery_image') {
+    uploadedFiles = uploadedFilesProductDeliveryImages.value;
+    fieldKey = 'product_delivery_images';
+  } else if (type === 'install_image') {
+    uploadedFiles = uploadedFilesProductInstallImages.value;
+    fieldKey = 'product_install_images';
   }
 
   if (!uploadedFiles || uploadedFiles.length === 0) {
@@ -289,11 +321,15 @@ const saveFilesToDirectus = async (type) => {
     );
 
     if (type === 'shipping') {
-      uploadedFilesShippingPDF.value = [];
+        uploadedFilesShippingPDF.value = [];
     } else if (type === 'install') {
-      uploadedFilesInstallPDF.value = [];
+        uploadedFilesInstallPDF.value = [];
     } else if (type === 'checklist') {
-      uploadedFilesCheckListPDF.value = [];
+        uploadedFilesCheckListPDF.value = [];
+    } else if (type === 'delivery_image') {
+        uploadedFilesProductDeliveryImages.value = [];
+    } else if (type === 'install_image') {
+        uploadedFilesProductInstallImages.value = [];
     }
   } catch (error) {
     console.error("Error uploading files:", error);
