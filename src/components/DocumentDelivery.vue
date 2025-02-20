@@ -3,46 +3,29 @@
         <div class="container">
             <form @submit.prevent="submitForm">
                 <div class="form-row">
-                    <label>สถานะการติดตั้ง</label>
-                    <input v-model="formData.install_status" type="text" disabled class="disable-form" />
+                    <label>สถานะการจัดส่ง</label>
+                    <input v-model="formData.delivery_status" type="text" disabled class="disable-form" />
                 </div>
             </form>
         </div>
-        <div class="container">
-            <form @submit.prevent="submitForm">
-                <div class="form-row">
-                    <label>บริษัท</label>
-                    <input v-model="formData.company_name" type="text" disabled class="disable-form" />
-                </div>
-                <div class="form-row">
-                    <label>สาขา</label>
-                    <input v-model="formData.branch_name" type="text" disabled class="disable-form" />
-                </div>
-                <div class="form-row">
-                    <label>วันที่ติดตั้ง</label>
-                    <input type="date" />
-                </div>
-            </form>
-        </div>
-        <DocumentCheckBox />
         <div class="documents-section">
-            <h2>เอกสารประกอบการติดตั้ง</h2>
+            <h2>เอกสารประกอบการจัดส่ง</h2>
             <div class="document-item">
                 <div class="document-header">
-                    <span>1. ใบรายงานติดตั้ง (กรุณากรอกรายละเอียดเพื่อจัดทำเอกสาร)</span>
+                    <span>1. ใบจัดส่งสินค้า (กรุณากรอกรายละเอียดเพื่อจัดทำเอกสาร)</span>
                     <div class="activity">
-                        <button class="btn btn-upload" @click="fileInputInstallPDF.click()">อัปโหลด</button>
-                        <input type="file" ref="fileInputInstallPDF" accept="application/pdf" @change="handleFileChange('ใบรายงานติดตั้ง', $event)" hidden/>
-                        <button class="btn btn-save" @click="saveFilesToDirectus('install')">บันทึก</button>
-                        <button class="btn btn-print" @click="handlePrint('ใบรายงานติดตั้ง',doc)">
+                        <button class="btn btn-upload" @click="fileInputShippingPDF.click()">อัปโหลด</button>
+                        <input type="file" ref="fileInputShippingPDF" accept="application/pdf" @change="handleFileChange('ใบจัดส่งสินค้า', $event)" hidden/>
+                        <button class="btn btn-save" @click="saveFilesToDirectus('shipping')">บันทึก</button>
+                        <button class="btn btn-print" @click="handlePrint('ใบจัดส่งสินค้า',doc)">
                             ดูไฟล์
                         </button>
                     </div>
                 </div>
-                <div v-if="uploadedFilesInstallPDF.length > 0">
+                <div v-if="uploadedFilesShippingPDF.length > 0">
                     <h4>ไฟล์ที่อัปโหลด</h4>
                     <ul>
-                        <li v-for="(file, index) in uploadedFilesInstallPDF" :key="index">
+                        <li v-for="(file, index) in uploadedFilesShippingPDF" :key="index">
                         {{ file.name }}
                         <button class="delete-file" @click="deleteFile(index)">X</button>
                         </li>
@@ -51,49 +34,29 @@
             </div>
             <div class="document-item">
                 <div class="document-header">
-                    <span>2. ใบ Checklist (กรุณากรอกรายละเอียดเพื่อจัดทำเอกสาร)</span>
+                    <span>2. รูปภาพการจัดส่งสินค้า (กรุณากรอกรายละเอียดเพื่อจัดทำเอกสาร)</span>
                     <div class="activity">
-                    <button class="btn btn-upload" @click="fileInputCheckListPDF.click()">อัปโหลด</button>
-                    <input type="file" ref="fileInputCheckListPDF" accept="application/pdf" @change="handleFileChange('ใบ CheckList', $event)" hidden multiple />
-                    <button class="btn btn-save" @click="saveFilesToDirectus('checklist')">บันทึก</button>
-                    <button class="btn btn-print" @click="handlePrint('ใบ CheckList',doc)">ดูไฟล์</button>
-                    </div>
-                </div>
-                <div v-if="uploadedFilesCheckListPDF.length > 0">
-                    <h4>ไฟล์ที่อัปโหลด</h4>
-                    <ul>
-                    <li v-for="(file, index) in uploadedFilesCheckListPDF" :key="index">
-                        {{ file.name }}
-                        <button class="delete-file" @click="deleteFile(index, 'checklist')">X</button>
-                    </li>
-                    </ul>
-                </div>
-            </div>
-            <div class="document-item">
-                <div class="document-header">
-                    <span>3. รูปภาพการติดตั้งสินค้า (กรุณากรอกรายละเอียดเพื่อจัดทำเอกสาร)</span>
-                    <div class="activity">
-                        <button class="btn btn-upload" @click="fileInputProductInstallImages.click()">อัปโหลด</button>
-                        <input type="file" ref="fileInputProductInstallImages" accept="image/png, image/gif, image/jpeg" @change="handleFileChange('install_image', $event)" hidden multiple/>
-                        <button class="btn btn-save" @click="saveFilesToDirectus('install_image')">บันทึก</button>
+                        <button class="btn btn-upload" @click="fileInputProductDeliveryImages.click()">อัปโหลด</button>
+                        <input type="file" ref="fileInputProductDeliveryImages" accept="image/png, image/gif, image/jpeg" @change="handleFileChange('delivery_image', $event)" hidden multiple/>
+                        <button class="btn btn-save" @click="saveFilesToDirectus('delivery_image')">บันทึก</button>
                         <button class="btn btn-print" @click="handlePrint(doc)">
                             ดูไฟล์
                         </button>
                     </div>
                 </div>
-                <div v-if="uploadedFilesProductInstallImages.length > 0">
+                <div v-if="uploadedFilesProductDeliveryImages.length > 0">
                     <h4>ไฟล์ที่อัปโหลด</h4>
                     <ul>
-                        <li v-for="(file, index) in uploadedFilesProductInstallImages" :key="index">
+                        <li v-for="(file, index) in uploadedFilesProductDeliveryImages" :key="index">
                             {{ file.name }}
-                            <button class="delete-file" @click="deleteFile(index, 'install_image')">X</button>
+                            <button class="delete-file" @click="deleteFile(index, 'delivery_image')">X</button>
                         </li>
                     </ul>
                 </div>
             </div>
         </div>
         <div class="form-actions">
-            <label style="padding-right: 8px;">พนักงานติดตั้ง</label>
+            <label style="padding-right: 8px;">พนักงานจัดส่ง</label>
             <input v-model="user" type="text" disabled class="disable-form-user" />
         </div>
     </main>
@@ -106,8 +69,7 @@
 import { ref } from 'vue';
 import { directus } from "@/services/directus";
 import { readItems, uploadFiles , updateItem , readFile} from "@directus/sdk";
-import { useRoute , useRouter} from "vue-router";
-import DocumentCheckBox from './DocumentCheckBox.vue';
+import { useRoute } from "vue-router";
 import ApprovePopup from "@/components/popup/ApprovePopup.vue";
 import ErrorPopup from "@/components/popup/ErrorPopup.vue";
 import WarningPopup from "@/components/popup/WarningPopup.vue";
@@ -116,14 +78,12 @@ const approvePopup = ref(null);
 const errorPopup = ref(null);
 const getUser = JSON.parse(localStorage.getItem('user'))
 const user = `${getUser.first_name} ${getUser.last_name}`
-const formData = ref({})
+const formData = ref({});
 const route = useRoute();
-const fileInputInstallPDF = ref(null);
-const fileInputCheckListPDF = ref(null);
-const fileInputProductInstallImages = ref(null);
-const uploadedFilesInstallPDF = ref([]);
-const uploadedFilesCheckListPDF = ref([]);
-const uploadedFilesProductInstallImages = ref([]);
+const fileInputShippingPDF = ref(null);
+const fileInputProductDeliveryImages = ref(null);
+const uploadedFilesShippingPDF = ref([]);
+const uploadedFilesProductDeliveryImages = ref([]);
 
 const fetchData = async () => {
   try {
@@ -143,9 +103,7 @@ const fetchData = async () => {
     if (delivery_sheet.length > 0) {
       const data = delivery_sheet[0];
       formData.value = {
-        install_status: data.install_status || "",
-        company_name: data.packing_sheet[0].company_name || "",
-        branch_name: data.packing_sheet[0].branch_name || "",
+        delivery_status: data.delivery_status || "",
       };
     }
   } catch (error) {
@@ -201,43 +159,36 @@ const handleFileChange = (filename, event) => {
   if (!selectedFiles || selectedFiles.length === 0) return;
 
   for (let index = 0; index < selectedFiles.length; index++) {
-    
-    if (filename === 'ใบรายงานติดตั้ง') {
-        uploadedFilesInstallPDF.value.push(selectedFiles[index]);
-    } else if (filename === 'ใบ CheckList') {
-        uploadedFilesCheckListPDF.value.push(selectedFiles[index]);
-    } else if (filename === 'install_image') {
-        if (!uploadedFilesProductInstallImages.value) {
-            uploadedFilesProductInstallImages.value = [];
+
+    if (filename === 'ใบจัดส่งสินค้า') {
+        uploadedFilesShippingPDF.value.push(selectedFiles[index]);
+    } else if (filename === 'delivery_image') {
+        if (!uploadedFilesProductDeliveryImages.value) {
+            uploadedFilesProductDeliveryImages.value = [];
         }
-        uploadedFilesProductInstallImages.value.push(selectedFiles[index]);
+        uploadedFilesProductDeliveryImages.value.push(selectedFiles[index]);
     }
   }
 };
 
 const deleteFile = (index, type) => {
-    if (type === 'install') {
-        uploadedFilesInstallPDF.value.splice(index, 1);
-    } else if (type === 'checklist') {
-        uploadedFilesCheckListPDF.value.splice(index, 1);
-    } else if (type === 'install_image') {
-        uploadedFilesProductInstallImages.value.splice(index, 1);
-    }
+  if (type === 'shipping') {
+    uploadedFilesShippingPDF.value.splice(index, 1);
+  } else if (type === 'delivery_image') {
+    uploadedFilesProductDeliveryImages.value.splice(index, 1);
+  }
 };
 
 const saveFilesToDirectus = async (type) => {
   let uploadedFiles;
   let fieldKey;
 
-  if (type === 'install') {
-    uploadedFiles = uploadedFilesInstallPDF.value;
-    fieldKey = 'install_report_pdf';
-  } else if (type === 'checklist') {
-    uploadedFiles = uploadedFilesCheckListPDF.value;
-    fieldKey = 'checklist_pdf';
-  } else if (type === 'install_image') {
-    uploadedFiles = uploadedFilesProductInstallImages.value;
-    fieldKey = 'product_install_images';
+  if (type === 'shipping') {
+    uploadedFiles = uploadedFilesShippingPDF.value;
+    fieldKey = 'shipping_pdf';
+  } else if (type === 'delivery_image') {
+    uploadedFiles = uploadedFilesProductDeliveryImages.value;
+    fieldKey = 'product_delivery_images';
   }
 
   if (!uploadedFiles || uploadedFiles.length === 0) {
@@ -270,31 +221,25 @@ const saveFilesToDirectus = async (type) => {
 
     fetchData();
     approvePopup.value.showSuccessUpload(
-        type === 'install'
-        ? 'ใบรายงานติดตั้ง'
-        : type === 'checklist'
-        ? 'ใบ CheckList'
-        : type === 'delivery_image'
-        ? 'รูปภาพการจัดส่งสินค้า'
+        type === 'shipping'
+        ? 'ใบจัดส่งสินค้า'
+        : type === 'install_image'
+        ? 'รูปภาพการติดตั้งสินค้า'
         : 'ไม่ระบุประเภทไฟล์'
     );
 
-    if (type === 'install') {
-        uploadedFilesInstallPDF.value = [];
-    } else if (type === 'checklist') {
-        uploadedFilesCheckListPDF.value = [];
-    } else if (type === 'install_image') {
-        uploadedFilesProductInstallImages.value = [];
+    if (type === 'shipping') {
+        uploadedFilesShippingPDF.value = [];
+    } else if (type === 'delivery_image') {
+        uploadedFilesProductDeliveryImages.value = [];
     }
   } catch (error) {
     console.error("Error uploading files:", error);
     errorPopup.value.showErrorUpload(
-        type === 'install'
-        ? 'ใบรายงานติดตั้ง'
-        : type === 'checklist'
-        ? 'ใบ CheckList'
-        : type === 'delivery_image'
-        ? 'รูปภาพการจัดส่งสินค้า'
+        type === 'shipping'
+        ? 'ใบจัดส่งสินค้า'
+        : type === 'install_image'
+        ? 'รูปภาพการติดตั้งสินค้า'
         : 'ไม่ระบุประเภทไฟล์'
     );
   }
@@ -440,7 +385,7 @@ main {
     background-color: #ffffff;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     overflow: hidden;
-    min-height: 100vh;
+    /* min-height: 100vh; */
 }
 
 h1 {

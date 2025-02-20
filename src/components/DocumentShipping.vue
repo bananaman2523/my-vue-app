@@ -89,7 +89,8 @@
               <th>เลขที่ใบสั่งซื้อ</th>
               <th>ชื่อลูกค้า</th>
               <th>ชื่อสาขา</th>
-              <th>สถานะ</th>
+              <th>สถานะจัดส่งสินค้า</th>
+              <th>สถานะรายงานติดตั้ง</th>
             </tr>
           </thead>
           <tbody>
@@ -101,7 +102,8 @@
               <td>{{ item.packing_sheet[0].quotation_number_office_design }}</td>
               <td>{{ item.packing_sheet[0].customer_name }}</td>
               <td>{{ item.packing_sheet[0].branch_name }}</td>
-              <td>{{ item.status }}</td>
+              <td>{{ item.delivery_status }}</td>
+              <td>{{ item.install_status }}</td>
             </tr>
           </tbody>
         </table>
@@ -145,6 +147,8 @@ const filterData = ref({
   model: "",
   sn: "",
   status: "",
+  delivery_status: "",
+  install_status: "",
 });
 
 const fetchData = async () => {

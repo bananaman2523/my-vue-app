@@ -250,7 +250,9 @@ async function createShippingDocument() {
       createItem('delivery_sheet', {
         document_delivery_number: packing.document_preparation_number,
         delivery_date: packing.plan_delivery_date,
-        packing_sheet: [packing.id]
+        packing_sheet: [packing.id],
+        delivery_status: 'รอการจัดส่งสินค้า',
+        install_status: 'รอการติดตั้ง',
       })
     );
     window.location.reload();

@@ -31,7 +31,7 @@
           </div>
         </form>
       </div>
-      <h1>อุปกรณ์</h1>
+      <h1>รายการอุปกรณ์ติดตั้งไปยังบริษัท/ร้าน</h1>
       <div v-for="(item, index) in formData.stock" :key="index" class="container-product">
         <form>
           <div class="form-row">
@@ -57,7 +57,7 @@
         </form>
       </div>
       <div class="form-actions">
-        <label style="padding-right: 8px;">ผู้ตรวจสอบ</label>
+        <label style="padding-right: 8px;">พนักงานจัดส่ง</label>
         <input v-model="user" type="text" disabled class="disable-form-user"/>
         <button v-if="formData.status !== 'ผ่าน'" type="button" @click="downloadReport()" style="margin-right: 8px;">Export</button>
         <button v-if="formData.status !== 'ผ่าน'" type="button" @click="submitForm()">บันทึก</button>
@@ -65,7 +65,9 @@
       <div class="form-delete">
         <button type="button" @click="deleteForm">ลบ</button>
       </div>
-      <h1>ตรวจสอบการติดตั้ง</h1>
+      <h1>รายงานการจัดส่ง</h1>
+      <DocumentDelivery />
+      <h1>รายงานการติดตั้ง</h1>
       <DocumentCheckInstall />
     </main>
   </div>
@@ -80,6 +82,7 @@ import { directus } from "@/services/directus";
 import { updateItems , readItems , updateItem , deleteItem , createItem } from "@directus/sdk";
 import SidebarMenu from "@/components/SidebarMenu.vue";
 import DocumentCheckInstall from './DocumentCheckInstall.vue';
+import DocumentDelivery from './DocumentDelivery.vue';
 import { useRoute , useRouter} from "vue-router";
 import axios from 'axios';
 import ApprovePopup from "@/components/popup/ApprovePopup.vue";
