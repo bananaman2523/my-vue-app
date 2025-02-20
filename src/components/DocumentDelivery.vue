@@ -26,8 +26,10 @@
                     <h4>ไฟล์ที่อัปโหลด</h4>
                     <ul>
                         <li v-for="(file, index) in uploadedFilesShippingPDF" :key="index">
-                        {{ file.name }}
-                        <button class="delete-file" @click="deleteFile(index)">X</button>
+                            <a :href="getFileUrl(file)" target="_blank" class="file-link">
+                                {{ file.name }}
+                            </a>
+                            <button class="delete-file" @click="deleteFile(index , 'shipping')">X</button>
                         </li>
                     </ul>
                 </div>
@@ -48,7 +50,9 @@
                     <h4>ไฟล์ที่อัปโหลด</h4>
                     <ul>
                         <li v-for="(file, index) in uploadedFilesProductDeliveryImages" :key="index">
-                            {{ file.name }}
+                            <a :href="getFileUrl(file)" target="_blank" class="file-link">
+                                {{ file.name }}
+                            </a>
                             <button class="delete-file" @click="deleteFile(index, 'delivery_image')">X</button>
                         </li>
                     </ul>
@@ -113,6 +117,13 @@ const fetchData = async () => {
 
 fetchData();
 
+const getFileUrl = (file) => {
+    if (file instanceof File) {
+        return URL.createObjectURL(file);
+    }
+    return `http://localhost:8055/assets/${file.id}`; 
+};
+
 const handlePrint = async (filename, doc) => {
     try {
         const fieldMapping = {
@@ -161,7 +172,7 @@ const handleFileChange = (filename, event) => {
   for (let index = 0; index < selectedFiles.length; index++) {
 
     if (filename === 'ใบจัดส่งสินค้า') {
-        uploadedFilesShippingPDF.value.push(selectedFiles[index]);
+        uploadedFilesShippingPDF.value = [selectedFiles[0]];
     } else if (filename === 'delivery_image') {
         if (!uploadedFilesProductDeliveryImages.value) {
             uploadedFilesProductDeliveryImages.value = [];
@@ -247,6 +258,18 @@ const saveFilesToDirectus = async (type) => {
 </script>
 
 <style scoped>
+.delete-file {
+    background-color: transparent;
+    border: none;
+    color: red;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.delete-file:hover {
+    color: darkred;
+}
+
 .activity {
     display: flex;
     margin-left: auto;
@@ -476,23 +499,6 @@ button:disabled {
     grid-column: span 3;
     text-align: right;
     margin: 20px;
-}
-
-.delete-button {
-    background-color: #e74c3c;
-    color: white;
-    /* width: 30px; */
-    height: 30px;
-    padding: 6px 12px;
-    font-size: 14px;
-    border: none;
-    cursor: pointer;
-    /* border-radius: 5px; */
-    /* margin-top: 10px; */
-}
-
-.delete-button:hover {
-    background-color: #c0392b;
 }
 
 @media (max-width: 768px) {
