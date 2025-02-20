@@ -235,15 +235,21 @@ const handleFileChange = (filename, event) => {
   for (let index = 0; index < selectedFiles.length; index++) {
 
     if (filename === 'ใบจัดส่งสินค้า') {
-      uploadedFilesShippingPDF.value.push(selectedFiles[index]);
+        uploadedFilesShippingPDF.value.push(selectedFiles[index]);
     } else if (filename === 'ใบรายงานติดตั้ง') {
-      uploadedFilesInstallPDF.value.push(selectedFiles[index]);
+        uploadedFilesInstallPDF.value.push(selectedFiles[index]);
     } else if (filename === 'ใบ CheckList') {
-      uploadedFilesCheckListPDF.value.push(selectedFiles[index]);
+        uploadedFilesCheckListPDF.value.push(selectedFiles[index]);
     } else if (filename === 'delivery_image') {
-      uploadedFilesProductDeliveryImages.value.push(selectedFiles[index]);
+        if (!uploadedFilesProductDeliveryImages.value) {
+            uploadedFilesProductDeliveryImages.value = [];
+        }
+        uploadedFilesProductDeliveryImages.value.push(selectedFiles[index]);
     } else if (filename === 'install_image') {
-      uploadedFilesProductInstallImages.value.push(selectedFiles[index]);
+        if (!uploadedFilesProductInstallImages.value) {
+            uploadedFilesProductInstallImages.value = [];
+        }
+        uploadedFilesProductInstallImages.value.push(selectedFiles[index]);
     }
   }
 };
@@ -313,11 +319,17 @@ const saveFilesToDirectus = async (type) => {
 
     fetchData();
     approvePopup.value.showSuccessUpload(
-      type === 'shipping'
+        type === 'shipping'
         ? 'ใบจัดส่งสินค้า'
         : type === 'install'
         ? 'ใบรายงานติดตั้ง'
-        : 'ใบ CheckList'
+        : type === 'checklist'
+        ? 'ใบ CheckList'
+        : type === 'delivery_image'
+        ? 'รูปภาพการจัดส่งสินค้า'
+        : type === 'install_image'
+        ? 'รูปภาพการติดตั้งสินค้า'
+        : 'ไม่ระบุประเภทไฟล์'
     );
 
     if (type === 'shipping') {
@@ -334,11 +346,17 @@ const saveFilesToDirectus = async (type) => {
   } catch (error) {
     console.error("Error uploading files:", error);
     errorPopup.value.showErrorUpload(
-      type === 'shipping'
+        type === 'shipping'
         ? 'ใบจัดส่งสินค้า'
         : type === 'install'
         ? 'ใบรายงานติดตั้ง'
-        : 'ใบ CheckList'
+        : type === 'checklist'
+        ? 'ใบ CheckList'
+        : type === 'delivery_image'
+        ? 'รูปภาพการจัดส่งสินค้า'
+        : type === 'install_image'
+        ? 'รูปภาพการติดตั้งสินค้า'
+        : 'ไม่ระบุประเภทไฟล์'
     );
   }
 };
