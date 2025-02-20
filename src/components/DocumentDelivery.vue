@@ -26,7 +26,7 @@
                             <a :href="getFileUrl(file)" target="_blank" class="file-link">
                                 {{ file.name }}
                             </a>
-                            <button class="delete-file" @click="deleteFile(index , 'shipping')">X</button>
+                            <button class="delete-file" @click="deleteFileForm(index , 'shipping' , file)">X</button>
                         </li>
                     </ul>
                 </div>
@@ -47,7 +47,7 @@
                             <a :href="getFileUrl(file)" target="_blank" class="file-link">
                                 {{ file.name }}
                             </a>
-                            <button class="delete-file" @click="deleteFile(index, 'delivery_image')">X</button>
+                            <button class="delete-file" @click="deleteFileForm(index, 'delivery_image' , file)">X</button>
                         </li>
                     </ul>
                 </div>
@@ -66,7 +66,7 @@
 <script setup>
 import { ref } from 'vue';
 import { directus } from "@/services/directus";
-import { readItems, uploadFiles , updateItem , readFile} from "@directus/sdk";
+import { readItems, uploadFiles , updateItem , deleteFile } from "@directus/sdk";
 import { useRoute } from "vue-router";
 import ApprovePopup from "@/components/popup/ApprovePopup.vue";
 import ErrorPopup from "@/components/popup/ErrorPopup.vue";
@@ -116,6 +116,21 @@ const fetchData = async () => {
                 name: file.directus_files_id.filename_download
                 }))
             : [];
+        
+        if (uploadedFilesShippingPDF.value.length > 0 && uploadedFilesProductDeliveryImages.value.length > 0) {
+            await directus.request(
+                updateItem('delivery_sheet', route.params.id, {
+                    delivery_status: 'จัดส่งสินค้าเสร็จสิ้น'
+                })
+            );
+        } else {
+            await directus.request(
+                updateItem('delivery_sheet', route.params.id, {
+                    delivery_status: 'รอการจัดส่งสินค้า'
+                })
+            );
+        }
+
     }
   } catch (error) {
     console.error("Error fetching activities:", error);
@@ -156,11 +171,32 @@ const handleFileChange = (filename, event) => {
   }
 };
 
-const deleteFile = (index, type) => {
-  if (type === 'shipping') {
-    uploadedFilesShippingPDF.value.splice(index, 1);
-  } else if (type === 'delivery_image') {
-    uploadedFilesProductDeliveryImages.value.splice(index, 1);
+const deleteFileForm = async (index, type , file) => {
+  let fileToDelete = file;
+  
+  if (!fileToDelete || !fileToDelete.id) {
+    console.error("File ID is missing.");
+    if (type === 'shipping') {
+        uploadedFilesShippingPDF.value.splice(index, 1);
+    } else if (type === 'delivery_image') {
+        uploadedFilesProductDeliveryImages.value.splice(index, 1);
+    }
+    return;
+  }
+
+  try {
+    const confirmDeleteResult = await warningPopup.value.confirmDelete();
+    if (!confirmDeleteResult.isConfirmed) return;
+    await directus.request(deleteFile(fileToDelete.id));
+    if (type === 'shipping') {
+        uploadedFilesShippingPDF.value.splice(index, 1);
+    } else if (type === 'delivery_image') {
+        uploadedFilesProductDeliveryImages.value.splice(index, 1);
+    }
+    approvePopup.value.showSuccessUpload("ลบไฟล์สำเร็จ!");
+  } catch (error) {
+    console.error("Error deleting file:", error);
+    errorPopup.value.showErrorUpload("เกิดข้อผิดพลาดในการลบไฟล์");
   }
 };
 
