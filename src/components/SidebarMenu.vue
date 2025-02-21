@@ -36,13 +36,13 @@
       </li>
       <li 
         @click="navigate('listPreparation')" 
-        :class="{ active: activeMenu === 'listPreparation' }"
+        :class="{ active: activeMenu === 'listPreparation' || activeMenu === 'documentPreparationDetail' }"
       >
         แสดงรายการจัดของ
       </li>
       <li 
         @click="navigate('documentShipping')" 
-        :class="{ active: activeMenu === 'documentShipping' }"
+        :class="{ active: activeMenu === 'documentShipping' || activeMenu === 'documentShippingDetail' }"
       >
         ใบจัดส่งสินค้า
       </li>
