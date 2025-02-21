@@ -106,7 +106,6 @@ import { ref } from 'vue';
 import { directus } from "@/services/directus";
 import { readItems, uploadFiles , updateItem , deleteFile} from "@directus/sdk";
 import { useRoute } from "vue-router";
-import { parse } from 'date-fns';
 import DocumentCheckBox from './DocumentCheckBox.vue';
 import ApprovePopup from "@/components/popup/ApprovePopup.vue";
 import ErrorPopup from "@/components/popup/ErrorPopup.vue";
@@ -170,6 +169,20 @@ const fetchData = async () => {
                 name: file.directus_files_id.filename_download
                 }))
             : [];
+
+        if (uploadedFilesInstallPDF.value.length > 0 && uploadedFilesCheckListPDF.value.length > 0 && uploadedFilesProductInstallImages.value.length > 0) {
+            await directus.request(
+                updateItem('delivery_sheet', route.params.id, {
+                    install_status: 'ติดตั้งเสร็จสิ้น'
+                })
+            );
+        } else {
+            await directus.request(
+                updateItem('delivery_sheet', route.params.id, {
+                    install_status: 'รอการติดตั้ง'
+                })
+            );
+        }
     }
   } catch (error) {
     console.error("Error fetching activities:", error);
