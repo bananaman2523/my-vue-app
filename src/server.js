@@ -1,11 +1,13 @@
 const express = require('express');
 const cors = require('cors');
+const puppeteer = require('puppeteer');
 const app = express();
 const port = 3000;
 const { addRows } = require('./services/node.js');
 const { writeFileAndDownload } = require('./services/writeFile.js');
 const { writeExcel } = require('./services/writeFileProduct.js');
 const { writeExcelShipping } = require('./services/writeFileShipping.js');
+const { generatePDF } = require("./template/install/installation-report.js");
 
 app.use(express.json());
 app.post('/api/addRows', (req, res) => {
@@ -66,6 +68,24 @@ app.post('/downloadShipping', (req, res) => {
         console.error("Error generating report:", err);
         res.status(500).send('Error generating report');
     });
+});
+
+app.post('/downloadPDF', async (req, res) => {
+    try {
+        const filePath = 'install_document.pdf';
+
+        await generatePDF(filePath, req.body);
+
+        res.download(filePath, 'install_document.pdf', (err) => {
+            if (err) {
+                console.error('Download error:', err);
+                res.status(500).send('Error downloading file');
+            }
+        });
+    } catch (error) {
+        console.error('Error generating PDF:', error);
+        res.status(500).send('Error generating PDF');
+    }
 });
 
 app.listen(port, () => {

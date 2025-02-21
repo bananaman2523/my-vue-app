@@ -115,6 +115,8 @@
         </div>
         <label style="margin-left: 16px;">รายละเอียดเพิ่มเติม / หมายเหตุ</label>
         <textarea v-model="formData.description" @change="updateDeliveryNote('description',formData.description)" class="note-textarea"></textarea>
+        <br>
+        <button @click="downloadInstallDoc">Export</button>
 
     </main>
     <WarningPopup ref="warningPopup" />
@@ -127,6 +129,7 @@ import { ref , watch } from 'vue';
 import { directus } from "@/services/directus";
 import { readItems, uploadFiles , updateItem , readFile} from "@directus/sdk";
 import { useRoute , useRouter} from "vue-router";
+import axios from 'axios';
 import ApprovePopup from "@/components/popup/ApprovePopup.vue";
 import ErrorPopup from "@/components/popup/ErrorPopup.vue";
 import WarningPopup from "@/components/popup/WarningPopup.vue";
@@ -279,6 +282,28 @@ fetchData();
 watch(() => formData.value.firstSection, (newVal) => updateDeliverySheet("first_section_check", newVal), { deep: true });
 watch(() => formData.value.secondSection, (newVal) => updateDeliverySheet("second_section_check", newVal), { deep: true });
 watch(() => formData.value.thirdSection, (newVal) => updateDeliverySheet("third_section_check", newVal), { deep: true });
+
+const downloadInstallDoc = async () => {
+  try {
+    const payload = formData.value
+    const response = await axios.post('http://localhost:3000/downloadPDF', payload, {
+      responseType: 'blob'
+    });
+    const blob = new Blob([response.data], { type: 'application/pdf' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'install_document.pdf';
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(link.href);
+  } catch (error) {
+    console.error('Error exporting report:', error.response ? error.response.data : error);
+  }
+};
+
+
 </script>
 
 <style scoped>
