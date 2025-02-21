@@ -20,7 +20,7 @@
                 </div>
                 <div class="form-row">
                     <label>วันที่ติดตั้ง</label>
-                    <input type="date" />
+                    <input type="date" v-model="formData.install_date" @change="updateDeliverySheet('install_date',formData.install_date)" />
                 </div>
             </form>
         </div>
@@ -106,6 +106,7 @@ import { ref } from 'vue';
 import { directus } from "@/services/directus";
 import { readItems, uploadFiles , updateItem , deleteFile} from "@directus/sdk";
 import { useRoute } from "vue-router";
+import { parse } from 'date-fns';
 import DocumentCheckBox from './DocumentCheckBox.vue';
 import ApprovePopup from "@/components/popup/ApprovePopup.vue";
 import ErrorPopup from "@/components/popup/ErrorPopup.vue";
@@ -145,6 +146,7 @@ const fetchData = async () => {
             install_status: data.install_status || "",
             company_name: data.packing_sheet[0].company_name || "",
             branch_name: data.packing_sheet[0].branch_name || "",
+            install_date: formatDate(data.install_date) || "",
         };
 
         uploadedFilesInstallPDF.value = data.install_report_pdf && data.install_report_pdf.id
@@ -175,6 +177,20 @@ const fetchData = async () => {
 };
 
 fetchData();
+
+const formatDate = (dateString) => {
+  if (!dateString) return "";
+  return dateString.split("T")[0];
+};
+
+const updateDeliverySheet = async (field, value) => {
+    try {
+        const payload = { [field]: value };
+        await directus.request(updateItem("delivery_sheet", route.params.id, payload));
+    } catch (error) {
+        console.error(`Error updating ${field} in delivery_sheet:`, error);
+    }
+};
 
 const getFileUrl = (file) => {
     if (file instanceof File) {
