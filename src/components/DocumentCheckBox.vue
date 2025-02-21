@@ -6,69 +6,25 @@
                 <div style="display: contents;">
                     <div class="form-row">
                         <label>
-                            <input type="checkbox" v-model="firstSection.installChecked" class="custom-checkbox" /> เจ้าหน้าที่เดินทางไปติดตั้ง
+                            <input type="checkbox" v-model="formData.firstSection.installChecked" class="custom-checkbox" /> เจ้าหน้าที่เดินทางไปติดตั้ง
                         </label>
                     </div>
                     <div class="form-row">
                         <label>
-                            <input type="checkbox" v-model="firstSection.sendChecked" class="custom-checkbox" /> ส่งเครื่องไป
+                            <input type="checkbox" v-model="formData.firstSection.sendChecked" class="custom-checkbox" /> ส่งเครื่องไป
                         </label>
                     </div>
                     <div class="form-row">
                         <label>
-                            <input type="checkbox" v-model="firstSection.onlineChecked" class="custom-checkbox" /> ติดตั้งระบบ online
+                            <input type="checkbox" v-model="formData.firstSection.onlineChecked" class="custom-checkbox" /> ติดตั้งระบบ online
                         </label>
                     </div>
                     <div class="form-row">
                         <label>
-                            <input type="checkbox" v-model="firstSection.otherChecked" class="custom-checkbox" /> อื่นๆ
+                            <input type="checkbox" v-model="formData.firstSection.otherChecked" class="custom-checkbox" /> อื่นๆ
                         </label>
                         <label>
-                            <input v-if="firstSection.otherChecked" type="text" v-model="firstSection.otherText" placeholder="โปรดระบุ" class="input-other" />
-                        </label>
-                    </div>
-                </div>
-            </form>
-        </div>
-        <div class="container_checkbox">
-            <form @submit.prevent="submitForm">
-                <div style="display: contents;">
-                    <div class="form-row">
-                        <label>
-                            <input type="checkbox" v-model="secondSection.posChecked" class="custom-checkbox" /> ชุด POS และ อุปกรณ์
-                        </label>
-                    </div>
-                    <div class="form-row">
-                        <label>
-                            <input type="checkbox" v-model="secondSection.monitor1Checked" class="custom-checkbox" /> VIVIPOS (Monitor 1)
-                        </label>
-                    </div>
-                    <div class="form-row">
-                        <label>
-                            <input type="checkbox" v-model="secondSection.monitor2Checked" class="custom-checkbox" /> VIVIPOS (Monitor 2)
-                        </label>
-                    </div>
-                    <div class="form-row">
-                        <label>
-                            <input type="checkbox" v-model="secondSection.receiptPrinterChecked" class="custom-checkbox" /> Receipt Printer
-                        </label>
-                    </div>
-                    <div class="form-row">
-                        <label>
-                            <input type="checkbox" v-model="secondSection.labelPrinterChecked" class="custom-checkbox" /> Label Printer
-                        </label>
-                    </div>
-                    <div class="form-row">
-                        <label>
-                            <input type="checkbox" v-model="secondSection.kitchenPrinterChecked" class="custom-checkbox" /> Kitchen Printer
-                        </label>
-                    </div>
-                    <div class="form-row">
-                        <label>
-                            <input type="checkbox" v-model="secondSection.otherChecked" class="custom-checkbox" /> อุปกรณ์อื่นๆ โปรดระบุ
-                        </label>
-                        <label>
-                            <input v-if="secondSection.otherChecked" type="text" v-model="secondSection.otherText" placeholder="โปรดระบุ" class="input-other" />
+                            <input v-if="formData.firstSection.otherChecked" type="text" v-model="formData.firstSection.otherText" placeholder="โปรดระบุ" class="input-other" />
                         </label>
                     </div>
                 </div>
@@ -79,35 +35,79 @@
                 <div style="display: contents;">
                     <div class="form-row">
                         <label>
-                            <input type="checkbox" v-model="thirdSection.kioskChecked" class="custom-checkbox" /> KIOSK
+                            <input type="checkbox" v-model="formData.secondSection.posChecked" class="custom-checkbox" /> ชุด POS และ อุปกรณ์
                         </label>
                     </div>
                     <div class="form-row">
                         <label>
-                            <input type="checkbox" v-model="thirdSection.queueChecked" class="custom-checkbox" /> ระบบ Queue
+                            <input type="checkbox" v-model="formData.secondSection.monitor1Checked" class="custom-checkbox" /> VIVIPOS (Monitor 1)
                         </label>
                     </div>
                     <div class="form-row">
                         <label>
-                            <input type="checkbox" v-model="thirdSection.crmChecked" class="custom-checkbox" /> ระบบ CRM
+                            <input type="checkbox" v-model="formData.secondSection.monitor2Checked" class="custom-checkbox" /> VIVIPOS (Monitor 2)
                         </label>
                     </div>
                     <div class="form-row">
                         <label>
-                            <input type="checkbox" v-model="thirdSection.eMenuChecked" class="custom-checkbox" /> ระบบ E - Menu
+                            <input type="checkbox" v-model="formData.secondSection.receiptPrinterChecked" class="custom-checkbox" /> Receipt Printer
                         </label>
                     </div>
                     <div class="form-row">
                         <label>
-                            <input type="checkbox" v-model="thirdSection.warehouseChecked" class="custom-checkbox" /> ระบบ Warehouse
+                            <input type="checkbox" v-model="formData.secondSection.labelPrinterChecked" class="custom-checkbox" /> Label Printer
                         </label>
                     </div>
                     <div class="form-row">
                         <label>
-                            <input type="checkbox" v-model="thirdSection.otherChecked" class="custom-checkbox" /> ระบบอื่นๆ โปรดระบุ
+                            <input type="checkbox" v-model="formData.secondSection.kitchenPrinterChecked" class="custom-checkbox" /> Kitchen Printer
+                        </label>
+                    </div>
+                    <div class="form-row">
+                        <label>
+                            <input type="checkbox" v-model="formData.secondSection.otherChecked" class="custom-checkbox" /> อุปกรณ์อื่นๆ โปรดระบุ
                         </label>
                         <label>
-                            <input v-if="thirdSection.otherChecked" type="text" v-model="thirdSection.otherText" placeholder="โปรดระบุ" class="input-other" />
+                            <input v-if="formData.secondSection.otherChecked" type="text" v-model="formData.secondSection.otherText" placeholder="โปรดระบุ" class="input-other" />
+                        </label>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="container_checkbox">
+            <form @submit.prevent="submitForm">
+                <div style="display: contents;">
+                    <div class="form-row">
+                        <label>
+                            <input type="checkbox" v-model="formData.thirdSection.kioskChecked" class="custom-checkbox" /> KIOSK
+                        </label>
+                    </div>
+                    <div class="form-row">
+                        <label>
+                            <input type="checkbox" v-model="formData.thirdSection.queueChecked" class="custom-checkbox" /> ระบบ Queue
+                        </label>
+                    </div>
+                    <div class="form-row">
+                        <label>
+                            <input type="checkbox" v-model="formData.thirdSection.crmChecked" class="custom-checkbox" /> ระบบ CRM
+                        </label>
+                    </div>
+                    <div class="form-row">
+                        <label>
+                            <input type="checkbox" v-model="formData.thirdSection.eMenuChecked" class="custom-checkbox" /> ระบบ E - Menu
+                        </label>
+                    </div>
+                    <div class="form-row">
+                        <label>
+                            <input type="checkbox" v-model="formData.thirdSection.warehouseChecked" class="custom-checkbox" /> ระบบ Warehouse
+                        </label>
+                    </div>
+                    <div class="form-row">
+                        <label>
+                            <input type="checkbox" v-model="formData.thirdSection.otherChecked" class="custom-checkbox" /> ระบบอื่นๆ โปรดระบุ
+                        </label>
+                        <label>
+                            <input v-if="formData.thirdSection.otherChecked" type="text" v-model="formData.thirdSection.otherText" placeholder="โปรดระบุ" class="input-other" />
                         </label>
                     </div>
                 </div>
@@ -123,7 +123,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref , watch } from 'vue';
 import { directus } from "@/services/directus";
 import { readItems, uploadFiles , updateItem , readFile} from "@directus/sdk";
 import { useRoute , useRouter} from "vue-router";
@@ -135,18 +135,15 @@ const approvePopup = ref(null);
 const errorPopup = ref(null);
 const getUser = JSON.parse(localStorage.getItem('user'))
 const user = `${getUser.first_name} ${getUser.last_name}`
-const formData = ref({})
-const route = useRoute();
-const note = ref()
-const firstSection = ref({
+const formData = ref({
+  firstSection: {
     installChecked: false,
     sendChecked: false,
     onlineChecked: false,
     otherChecked: false,
     otherText: "",
-});
-
-const secondSection = ref({
+  },
+  secondSection: {
     posChecked: false,
     monitor1Checked: false,
     monitor2Checked: false,
@@ -155,9 +152,8 @@ const secondSection = ref({
     kitchenPrinterChecked: false,
     otherChecked: false,
     otherText: "",
-});
-
-const thirdSection = ref({
+  },
+  thirdSection: {
     kioskChecked: false,
     queueChecked: false,
     crmChecked: false,
@@ -165,7 +161,11 @@ const thirdSection = ref({
     warehouseChecked: false,
     otherChecked: false,
     otherText: "",
+  },
 });
+
+const route = useRoute();
+const note = ref()
 
 const fetchData = async () => {
   try {
@@ -188,14 +188,80 @@ const fetchData = async () => {
         install_status: data.install_status || "",
         company_name: data.packing_sheet[0].company_name || "",
         branch_name: data.packing_sheet[0].branch_name || "",
+        firstSection: getSectionStatus(data.first_section_check, "firstSection"),
+        secondSection: getSectionStatus(data.second_section_check, "secondSection"),
+        thirdSection: getSectionStatus(data.third_section_check, "thirdSection")
       };
+      
     }
   } catch (error) {
     console.error("Error fetching activities:", error);
   }
 };
 
+const getSectionStatus = (sectionCheck, sectionName) => {
+  const allFields = {
+    firstSection: [
+      "installChecked",
+      "sendChecked",
+      "onlineChecked",
+      "otherChecked"
+    ],
+    secondSection: [
+      "posChecked",
+      "monitor1Checked",
+      "monitor2Checked",
+      "receiptPrinterChecked",
+      "labelPrinterChecked",
+      "kitchenPrinterChecked",
+      "otherChecked"
+    ],
+    thirdSection: [
+      "kioskChecked",
+      "queueChecked",
+      "crmChecked",
+      "eMenuChecked",
+      "warehouseChecked",
+      "otherChecked"
+    ]
+  };
+
+  const sectionStatus = allFields[sectionName].reduce((acc, field) => {
+    acc[field] = false;
+    return acc;
+  }, {});
+
+  if (sectionCheck) {
+    sectionCheck.forEach(field => {
+      if (Object.prototype.hasOwnProperty.call(sectionStatus, field)) {
+        sectionStatus[field] = true;
+      }
+    });
+  }
+
+  return sectionStatus;
+};
+
+
+const getCheckedFields = (value) => {
+    return Object.keys(value).filter(key => value[key] === true);
+};
+
+const updateDeliverySheet = async (field, value) => {
+    try {
+        const result = getCheckedFields(value);
+        
+        const payload = { [field]: result };
+        await directus.request(updateItem("delivery_sheet", route.params.id, payload));
+    } catch (error) {
+        console.error(`Error updating ${field} in delivery_sheet:`, error);
+    }
+};
+
 fetchData();
+watch(() => formData.value.firstSection, (newVal) => updateDeliverySheet("first_section_check", newVal), { deep: true });
+watch(() => formData.value.secondSection, (newVal) => updateDeliverySheet("second_section_check", newVal), { deep: true });
+watch(() => formData.value.thirdSection, (newVal) => updateDeliverySheet("third_section_check", newVal), { deep: true });
 </script>
 
 <style scoped>
