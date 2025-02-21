@@ -24,7 +24,7 @@
                             <input type="checkbox" v-model="formData.firstSection.otherChecked" class="custom-checkbox" /> อื่นๆ
                         </label>
                         <label>
-                            <input v-if="formData.firstSection.otherChecked" type="text" v-model="formData.firstSection.otherText" placeholder="โปรดระบุ" class="input-other" />
+                            <input v-if="formData.firstSection.otherChecked" type="text" v-model="formData.description_first_section" @change="updateDeliveryNote('description_first_section',formData.description_first_section)" placeholder="โปรดระบุ" class="input-other" />
                         </label>
                     </div>
                 </div>
@@ -68,7 +68,7 @@
                             <input type="checkbox" v-model="formData.secondSection.otherChecked" class="custom-checkbox" /> อุปกรณ์อื่นๆ โปรดระบุ
                         </label>
                         <label>
-                            <input v-if="formData.secondSection.otherChecked" type="text" v-model="formData.secondSection.otherText" placeholder="โปรดระบุ" class="input-other" />
+                            <input v-if="formData.secondSection.otherChecked" type="text" v-model="formData.description_second_section" @change="updateDeliveryNote('description_second_section',formData.description_second_section)" placeholder="โปรดระบุ" class="input-other" />
                         </label>
                     </div>
                 </div>
@@ -107,14 +107,14 @@
                             <input type="checkbox" v-model="formData.thirdSection.otherChecked" class="custom-checkbox" /> ระบบอื่นๆ โปรดระบุ
                         </label>
                         <label>
-                            <input v-if="formData.thirdSection.otherChecked" type="text" v-model="formData.thirdSection.otherText" placeholder="โปรดระบุ" class="input-other" />
+                            <input v-if="formData.thirdSection.otherChecked" type="text" v-model="formData.description_third_section" @change="updateDeliveryNote('description_third_section',formData.description_third_section)" placeholder="โปรดระบุ" class="input-other" />
                         </label>
                     </div>
                 </div>
             </form>
         </div>
         <label style="margin-left: 16px;">รายละเอียดเพิ่มเติม / หมายเหตุ</label>
-        <textarea v-model="note" class="note-textarea"></textarea>
+        <textarea v-model="formData.description" @change="updateDeliveryNote('description',formData.description)" class="note-textarea"></textarea>
 
     </main>
     <WarningPopup ref="warningPopup" />
@@ -165,7 +165,6 @@ const formData = ref({
 });
 
 const route = useRoute();
-const note = ref()
 
 const fetchData = async () => {
   try {
@@ -184,13 +183,18 @@ const fetchData = async () => {
     
     if (delivery_sheet.length > 0) {
       const data = delivery_sheet[0];
+      
       formData.value = {
         install_status: data.install_status || "",
         company_name: data.packing_sheet[0].company_name || "",
         branch_name: data.packing_sheet[0].branch_name || "",
         firstSection: getSectionStatus(data.first_section_check, "firstSection"),
         secondSection: getSectionStatus(data.second_section_check, "secondSection"),
-        thirdSection: getSectionStatus(data.third_section_check, "thirdSection")
+        thirdSection: getSectionStatus(data.third_section_check, "thirdSection"),
+        description_first_section: data.description_first_section || "",
+        description_second_section: data.description_second_section || "",
+        description_third_section: data.description_third_section || "",
+        description: data.description || "",
       };
       
     }
@@ -257,6 +261,19 @@ const updateDeliverySheet = async (field, value) => {
         console.error(`Error updating ${field} in delivery_sheet:`, error);
     }
 };
+
+
+const updateDeliveryNote = async (field, value) => {
+    try {
+        if (value !== undefined && value !== null) {
+            const payload = { [field]: value };
+            await directus.request(updateItem("delivery_sheet", route.params.id, payload));
+        }
+    } catch (error) {
+        console.error(`Error updating ${field} in delivery_sheet:`, error);
+    }
+};
+
 
 fetchData();
 watch(() => formData.value.firstSection, (newVal) => updateDeliverySheet("first_section_check", newVal), { deep: true });
