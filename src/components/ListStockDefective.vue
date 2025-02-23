@@ -316,7 +316,7 @@ select {
   max-width: 1440px;
   color: #333;
   margin: 0 auto;
-  padding: 20px;
+  /* padding: 20px; */
 }
 
 main {
