@@ -272,7 +272,31 @@ async function createShippingDocument() {
 async function switchEquipment(item) {
   try {
     const packingID = route.params.id;
-    
+
+    const [packing_sheet] = await directus.request(
+      readItems("packing_sheet", {
+        fields: ["stock"],
+      })
+    );
+
+    const newStockItem = await directus.request(
+      readItems("stock", {
+        fields: ["id"],
+        filter: {
+          serial_number: { _eq: item.serialNumber }
+        }
+      })
+    );
+
+    if (newStockItem.length === 0) {
+      throw new Error("Stock item not found with the given serial number.");
+    }
+
+    let selectValue = item.id;
+    let newValue = newStockItem[0].id;
+
+    let updatedArr = packing_sheet.stock.map(num => num === selectValue ? newValue : num);
+
     await directus.request(
       updateItem('stock', item.id, { 
         status: 'ชำรุด',
@@ -281,25 +305,12 @@ async function switchEquipment(item) {
       })
     );
 
-    const [newStockItem] = await directus.request(
-      readItems("stock", {
-        fields: ["*"],
-        filter: {
-          serial_number: { _eq: item.serialNumber }
-        }
-      })
-    );
-
-    if (!newStockItem) {
-      throw new Error("Stock item not found with the given serial number.");
-    }
-
-    const updatePackingStock = await directus.request(
-      updateItem('packing_sheet', packingID, { stock: [newStockItem.id] })
+    await directus.request(
+      updateItem('packing_sheet', packingID, { stock: updatedArr })
     );
 
     await directus.request(
-      updateItem('stock', newStockItem.id, { status: 'รอเช็คก่อนส่ง' })
+      updateItem('stock', newStockItem[0].id, { status: 'รอเช็คก่อนส่ง' })
     );
 
     window.location.reload();
