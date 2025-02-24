@@ -91,7 +91,7 @@
               <label>ชื่อสินค้าของ Office Design</label>
               <select v-model="item.productName" @change="updateProduct(index)">
                 <option value="">Select a category</option>
-                <option v-for="productName in productConfig" :key="productName.product_name" :value="productName.product_name">
+                <option v-for="productName in filteredProducts" :key="productName.product_name" :value="productName.product_name">
                   {{ productName.product_name }}
                 </option>
               </select>
@@ -151,7 +151,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref , computed} from 'vue';
 import { directus } from "@/services/directus";
 import { updateItems , readItems , updateItem , deleteItem , createItem } from "@directus/sdk";
 import SidebarMenu from "@/components/SidebarMenu.vue";
@@ -229,6 +229,14 @@ async function submitForm() {
     console.error('Error updating stock:', error);
   }
 }
+const filteredProducts = computed(() => {
+  const index = 0;
+  const text = formData.value.stock[index].product_name_office_design;
+  const textBeforeHash = text.split('#')[0];
+
+  return productConfig.value.filter(product => product.product_name.includes(textBeforeHash));
+});
+
 
 const formatDate = (dateString) => {
   if (!dateString) return "";

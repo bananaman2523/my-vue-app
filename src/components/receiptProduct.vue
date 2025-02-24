@@ -22,12 +22,15 @@
             <input type="text" v-model="formData.deliveryNoteNumber" />
           </div>
           <div class="form-row">
-            <label>วันเลขที่ใบส่งสินค้า</label>
+            <label>วันที่ในใบส่งสินค้า</label>
             <input type="date" v-model="formData.deliveryNoteDate" />
           </div>
           <div class="form-row">
             <label>สถานะสินค้า</label>
-            <input type="text" v-model="formData.statusProduct" disabled class="disable-form">
+            <select v-model="formData.statusProduct">
+              <option value="สินค้าขาย">สินค้าขาย</option>
+              <option value="เครื่องสำรอง">เครื่องสำรอง</option>
+            </select>
           </div>
           <div class="form-row">
             <label>เลขที่ใบกำกับภาษี <label style="color: red;">*</label></label>
@@ -56,11 +59,11 @@
             <input type="date" v-model="formData.dueDate" />
           </div>
           <br>
-          <div class="form-row">
+          <!-- <div class="form-row">
             <label>Item code <label style="color: red;">*</label></label>
             <input type="text" v-model="formData.itemCode" required/>
           </div>
-          <!-- <div class="form-row">
+          <div class="form-row">
             <label>ชื่อสินค้า (Supplier) <label style="color: red;">*</label></label>
             <input type="text" v-model="formData.supplierProductName" required/>
           </div> -->
@@ -116,7 +119,6 @@ const addStock = async () => {
         receipt_number_date: formData.value.receiptDate || null,
         bill_number: formData.value.billingNoteNumber || null,
         due_date: formData.value.dueDate || null,
-        item_code: formData.value.itemCode || null,
         product_name_supplier: formData.value.supplierProductName || null,
         product_code_office_design: receiptProducts.value[i].productCode || null,
         product_name_office_design: receiptProducts.value[i].productName || null,
@@ -154,8 +156,6 @@ const formData = ref({
   receiptDate: "",
   billingNoteNumber: "",
   dueDate: "",
-  itemCode: "",
-  supplierProductName: "",
   poNumber: "",
   statusProduct: "สินค้าขาย",
 });
@@ -168,8 +168,6 @@ const submitForm = () => {
     !formData.value.supplierName ||
     !formData.value.taxInvoiceNumber ||
     !formData.value.invoiceDate ||
-    !formData.value.itemCode ||
-    !formData.value.supplierProductName ||
     !formData.value.poNumber
   ) {
     warningPopup.value.showWarningNoFullField();
