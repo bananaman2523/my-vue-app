@@ -30,6 +30,7 @@
             <select v-model="formData.statusProduct">
               <option value="สินค้าขาย">สินค้าขาย</option>
               <option value="เครื่องสำรอง">เครื่องสำรอง</option>
+              <option value="อะไหล่สำรอง">อะไหล่สำรอง</option>
             </select>
           </div>
           <div class="form-row">

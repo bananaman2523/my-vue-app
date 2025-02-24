@@ -3,90 +3,72 @@
     <SidebarMenu />
     <main>
       <h1>ใบจัดเตรียมสินค้า</h1>
-      <!-- <div v-show="isFilterVisible" class="input-container">
+      <div v-show="isFilterVisible" class="input-container">
         <div class="form-row">
-          <label>ค้นหาด้วย วันที่รับ เริ่มต้น</label>
-          <input type="date" v-model="filterData.receive_date_from" placeholder="From Date">
+          <label>ค้นหาด้วย วันส่งสินค้า เริ่มต้น</label>
+          <input type="date" v-model="filterData.delivery_date_from" placeholder="From Date">
         </div>
         <div class="form-row">
-          <label>ค้นหาด้วย วันที่รับ สิ้นสุด</label>
-          <input type="date" v-model="filterData.receive_date_to" placeholder="To Date">
+          <label>ค้นหาด้วย วันส่งสินค้า สิ้นสุด</label>
+          <input type="date" v-model="filterData.delivery_date_to" placeholder="To Date">
+        </div>
+        <br>
+        <div class="form-row">
+          <label class="label-filter">ค้นหาด้วย เลขที่ใบจัดส่งสินค้า</label>
+          <input v-model="filterData.document_delivery_number" type="text" class="input-field" placeholder="เลขที่ใบจัดส่งสินค้า">
         </div>
         <div class="form-row">
-          <label class="label-filter">ค้นหาด้วย ชื่อ supplier</label>
-          <input v-model="filterData.name_supplier" type="text" class="input-field" placeholder="ชื่อ supplier">
+          <label class="label-filter">ค้นหาด้วย เลขที่ใบเสนอราคา</label>
+          <input v-model="filterData.customer_order_number" type="text" class="input-field" placeholder="เลขที่ใบเสนอราคา">
         </div>
         <div class="form-row">
-          <label class="label-filter">ค้นหาด้วย เลขที่ใบส่งสินค้า</label>
-          <input v-model="filterData.bill_lading_number" type="text" class="input-field"
-            placeholder="เลขที่ใบส่งสินค้า">
+          <label class="label-filter">ค้นหาด้วย เลขที่ใบสั่งซื้อ</label>
+          <input v-model="filterData.quotation_number_office_design" type="text" class="input-field" placeholder="เลขที่ใบสั่งซื้อ">
         </div>
         <div class="form-row">
-          <label class="label-filter">ค้นหาด้วย เลขที่ใบกำกับภาษี</label>
-          <input v-model="filterData.bill_lading_number_date" type="text" class="input-field"
-            placeholder="เลขที่ใบกำกับภาษี">
+          <label class="label-filter">ค้นหาด้วย ชื่อลูกค้า</label>
+          <input v-model="filterData.customer_name" type="text" class="input-field" placeholder="ชื่อลูกค้า">
         </div>
         <div class="form-row">
-          <label class="label-filter">ค้นหาด้วย เลขที่ใบเสร็จ</label>
-          <input v-model="filterData.invoice_number" type="text" class="input-field" placeholder="เลขที่ใบเสร็จ">
+          <label class="label-filter">ค้นหาด้วย ชื่อสาขา</label>
+          <input v-model="filterData.branch_name" type="text" class="input-field" placeholder="ชื่อสาขา">
         </div>
+        <br>
         <div class="form-row">
-          <label class="label-filter">ค้นหาด้วย เลขที่ใบวางบิล</label>
-          <input v-model="filterData.invoice_number_date" type="text" class="input-field" placeholder="เลขที่ใบวางบิล">
-        </div>
-        <div class="form-row">
-          <label class="label-filter">ค้นหาด้วย Item code</label>
-          <input v-model="filterData.item_code" type="text" class="input-field" placeholder="Item code">
-        </div>
-        <div class="form-row">
-          <label class="label-filter">ค้นหาด้วย ชื่อ supplier</label>
-          <input v-model="filterData.product_name_supplier" type="text" class="input-field"
-            placeholder="ชื่อสินค้า (Supplier)">
-        </div>
-        <div class="form-row">
-          <label class="label-filter">ค้นหาด้วย รหัสสินค้า office design</label>
-          <input v-model="filterData.product_code_office_design" type="text" class="input-field"
-            placeholder="รหัสสินค้า Office Design">
-        </div>
-        <div class="form-row">
-          <label class="label-filter">ค้นหาด้วย ชื่อสินค้า office design</label>
-          <input v-model="filterData.product_name_office_design" type="text" class="input-field"
-            placeholder="ชื่อสินค้า Office Design">
-        </div>
-        <div class="form-row">
-          <label class="label-filter">ค้นหาด้วย รหัสสินค้า</label>
-          <input v-model="filterData.product_category" type="text" class="input-field" placeholder="หมวดหมู่สินค้า">
-        </div>
-        <div class="form-row">
-          <label class="label-filter">ค้นหาด้วยรุ่น</label>
-          <input v-model="filterData.model" type="text" class="input-field" placeholder="model">
-        </div>
-        <div class="form-row">
-          <label class="label-filter">ค้นหาด้วย S/N</label>
-          <input v-model="filterData.sn" type="text" class="input-field" placeholder="S/N">
-        </div>
-        <div class="form-row">
-          <label class="label-filter">สถานะ</label>
-          <select v-model="filterData.status">
+          <label class="label-filter">ค้นหาด้วย สถานะจัดส่งสินค้า</label>
+          <select v-model="filterData.delivery_status">
             <option value=""></option>
-            <option value="ชำรุด">ชำรุด</option>
-            <option value="รอตรวจสอบอุปกรณ์">รอตรวจสอบอุปกรณ์</option>
-            <option value="พร้อมใช้งาน">พร้อมใช้งาน</option>
-            <option value="รอเช็คก่อนส่ง">รอเช็คก่อนส่ง</option>
+            <option value="รอการจัดส่งสินค้า">รอการจัดส่งสินค้า</option>
+            <option value="จัดส่งสินค้าเสร็จสิ้น">จัดส่งสินค้าเสร็จสิ้น</option>
           </select>
         </div>
-      </div> -->
-      <!-- <button @click="toggleFilterVisibility" class="toggle-btn">
-          {{ isFilterVisible ? 'ซ่อน Filter' : 'แสดง Filter' }}
-        </button> -->
+        <div class="form-row">
+          <label class="label-filter">ค้นหาด้วย สถานะรายงานติดตั้ง</label>
+          <select v-model="filterData.install_status">
+            <option value=""></option>
+            <option value="รอการติดตั้ง">รอการติดตั้ง</option>
+            <option value="ติดตั้งเสร็จสิ้น">ติดตั้งเสร็จสิ้น</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label class="label-filter">ค้นหาด้วย พนักงานติดตั้ง</label>
+          <select v-model="filterData.prepared_by">
+            <option value="">เลือกจัดเตรียมโดย</option>
+            <option v-for="(item, index) in preparedByList" :key="index" :value="item.prepared_by">
+              {{ item.prepared_by }}
+            </option>
+          </select>
+        </div>
+        <label style="grid-column: 1/4;">จำนวนสถานะ ผ่าน {{ countSuccess }} , รอเช็คก่อนส่ง {{ countWaitCheck }} <br> จำนวน รายการจัดของ {{ countPreparTotal }}</label>
+      </div>
       <div class="table-container">
         <table>
           <thead>
             <tr>
               <th>วันส่งสินค้า</th>
               <th>เลขที่ใบจัดส่งสินค้า</th>
-              <th>เลขที่ใบเสนอราคา</th>
               <th>เลขที่ใบสั่งซื้อ</th>
+              <th>เลขที่ใบเสนอราคา</th>
               <th>ชื่อลูกค้า</th>
               <th>ชื่อสาขา</th>
               <th>สถานะจัดส่งสินค้า</th>
@@ -131,6 +113,7 @@ const router = useRouter();
 const data = ref([]);
 const currentPage = ref(1);
 const itemsPerPage = 10;
+const preparedByList = ref([]);
 
 const filterData = ref({
   receive_date: "",
@@ -159,6 +142,13 @@ const fetchData = async () => {
       })
     );
     data.value = response;
+
+    const getAdmin = await directus.request(
+      readItems("packing_sheet", {
+        groupBy: ["prepared_by"],
+      })
+    );
+    preparedByList.value = getAdmin
   } catch (error) {
     console.error("Error fetching activities:", error);
   }
@@ -172,56 +162,22 @@ const paginatedData = computed(() => {
   const start = (currentPage.value - 1) * itemsPerPage;
 
   const filteredData = data.value.filter(item => {
-    const itemReceiveDate = new Date(item.receive_date);
-    const fromDate = filterData.value.receive_date_from ? new Date(filterData.value.receive_date_from) : null;
-    const toDate = filterData.value.receive_date_to ? new Date(filterData.value.receive_date_to) : null;
+    const itemReceiveDate = new Date(item.delivery_date);
+    const fromDate = filterData.value.delivery_date_from ? new Date(filterData.value.delivery_date_from) : null;
+    const toDate = filterData.value.delivery_date_to ? new Date(filterData.value.delivery_date_to) : null;
 
     const isInDateRange = (!fromDate || itemReceiveDate >= fromDate) && (!toDate || itemReceiveDate <= toDate);
 
     return (
       isInDateRange &&
-      (!filterData.value.name_supplier || (item.name_supplier && item.name_supplier.includes(filterData.value.name_supplier))) &&
-      (!filterData.value.bill_lading_number || (item.bill_lading_number && item.bill_lading_number.includes(filterData.value.bill_lading_number))) &&
-      (!filterData.value.bill_lading_number_date || (item.bill_lading_number_date && item.bill_lading_number_date.includes(filterData.value.bill_lading_number_date))) &&
-      (!filterData.value.invoice_number || (item.invoice_number && item.invoice_number.includes(filterData.value.invoice_number))) &&
-      (!filterData.value.invoice_number_date || (item.invoice_number_date && item.invoice_number_date.includes(filterData.value.invoice_number_date))) &&
-      (!filterData.value.item_code || (item.item_code && item.item_code.includes(filterData.value.item_code))) &&
-      (!filterData.value.product_name_supplier || (item.product_name_supplier && item.product_name_supplier.includes(filterData.value.product_name_supplier))) &&
-      (!filterData.value.product_code_office_design || (item.product_code_office_design && item.product_code_office_design.includes(filterData.value.product_code_office_design))) &&
-      (!filterData.value.product_name_office_design || (item.product_name_office_design && item.product_name_office_design.includes(filterData.value.product_name_office_design))) &&
-      (!filterData.value.product_category || (item.product_category && item.product_category.includes(filterData.value.product_category))) &&
-      (!filterData.value.model || (item.model && item.model.includes(filterData.value.model))) &&
-      (!filterData.value.sn || (item.sn && item.sn.includes(filterData.value.sn))) &&
-      (!filterData.value.status || (item.status && item.status.includes(filterData.value.status)))
-    );
-  });
-  const reverseData = filteredData.reverse()
-  return reverseData.slice(start, start + itemsPerPage);
-});
-
-const paginatedDataExport = computed(() => {
-  const filteredData = data.value.filter(item => {
-    const itemReceiveDate = new Date(item.receive_date);
-    const fromDate = filterData.value.receive_date_from ? new Date(filterData.value.receive_date_from) : null;
-    const toDate = filterData.value.receive_date_to ? new Date(filterData.value.receive_date_to) : null;
-
-    const isInDateRange = (!fromDate || itemReceiveDate >= fromDate) && (!toDate || itemReceiveDate <= toDate);
-
-    return (
-      isInDateRange &&
-      (!filterData.value.name_supplier || (item.name_supplier && item.name_supplier.includes(filterData.value.name_supplier))) &&
-      (!filterData.value.bill_lading_number || (item.bill_lading_number && item.bill_lading_number.includes(filterData.value.bill_lading_number))) &&
-      (!filterData.value.bill_lading_number_date || (item.bill_lading_number_date && item.bill_lading_number_date.includes(filterData.value.bill_lading_number_date))) &&
-      (!filterData.value.invoice_number || (item.invoice_number && item.invoice_number.includes(filterData.value.invoice_number))) &&
-      (!filterData.value.invoice_number_date || (item.invoice_number_date && item.invoice_number_date.includes(filterData.value.invoice_number_date))) &&
-      (!filterData.value.item_code || (item.item_code && item.item_code.includes(filterData.value.item_code))) &&
-      (!filterData.value.product_name_supplier || (item.product_name_supplier && item.product_name_supplier.includes(filterData.value.product_name_supplier))) &&
-      (!filterData.value.product_code_office_design || (item.product_code_office_design && item.product_code_office_design.includes(filterData.value.product_code_office_design))) &&
-      (!filterData.value.product_name_office_design || (item.product_name_office_design && item.product_name_office_design.includes(filterData.value.product_name_office_design))) &&
-      (!filterData.value.product_category || (item.product_category && item.product_category.includes(filterData.value.product_category))) &&
-      (!filterData.value.model || (item.model && item.model.includes(filterData.value.model))) &&
-      (!filterData.value.sn || (item.sn && item.sn.includes(filterData.value.sn))) &&
-      (!filterData.value.status || (item.status && item.status.includes(filterData.value.status)))
+      (!filterData.value.document_delivery_number || (item.document_delivery_number && item.document_delivery_number.includes(filterData.value.document_delivery_number))) &&
+      (!filterData.value.delivery_status || (item.delivery_status && item.delivery_status.includes(filterData.value.delivery_status))) &&
+      (!filterData.value.install_status || (item.install_status && item.install_status.includes(filterData.value.install_status))) &&
+      (!filterData.value.document_delivery_number || (item.document_delivery_number && item.document_delivery_number.includes(filterData.value.document_delivery_number))) &&
+      (!filterData.value.customer_order_number || (item.packing_sheet[0].customer_order_number && item.packing_sheet[0].customer_order_number.includes(filterData.value.customer_order_number))) &&
+      (!filterData.value.quotation_number_office_design || (item.packing_sheet[0].quotation_number_office_design && item.packing_sheet[0].quotation_number_office_design.includes(filterData.value.quotation_number_office_design))) &&
+      (!filterData.value.branch_name || (item.packing_sheet[0].branch_name && item.packing_sheet[0].branch_name.includes(filterData.value.branch_name))) &&
+      (!filterData.value.customer_name || (item.packing_sheet[0].customer_name && item.packing_sheet[0].customer_name.includes(filterData.value.customer_name))) 
     );
   });
   const reverseData = filteredData.reverse()

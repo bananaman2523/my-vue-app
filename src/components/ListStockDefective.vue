@@ -67,10 +67,8 @@
         <div style="text-align: left; padding: 25px;">
           <button @click="downloadReport()" style="border-radius: 16px;padding: 10px 20px; min-width: 120px; height: 40px;">Export</button>
         </div>
+        <label style="grid-column: 2/4;">จำนวนสถานะ ชำรุด {{ countBroken }}</label>
       </div>
-      <!-- <button @click="toggleFilterVisibility" class="toggle-btn">
-        {{ isFilterVisible ? 'ซ่อน Filter' : 'แสดง Filter' }}
-      </button> -->
       <div class="table-container">
         <table>
           <thead>
@@ -282,9 +280,31 @@ const navigate = (route, itemId) => {
   router.push({ name: route , params: { id: itemId }});
 };
 
-const toggleFilterVisibility = () => {
-  isFilterVisible.value = !isFilterVisible.value;
-};
+countStatus()
+const countBroken = ref(0);
+async function countStatus(input) {
+  try {
+    const response = await directus.request(
+      readItems("stock", {
+        aggregate: {
+          count: "*",
+        },
+        groupBy: ["status"],
+        filter: {
+          status: {
+            _in: ["ชำรุด","รอเช็คก่อนส่ง","รอตรวจสอบอุปกรณ์","พร้อมใช้งาน"],
+          },
+        },
+      })
+    );
+    
+    countBroken.value = response.find(item => item.status === "ชำรุด")?.count;
+    
+  } catch (error) {
+    console.error("Error fetching count:", error);
+    return 0;
+  }
+}
 </script>
 
 <style scoped>

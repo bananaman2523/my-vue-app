@@ -73,11 +73,7 @@
         <div style="text-align: left; padding: 25px;">
           <button @click="downloadReport()" style="border-radius: 16px;padding: 10px 20px; min-width: 120px; height: 40px;">Export</button>
         </div>
-      </div>
-      <div class="info-container">
-        <div class="form-row">
-          <label>จำนวนสถานะ พร้อมใช้งาน {{ countReadyUse }} , ชำรุด {{ countBroken }} , รอเช็คก่อนส่ง {{ countWaitCheck }}, รอตรวจสอบอุปกรณ์ {{ countWaitCheckEquipment }}</label>
-        </div>
+        <label style="grid-column: 2/4;">จำนวนสถานะ ผ่าน {{ countSuccess }} , พร้อมใช้งาน {{ countReadyUse }} , ชำรุด {{ countBroken }} , รอเช็คก่อนส่ง {{ countWaitCheck }}, รอตรวจสอบอุปกรณ์ {{ countWaitCheckEquipment }} <br> จำนวน สินค้าขาย {{ countSelltotal}}</label>
       </div>
       <!-- <button @click="toggleFilterVisibility" class="toggle-btn">
         {{ isFilterVisible ? 'ซ่อน Filter' : 'แสดง Filter' }}
@@ -213,6 +209,8 @@ const countBroken = ref(0);
 const countWaitCheck = ref(0);
 const countWaitCheckEquipment = ref(0);
 const countReadyUse = ref(0);
+const countSelltotal = ref(0);
+const countSuccess = ref(0);
 async function countStatus(input) {
   try {
     const response = await directus.request(
@@ -223,8 +221,21 @@ async function countStatus(input) {
         groupBy: ["status"],
         filter: {
           status: {
-            _in: ["ชำรุด","รอเช็คก่อนส่ง","รอตรวจสอบอุปกรณ์","พร้อมใช้งาน"],
+            _in: ["ชำรุด","รอเช็คก่อนส่ง","รอตรวจสอบอุปกรณ์","พร้อมใช้งาน","ผ่าน"],
           },
+          device_status: {
+            _eq: 'สินค้าขาย'
+          }
+        },
+      })
+    );
+
+    const total = await directus.request(
+      readItems("stock", {
+        filter: {
+          device_status: {
+            _eq: 'สินค้าขาย'
+          }
         },
       })
     );
@@ -233,6 +244,8 @@ async function countStatus(input) {
     countWaitCheck.value = response.find(item => item.status === "รอเช็คก่อนส่ง")?.count;
     countWaitCheckEquipment.value = response.find(item => item.status === "รอตรวจสอบอุปกรณ์")?.count;
     countReadyUse.value = response.find(item => item.status === "พร้อมใช้งาน")?.count;
+    countSuccess.value = response.find(item => item.status === "ผ่าน")?.count;
+    countSelltotal.value = total.length
     
   } catch (error) {
     console.error("Error fetching count:", error);
@@ -491,17 +504,6 @@ table tbody tr:hover {
   background-color: #e9ecef;
   color: #bbb;
   cursor: not-allowed;
-}
-
-.info-container{
-  display: grid;
-  gap: 20px;
-  padding: 25px;
-  max-width: 100%;
-  box-sizing: border-box;
-  background-color: #f4f4f9; 
-  border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .input-container {

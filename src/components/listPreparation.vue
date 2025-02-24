@@ -3,21 +3,71 @@
     <SidebarMenu />
     <main>
       <h1>รายการจัดของ</h1>
-      <div class="input-container">
-        <input type="date" v-model="filterData.receive_date_from" placeholder="From Date">
-        <input type="date" v-model="filterData.receive_date_to" placeholder="To Date">
-        <input v-model="filterData.name_supplier" type="text" class="input-field" placeholder="ชื่อ supplier">
-        <input v-model="filterData.bill_lading_number" type="text" class="input-field" placeholder="เลขที่ใบส่งสินค้า">
-        <input v-model="filterData.bill_lading_number_date" type="text" class="input-field" placeholder="เลขที่ใบกำกับภาษี">
-        <input v-model="filterData.invoice_number" type="text" class="input-field" placeholder="เลขที่ใบเสร็จ">
-        <input v-model="filterData.invoice_number_date" type="text" class="input-field" placeholder="เลขที่ใบวางบิล">
-        <input v-model="filterData.item_code" type="text" class="input-field" placeholder="Item code">
-        <input v-model="filterData.product_name_supplier" type="text" class="input-field" placeholder="ชื่อสินค้า (Supplier)">
-        <input v-model="filterData.product_code_office_design" type="text" class="input-field" placeholder="รหัสสินค้า Office Design">
-        <input v-model="filterData.product_name_office_design" type="text" class="input-field" placeholder="ชื่อสินค้า Office Design">
-        <input v-model="filterData.product_category" type="text" class="input-field" placeholder="หมวดหมู่สินค้า">
-        <input v-model="filterData.model" type="text" class="input-field" placeholder="model">
-        <input v-model="filterData.sn" type="text" class="input-field" placeholder="S/N">
+      <div v-show="isFilterVisible" class="input-container">
+        <div class="form-row">
+          <label>ค้นหาด้วย วันเตรียมสินค้า เริ่มต้น</label>
+          <input type="date" v-model="filterData.product_preparation_date_from" placeholder="From Date">
+        </div>
+        <div class="form-row">
+          <label>ค้นหาด้วย วันเตรียมสินค้า สิ้นสุด</label>
+          <input type="date" v-model="filterData.product_preparation_date_to" placeholder="To Date">
+        </div>
+        <br>
+        <div class="form-row">
+          <label>ค้นหาด้วย วัน plan จัดส่ง เริ่มต้น</label>
+          <input type="date" v-model="filterData.plan_delivery_date_from" placeholder="From Date">
+        </div>
+        <div class="form-row">
+          <label>ค้นหาด้วย วัน plan จัดส่ง สิ้นสุด</label>
+          <input type="date" v-model="filterData.plan_delivery_date_to" placeholder="To Date">
+        </div>
+        <br>
+        <div class="form-row">
+          <label class="label-filter">ค้นหาด้วย เลขที่ใบจัดสินค้า</label>
+          <input v-model="filterData.document_preparation_number" type="text" class="input-field" placeholder="เลขที่ใบจัดสินค้า">
+        </div>
+        <div class="form-row">
+          <label class="label-filter">ค้นหาด้วย ชื่อลูกค้า</label>
+          <input v-model="filterData.customer_name" type="text" class="input-field" placeholder="ชื่อลูกค้า">
+        </div>
+        <div class="form-row">
+          <label class="label-filter">ค้นหาด้วย ชื่อบริษัท</label>
+          <input v-model="filterData.company_name" type="text" class="input-field" placeholder="ชื่อบริษัท">
+        </div>
+        <div class="form-row">
+          <label class="label-filter">ค้นหาด้วย สาขา</label>
+          <input v-model="filterData.branch_name" type="text" class="input-field" placeholder="สาขา">
+        </div>
+        <div class="form-row">
+          <label class="label-filter">ค้นหาด้วย รหัสสาขา</label>
+          <input v-model="filterData.branch_code" type="text" class="input-field" placeholder="รหัสสาขา">
+        </div>
+        <div class="form-row">
+          <label class="label-filter">ค้นหาด้วย เลขที่ใบเสนอราคา (Office Design)</label>
+          <input v-model="filterData.quotation_number_office_design" type="text" class="input-field" placeholder="เลขที่ใบเสนอราคา (Office Design)">
+        </div>
+        <div class="form-row">
+          <label class="label-filter">ค้นหาด้วย เลขที่ใบสั่งซื้อของลูกค้า</label>
+          <input v-model="filterData.customer_order_number" type="text" class="input-field" placeholder="เลขที่ใบสั่งซื้อของลูกค้า">
+        </div>
+        <div class="form-row">
+          <label class="label-filter">ค้นหาด้วย จัดเตรียมโดย</label>
+          <select v-model="filterData.prepared_by">
+            <option value="">เลือกจัดเตรียมโดย</option>
+            <option v-for="(item, index) in preparedByList" :key="index" :value="item.prepared_by">
+              {{ item.prepared_by }}
+            </option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label class="label-filter">สถานะ</label>
+          <select v-model="filterData.status">
+            <option value=""></option>
+            <option value="ผ่าน">ผ่าน</option>
+            <option value="รอเช็คก่อนส่ง">รอเช็คก่อนส่ง</option>
+          </select>
+        </div>
+        <label style="grid-column: 1/4;">จำนวนสถานะ ผ่าน {{ countSuccess }} , รอเช็คก่อนส่ง {{ countWaitCheck }} <br> จำนวน รายการจัดของ {{ countPreparTotal }}</label>
       </div>
       <div class="table-container">
         <table>
@@ -73,8 +123,10 @@ import { readItems } from "@directus/sdk";
 import SidebarMenu from "@/components/SidebarMenu.vue";
 import { useRouter } from 'vue-router';
 
+const isFilterVisible = ref(true);
 const router = useRouter();
 const data = ref([]);
+const preparedByList = ref([]);
 const currentPage = ref(1);
 const itemsPerPage = 20;
 
@@ -102,6 +154,13 @@ const fetchData = async () => {
       })
     );
     data.value = response;
+
+    const getAdmin = await directus.request(
+      readItems("packing_sheet", {
+        groupBy: ["prepared_by"],
+      })
+    );
+    preparedByList.value = getAdmin
   } catch (error) {
     console.error("Error fetching activities:", error);
   }
@@ -115,26 +174,29 @@ const paginatedData = computed(() => {
   const start = (currentPage.value - 1) * itemsPerPage;
 
   const filteredData = data.value.filter(item => {
-    const itemReceiveDate = new Date(item.receive_date);
-    const fromDate = filterData.value.receive_date_from ? new Date(filterData.value.receive_date_from) : null;
-    const toDate = filterData.value.receive_date_to ? new Date(filterData.value.receive_date_to) : null;
+    const itemReceiveDate = new Date(item.product_preparation_date);
+    const itemReceivePlanDate = new Date(item.plan_delivery_date);
+    const fromDate = filterData.value.product_preparation_date_from ? new Date(filterData.value.product_preparation_date_from) : null;
+    const toDate = filterData.value.product_preparation_date_to ? new Date(filterData.value.product_preparation_date_to) : null;
+
+    const fromDatePlan = filterData.value.plan_delivery_date_from ? new Date(filterData.value.plan_delivery_date_from) : null;
+    const toDatePlan = filterData.value.plan_delivery_date_to ? new Date(filterData.value.plan_delivery_date_to) : null;
 
     const isInDateRange = (!fromDate || itemReceiveDate >= fromDate) && (!toDate || itemReceiveDate <= toDate);
+    const isInDateRangePlan = (!fromDatePlan || itemReceivePlanDate >= fromDatePlan) && (!toDatePlan || itemReceivePlanDate <= toDatePlan);
 
     return (
       isInDateRange &&
-      (!filterData.value.name_supplier || (item.name_supplier && item.name_supplier.includes(filterData.value.name_supplier))) &&
-      (!filterData.value.bill_lading_number || (item.bill_lading_number && item.bill_lading_number.includes(filterData.value.bill_lading_number))) &&
-      (!filterData.value.bill_lading_number_date || (item.bill_lading_number_date && item.bill_lading_number_date.includes(filterData.value.bill_lading_number_date))) &&
-      (!filterData.value.invoice_number || (item.invoice_number && item.invoice_number.includes(filterData.value.invoice_number))) &&
-      (!filterData.value.invoice_number_date || (item.invoice_number_date && item.invoice_number_date.includes(filterData.value.invoice_number_date))) &&
-      (!filterData.value.item_code || (item.item_code && item.item_code.includes(filterData.value.item_code))) &&
-      (!filterData.value.product_name_supplier || (item.product_name_supplier && item.product_name_supplier.includes(filterData.value.product_name_supplier))) &&
-      (!filterData.value.product_code_office_design || (item.product_code_office_design && item.product_code_office_design.includes(filterData.value.product_code_office_design))) &&
-      (!filterData.value.product_name_office_design || (item.product_name_office_design && item.product_name_office_design.includes(filterData.value.product_name_office_design))) &&
-      (!filterData.value.product_category || (item.product_category && item.product_category.includes(filterData.value.product_category))) &&
-      (!filterData.value.model || (item.model && item.model.includes(filterData.value.model))) &&
-      (!filterData.value.sn || (item.sn && item.sn.includes(filterData.value.sn)))
+      isInDateRangePlan &&
+      (!filterData.value.document_preparation_number || (item.document_preparation_number && item.document_preparation_number.includes(filterData.value.document_preparation_number))) &&
+      (!filterData.value.customer_name || (item.customer_name && item.customer_name.includes(filterData.value.customer_name))) &&
+      (!filterData.value.company_name || (item.company_name && item.company_name.includes(filterData.value.company_name))) &&
+      (!filterData.value.branch_name || (item.branch_name && item.branch_name.includes(filterData.value.branch_name))) &&
+      (!filterData.value.branch_code || (item.branch_code && item.branch_code.includes(filterData.value.branch_code))) &&
+      (!filterData.value.quotation_number_office_design || (item.quotation_number_office_design && item.quotation_number_office_design.includes(filterData.value.quotation_number_office_design))) &&
+      (!filterData.value.customer_order_number || (item.customer_order_number && item.customer_order_number.includes(filterData.value.customer_order_number))) &&
+      (!filterData.value.prepared_by || (item.prepared_by && item.prepared_by.includes(filterData.value.prepared_by))) &&
+      (!filterData.value.status || (item.status && item.status.includes(filterData.value.status)))
     );
   });
 
@@ -166,9 +228,58 @@ const goToLastPage = () => {
 const navigate = (route, itemId) => {
   router.push({ name: route , params: { id: itemId }});
 };
+
+countStatus()
+const countWaitCheck = ref(0);
+const countPreparTotal = ref(0);
+const countSuccess = ref(0);
+async function countStatus(input) {
+  try {
+    const response = await directus.request(
+      readItems("packing_sheet", {
+        aggregate: {
+          count: "*",
+        },
+        groupBy: ["status"],
+        filter: {
+          status: {
+            _in: ["ผ่าน","รอเช็คก่อนส่ง"],
+          },
+        },
+      })
+    );
+
+    const total = await directus.request(
+      readItems("packing_sheet", {})
+    );
+    
+    countWaitCheck.value = response.find(item => item.status === "รอเช็คก่อนส่ง")?.count;
+    countSuccess.value = response.find(item => item.status === "ผ่าน")?.count;
+    countPreparTotal.value = total.length
+    
+  } catch (error) {
+    console.error("Error fetching count:", error);
+    return 0;
+  }
+}
 </script>
 
 <style scoped>
+.form-row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+select {
+  padding: 12px;
+  margin-top: 4px;
+  border: 1px solid #d0d0d0;
+  border-radius: 8px;
+  font-size: 16px;
+  background-color: #f7f7f7;
+  color: #333;
+  transition: all 0.3s ease;
+}
 .repair-form {
   display: flex;
   justify-content: center;

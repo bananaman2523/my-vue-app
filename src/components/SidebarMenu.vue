@@ -26,7 +26,7 @@
         @click="navigate('backupStock')" 
         :class="{ active: activeMenu === 'backupStock' }"
       >
-        อุปกรณ์สำรอง
+        อุปกรณ์สำรอง / อะไหล่สำรอง
       </li>
       <li 
         @click="navigate('documentPreparation')" 

@@ -73,6 +73,7 @@
         <div style="text-align: left; padding: 25px;">
           <button @click="downloadReport()" style="border-radius: 16px;padding: 10px 20px; min-width: 120px; height: 40px;">Export</button>
         </div>
+        <label style="grid-column: 2/4;">จำนวนสถานะ พร้อมใช้งาน {{ countReadyUse }} , ชำรุด {{ countBroken }} , รอเช็คก่อนส่ง {{ countWaitCheck }}, รอตรวจสอบอุปกรณ์ {{ countWaitCheckEquipment }} <br> จำนวนอุปกรณ์ สำรอง {{ countBackUptotal }}</label>
       </div>
       <!-- <button @click="toggleFilterVisibility" class="toggle-btn">
         {{ isFilterVisible ? 'ซ่อน Filter' : 'แสดง Filter' }}
@@ -96,6 +97,7 @@
               <th>S/N</th>
               <th>สถานะ</th>
               <th>หมวดหมู่</th>
+              <th>ประเภท</th>
             </tr>
           </thead>
           <tbody>
@@ -115,6 +117,7 @@
               <td>{{ item.serial_number }}</td>
               <td>{{ item.status}}</td>
               <td>{{ item.broken_category }}</td>
+              <td>{{ item.device_status }}</td>
             </tr>
           </tbody>
         </table>
@@ -166,7 +169,7 @@ const fetchData = async () => {
         fields: ["*.*"],
         filter: {
           device_status:{
-            _eq: 'เครื่องสำรอง'
+            _in: ['เครื่องสำรอง','อะไหล่สำรอง']
           }
         }
       })
@@ -270,6 +273,54 @@ const navigate = (route, itemId) => {
 const toggleFilterVisibility = () => {
   isFilterVisible.value = !isFilterVisible.value;
 };
+
+countStatus()
+const countBroken = ref(0);
+const countWaitCheck = ref(0);
+const countWaitCheckEquipment = ref(0);
+const countReadyUse = ref(0);
+const countBackUptotal = ref(0);
+const countSuccess = ref(0);
+async function countStatus(input) {
+  try {
+    const response = await directus.request(
+      readItems("stock", {
+        aggregate: {
+          count: "*",
+        },
+        groupBy: ["status"],
+        filter: {
+          status: {
+            _in: ["ชำรุด","รอเช็คก่อนส่ง","รอตรวจสอบอุปกรณ์","พร้อมใช้งาน","ผ่าน"],
+          },
+          device_status: {
+            _eq: 'เครื่องสำรอง'
+          }
+        },
+      })
+    );
+
+    const total = await directus.request(
+      readItems("stock", {
+        filter: {
+          device_status: {
+            _eq: 'เครื่องสำรอง'
+          }
+        },
+      })
+    );
+    
+    countBroken.value = response.find(item => item.status === "ชำรุด")?.count;
+    countWaitCheck.value = response.find(item => item.status === "รอเช็คก่อนส่ง")?.count;
+    countWaitCheckEquipment.value = response.find(item => item.status === "รอตรวจสอบอุปกรณ์")?.count;
+    countReadyUse.value = response.find(item => item.status === "พร้อมใช้งาน")?.count;
+    countSuccess.value = response.find(item => item.status === "ผ่าน")?.count;
+    countBackUptotal.value = total.length
+  } catch (error) {
+    console.error("Error fetching count:", error);
+    return 0;
+  }
+}
 </script>
 
 <style scoped>
