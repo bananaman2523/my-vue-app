@@ -60,10 +60,10 @@
             <label>Item code <label style="color: red;">*</label></label>
             <input type="text" v-model="formData.itemCode" required/>
           </div>
-          <div class="form-row">
+          <!-- <div class="form-row">
             <label>ชื่อสินค้า (Supplier) <label style="color: red;">*</label></label>
             <input type="text" v-model="formData.supplierProductName" required/>
-          </div>
+          </div> -->
         </form>
       </div>
       <h1>อุปกรณ์</h1>
