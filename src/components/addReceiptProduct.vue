@@ -74,11 +74,16 @@ const removeForm = (index) => {
 
 const generateSerialNumbers = (index) => {
   const form = forms.value[index];
-  const newQuantity = form.quantity || 1;
-  form.serialNumbers = [
-    ...form.serialNumbers.slice(0, newQuantity),
-    ...Array(newQuantity - form.serialNumbers.length).fill('')
-  ];
+  const newQuantity = Math.max(form.quantity || 1, 1);
+  
+  if (newQuantity < form.serialNumbers.length) {
+    form.serialNumbers = form.serialNumbers.slice(0, newQuantity);
+  } else {
+    form.serialNumbers = [
+      ...form.serialNumbers,
+      ...Array(newQuantity - form.serialNumbers.length).fill('')
+    ];
+  }
 };
 
 watch(forms, (newForms) => {
