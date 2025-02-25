@@ -174,6 +174,12 @@ async function cheakSerialNumberInStock(serialNumber, formItem) {
           formItem.serialNumbers[position] = "";
           return;
         }
+        // if (stock[0].status !== 'พร้อมใช้งาน' ) {
+        //   warningPopup.value.showWarningAlert('อุปกรณ์ยังไม่ได้ตรวจสอบ');
+        //   const position = findDuplicatePosition(formItem.serialNumbers, serialNumber);
+        //   formItem.serialNumbers[position] = "";
+        //   return;   
+        // }
       }
 
     }

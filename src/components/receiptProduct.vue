@@ -114,41 +114,17 @@ function checklist(field,group_product) {
   const checklistDrawer = ['Drawer']
   const checklistPOSMonitor = ["POS VIVIPOS (1st Monitor)","POS VIVIPOS (2st Monitor)","POS Casio"]
   if (checklistPrinter.includes(group_product)) {
-    if (field === 'checklist_pre') {
-      return data.printer_pre;
-    } else if (field === 'checklist_final') {
-      return data.printer_final;
-    }
+    return data.printer_final;
   } else if (checklistKiosk.includes(group_product)) {
-    if (field === 'checklist_pre') {
-      return data.kiosk_pre;
-    } else if (field === 'checklist_final') {
-      return data.kiosk_final;
-    }
+    return data.kiosk_final;
   } else if (checklistUPS.includes(group_product)) {
-    if (field === 'checklist_pre') {
-      return data.ups_pre;
-    } else if (field === 'checklist_final') {
-      return data.ups_final;
-    }
+    return data.ups_final;
   } else if (checklistScanner.includes(group_product)) {
-    if (field === 'checklist_pre') {
-      return data.scanner_pre;
-    } else if (field === 'checklist_final') {
-      return data.scanner_final;
-    }
+    return data.scanner_final;
   } else if (checklistDrawer.includes(group_product)) {
-    if (field === 'checklist_pre') {
-      return data.drawer_pre;
-    } else if (field === 'checklist_final') {
-      return data.drawer_final;
-    }
+    return data.drawer_final;
   } else if (checklistPOSMonitor.includes(group_product)) {
-    if (field === 'checklist_pre') {
-      return data.pos_monitor_pre;
-    } else if (field === 'checklist_final') {
-      return data.pos_monitor_final;
-    }
+    return data.pos_monitor_final;
   }
   return null;
 }
@@ -185,8 +161,7 @@ const addStock = async () => {
         po_number: formData.value.poNumber || null,
         device_status: formData.value.statusProduct,
         status: 'รอตรวจสอบอุปกรณ์',
-        checklist_pre: checklist('checklist_pre' ,receiptProducts.value[i].productModel),
-        checklist_final: checklist('checklist_final' ,receiptProducts.value[i].productModel),
+        checklist: checklist('checklist_final' ,receiptProducts.value[i].productModel),
       };
       stockItems.push(stockItem);
     }

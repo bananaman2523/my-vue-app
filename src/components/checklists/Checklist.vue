@@ -12,23 +12,27 @@
             <tbody>
                 <template v-for="(group, index) in groupedChecklist" :key="index">
                     <tr v-for="(item, i) in group.items" :key="i">
-                        <td v-if="i === 0" :rowspan="group.items.length"
-                            class="border border-gray-300 p-2 font-semibold text-center align-top">
-                            {{ group.category }}
-                        </td>
-                        <td class="border border-gray-300 p-2">{{ item.description }}</td>
-                        <td class="border border-gray-300 p-2 text-center button-center">
-                            <select v-model="item.status" class="p-2 rounded w-full text-white font-bold text-center"
-                                :class="statusClass(item.status)">
-                                <option value="รอตรวจสอบ" class="text-gray-700" disabled>รอตรวจสอบ</option>
-                                <option value="ผ่าน" class="text-green-700">ผ่าน</option>
-                                <option value="ไม่ผ่าน" class="text-red-700">ไม่ผ่าน</option>
-                            </select>
-                        </td>
-                        <td class="border border-gray-300 p-2 italic text-gray-600 text-center">
-                            <textarea v-model="item.note" class="w-full p-1 border rounded text-gray-700"></textarea>
-                        </td>
-                    </tr>
+                      <td v-if="i === 0" :rowspan="group.items.length"
+                          class="border border-gray-300 p-2 font-semibold text-center align-top">
+                          {{ group.category }}
+                      </td>
+                      <td class="border border-gray-300 p-2">{{ item.description }}</td>
+                      <td class="border border-gray-300 p-2 text-center">
+                          <select v-model="item.status"
+                                  class="p-2 rounded w-full font-bold text-center"
+                                  :class="statusClass(item.status)"
+                                  :disabled="item.disabled">
+                              <option value="รอตรวจสอบ" disabled>รอตรวจสอบ</option>
+                              <option value="ผ่าน">ผ่าน</option>
+                              <option value="ไม่ผ่าน">ไม่ผ่าน</option>
+                          </select>
+                      </td>
+                      <td class="border border-gray-300 p-2 italic text-gray-600 text-center">
+                          <textarea v-model="item.note"
+                                    class="w-full p-1 border rounded text-gray-700"
+                                    :disabled="item.disabled"></textarea>
+                      </td>
+                  </tr>
                 </template>
             </tbody>
         </table>
@@ -48,7 +52,7 @@ const fetchData = async () => {
   try {
     const delivery_sheet = await directus.request(
       readItems("stock", {
-        fields: ["checklist_pre"],
+        fields: ["checklist","status","group_product"],
         filter: {
           id: {
             _eq: route.params.id
@@ -60,23 +64,33 @@ const fetchData = async () => {
     if (delivery_sheet.length > 0) {
       const data = delivery_sheet[0];
       formData.value = {
-        checklist: data.checklist_pre || [],
+        checklist: data.checklist || [],
+        status: data.status || "",
+        group_product: data.group_product || "",
       };
     }
 
+    const filteredData = {
+      ...formData.value,
+      checklist: (formData.value.checklist || []).filter(item => !item.disabled)
+    };
+
+
     if (formData.value.checklist.length > 0) {
-      const hasNotPassed = formData.value.checklist.some(item => item.status === "ไม่ผ่าน");
-      const allPassed = formData.value.checklist.every(item => item.status === "ผ่าน");
+      const hasNotPassed = filteredData.checklist.some(item => item.status === "ไม่ผ่าน");
+      const allPassed = filteredData.checklist.every(item => item.status === "ผ่าน");
       
-      if (hasNotPassed) {
-        const payload = { status: 'ชำรุด' };
-        await directus.request(updateItem("stock", route.params.id, payload));
-      } else if (allPassed) {
-        const payload = { status: 'พร้อมใช้งาน' };
-        await directus.request(updateItem("stock", route.params.id, payload));
-      } else {
-        const payload = { status: 'รอตรวจสอบอุปกรณ์' };
-        await directus.request(updateItem("stock", route.params.id, payload));
+      if (formData.value.status !== 'รอเช็คก่อนส่ง' && formData.value.status !== 'ผ่าน' && formData.value.status !== 'ชำรุด') {
+        if (hasNotPassed) {
+          const payload = { status: 'ชำรุด' };
+          await directus.request(updateItem("stock", route.params.id, payload));
+        } else if (allPassed) {
+          const payload = { status: 'พร้อมใช้งาน' };
+          await directus.request(updateItem("stock", route.params.id, payload));
+        } else {
+          const payload = { status: 'รอตรวจสอบอุปกรณ์' };
+          await directus.request(updateItem("stock", route.params.id, payload));
+        }
       }
     }
     
@@ -94,7 +108,7 @@ const groupedChecklist = computed(() => {
       groups[item.category] = { category: item.category, items: [] };
     }
     groups[item.category].items.push(item);
-  });
+  });  
   
   return Object.values(groups);
 });
@@ -111,7 +125,7 @@ const updateChecklist = async (value) => {
   try {
     const result = value;
     
-    const payload = { checklist_pre: result };
+    const payload = { checklist: result };
     await directus.request(updateItem("stock", route.params.id, payload));
   } catch (error) {
     console.error(`Error updating in stock:`, error);

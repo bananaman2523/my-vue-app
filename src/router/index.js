@@ -10,7 +10,7 @@ import LoginPage from "@/components/Login.vue";
 import productOrderPage from "@/components/productOrder.vue";
 import stickerOrderPage from "@/components/stickerOrder.vue";
 import receiptDetailsPage from "@/components/receiptDetails.vue";
-import DocumentPreparationDetailPage from "@/components/documentPreparationDetail.vue";
+import DocumentPreparationDetailPage from "@/components/DocumentPreparationDetail.vue";
 import ListStockDefectivePage from "@/components/ListStockDefective.vue";
 import BackupStockPage from "@/components/BackupStock.vue";
 import DocumentShippingPage from "@/components/DocumentShipping.vue";

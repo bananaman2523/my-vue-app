@@ -8,6 +8,14 @@ import { defineEmits } from "vue";
 
 const emit = defineEmits(["confirmed", "cancelled"]);
 
+const showWarningAlert= (text) => {
+    Swal.fire({
+        title: `${text}!`,
+        icon: "warning",
+        confirmButtonText: "OK",
+    });
+};
+
 const showWarningNoFullField = () => {
     Swal.fire({
         title: "กรุณาใส่ข้อมูลที่จำเป็นให้ครบ!",
@@ -98,5 +106,5 @@ const showWarningSerailNumberDuplicated = () => {
     });
 };
 
-defineExpose({ showWarningNoFullField , showWarning , showWarningDuplicate , showWarningBroken, showWarningAlreadyUse , confirmDelete , confirmUpdate , showWarningBackupDevice , showWarningSerailNumberDuplicated, showWarningInStock});
+defineExpose({ showWarningAlert , showWarningNoFullField , showWarning , showWarningDuplicate , showWarningBroken, showWarningAlreadyUse , confirmDelete , confirmUpdate , showWarningBackupDevice , showWarningSerailNumberDuplicated, showWarningInStock});
 </script>

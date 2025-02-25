@@ -78,14 +78,17 @@
             <label>Serial Number</label>
             <input type="text" v-model="item.serial_number" disabled/>
           </div>
-          <div class="form-row" style="grid-column: 1 / span 3; width: 345px;">
+          <!-- <div class="form-row" style="grid-column: 1 / span 3; width: 345px;">
             <label>คุณภาพสินค้า</label>
             <select v-model="item.status" :disabled="formData.status === 'ผ่าน'">
               <option>ระบุ</option>
               <option>ผ่าน</option>
               <option>ชำรุด</option>
             </select>
-          </div>
+          </div> -->
+        </form>
+        <ChecklistFinal :id="item.id" style="margin-top: 16px;margin-bottom: 16px;"/>
+        <form>
           <div v-if="item.status === 'ชำรุด'" style="display: contents;">
             <div class="form-row">
               <label>ชื่อสินค้าของ Office Design</label>
@@ -128,9 +131,7 @@
             <div style="display: flex; align-items: flex-end;">
               <button type="button" @click="switchEquipment(item)">สับเปลี่ยน</button>
             </div>
-            
           </div>
-          
         </form>
       </div>
       <div class="form-actions">
@@ -160,6 +161,7 @@ import axios from 'axios';
 import ApprovePopup from "@/components/popup/ApprovePopup.vue";
 import ErrorPopup from "@/components/popup/ErrorPopup.vue";
 import WarningPopup from "@/components/popup/WarningPopup.vue";
+import ChecklistFinal from './checklists/ChecklistFinal.vue';
 const warningPopup = ref(null);
 const approvePopup = ref(null);
 
@@ -202,6 +204,8 @@ const productConfig = ref({ product: [] });
 async function submitForm() {
   try {
     const packingID = route.params.id
+    console.log(formData.value);
+    
     const allPassed = formData.value.stock.every(item => item.status === 'ผ่าน');
     const timestamp = new Date().toISOString().split('.')[0];
     if (allPassed) {
@@ -440,7 +444,7 @@ async function deleteForm() {
     const ids = formData.value.stock.map(item => item.id);
     const updateStock = await directus.request(
         updateItems('stock', ids, {
-          status: 'รอตรวจสอบอุปกรณ์',
+          status: 'พร้อมใช้งาน',
       })
     )
     await directus.request(

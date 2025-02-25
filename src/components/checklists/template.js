@@ -48,61 +48,71 @@ const printer_final = [
         "category": "ตรวจเช็กสภาพภายนอกของเครื่อง",
         "description": "ตรวจสอบสภาพของเครื่องไม่มีรอยแตกหักหรือชำรุด",
         "status": "รอตรวจสอบ",
-        "note": ""
+        "note": "",
+        "disabled": false
     },
     {
         "category": "ตรวจเช็กสภาพภายนอกของเครื่อง",
         "description": "ตรวจสอบการเชื่อมต่อของสายไฟและพอร์ตดังนี้ สาย Adapter, AC, และ USB",
         "status": "รอตรวจสอบ",
-        "note": ""
+        "note": "",
+        "disabled": false
     },
     {
         "category": "ตรวจเช็กสภาพภายนอกของเครื่อง",
         "description": "เปิดเครื่องและตรวจสอบว่ามีการทำงานปกติ หรือไฟไม่ขึ้น Error",
         "status": "รอตรวจสอบ",
-        "note": ""
+        "note": "",
+        "disabled": false
     },
     {
         "category": "ทดสอบการพิมพ์",
         "description": "ตรวจสอบว่ามีเสียงสัญญาณเตือนผิดปกติจากเครื่องพิมพ์/ไฟแสดงสถานะ",
         "status": "รอตรวจสอบ",
-        "note": ""
+        "note": "",
+        "disabled": false
     },
     {
         "category": "ทดสอบการพิมพ์",
         "description": "ตรวจสอบว่าหัวพิมพ์ไม่จางหรือมีปัญหา",
         "status": "รอตรวจสอบ",
-        "note": ""
+        "note": "",
+        "disabled": false
     },
     {
         "category": "ทดสอบการพิมพ์",
         "description": "ตรวจสอบการฟีดกระดาษ",
         "status": "รอตรวจสอบ",
-        "note": ""
+        "note": "",
+        "disabled": false
     },
     {
         "category": "ทดสอบการพิมพ์",
         "description": "ตรวจสอบการตัดกระดาษ (หากเสียบสาย Lan กรุณาถอดสาย Lan ก่อน)",
         "status": "รอตรวจสอบ",
-        "note": ""
+        "note": "",
+        "disabled": false
     },
     {
         "category": "Template",
         "description": "Template ของใบเสร็จตรงกับ Template ปัจจุบัน",
         "status": "รอตรวจสอบ",
-        "note": ""
+        "note": "",
+        "disabled": true
     },
     {
         "category": "Template",
         "description": "บิลมีรายละเอียดถูกต้อง ครบถ้วน ตัวพิมพ์ชัดเจน",
         "status": "รอตรวจสอบ",
-        "note": ""
+        "note": "",
+        "disabled": true
     },
     {
         "category": "Template",
         "description": "เครื่องพิมพ์ทำงานได้ตามปกติ",
         "status": "รอตรวจสอบ",
-        "note": ""
+        "note": "",
+        "disabled": true
     }
 ];
 
