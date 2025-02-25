@@ -60,23 +60,15 @@
             <input type="date" v-model="formData.dueDate" :disabled="disabledField" class="disable-form"/>
           </div>
           <br>
-          <div class="form-row">
+          <!-- <div class="form-row">
             <label>Item code <label style="color: red;">*</label></label>
             <input type="text" v-model="formData.itemCode" required :disabled="disabledField" class="disable-form"/>
           </div>
           <div class="form-row">
             <label>ชื่อสินค้า (Supplier) <label style="color: red;">*</label></label>
             <input type="text" v-model="formData.supplierProductName" required :disabled="disabledField" class="disable-form"/>
-          </div>
+          </div> -->
           <br>
-          <div class="form-row">
-            <label>สถานะอุปกรณ์</label>
-            <select v-model="formData.status">
-              <option value="รอตรวจสอบอุปกรณ์">รอตรวจสอบอุปกรณ์</option>
-              <option value="ชำรุด">ชำรุด</option>
-              <option value="พร้อมใช้งาน">พร้อมใช้งาน</option>
-            </select>
-          </div>
           <div class="form-row" v-if="formData.status === 'ชำรุด'">
             <label>ประเภทชำรุด</label>
             <select v-model="formData.broken_category">
@@ -103,7 +95,15 @@
               <label>รหัสสินค้า Office Design <label style="color: red;">*</label></label>
               <input type="text" v-model="formData.productCodeOfficeDesign" required :disabled="disabledField" class="disable-form"/>
             </div>
-            <br>
+            <div class="form-row">
+              <label>สถานะอุปกรณ์</label>
+              <input type="text" v-model="formData.status" required :disabled="disabledField" class="disable-form"/>
+              <!-- <select v-model="formData.status">
+                <option value="รอตรวจสอบอุปกรณ์">รอตรวจสอบอุปกรณ์</option>
+                <option value="ชำรุด">ชำรุด</option>
+                <option value="พร้อมใช้งาน">พร้อมใช้งาน</option>
+              </select> -->
+            </div>
             <div class="form-row">
               <label>อุปกรณ์ <label style="color: red;">*</label></label>
               <input type="text" v-model="formData.group_product" required :disabled="disabledField" class="disable-form"/>
@@ -116,12 +116,17 @@
               <label>S/N <label style="color: red;">*</label></label>
               <input type="text" v-model="formData.serial_number" required :disabled="disabledField" class="disable-form"/>
             </div>
-            <div class="form">
-              <label style="margin-right: 16px;">ตรวจสอบโดย</label>
-              <input type="text" v-model="formData.checked_by" required :disabled="disabledField" class="disable-form" style="margin-right: 16px;"/>
-              <button type="button" class="update-button" @click="updateForm">บันทึก</button>
-              <button type="button" class="delete-button" @click="deleteForm">ลบ</button>
-            </div>
+          </div>
+        </form>
+      </div>
+      <PrinterChecklist />
+      <div class="container">
+        <form>
+          <div class="form">
+            <label style="margin-right: 16px;">ตรวจสอบโดย</label>
+            <input type="text" v-model="formData.checked_by" required :disabled="disabledField" class="disable-form" style="margin-right: 16px;"/>
+            <button type="button" class="update-button" @click="updateForm">บันทึก</button>
+            <button type="button" class="delete-button" @click="deleteForm">ลบ</button>
           </div>
         </form>
       </div>
@@ -138,6 +143,7 @@ import { directus } from "@/services/directus";
 import { readItems, deleteItem , updateItem } from "@directus/sdk";
 import SidebarMenu from "@/components/SidebarMenu.vue";
 import { useRoute , useRouter} from "vue-router";
+import PrinterChecklist from "./checklists/PrinterChecklist.vue";
 import ApprovePopup from "@/components/popup/ApprovePopup.vue";
 import ErrorPopup from "@/components/popup/ErrorPopup.vue";
 import WarningPopup from "@/components/popup/WarningPopup.vue";
