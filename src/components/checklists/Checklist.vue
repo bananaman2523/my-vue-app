@@ -72,6 +72,9 @@ const fetchData = async () => {
     } else if (allPassed) {
         const payload = { status: 'ผ่าน' };
         await directus.request(updateItem("stock", route.params.id, payload));
+    } else {
+        const payload = { status: 'รอตรวจสอบอุปกรณ์' };
+        await directus.request(updateItem("stock", route.params.id, payload));
     }
     
   } catch (error) {

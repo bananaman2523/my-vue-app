@@ -92,6 +92,7 @@ import axios from 'axios';
 import ApprovePopup from "@/components/popup/ApprovePopup.vue";
 import ErrorPopup from "@/components/popup/ErrorPopup.vue";
 import WarningPopup from "@/components/popup/WarningPopup.vue";
+import data from '@/components/checklists/template.js';
 const warningPopup = ref(null);
 const approvePopup = ref(null);
 const errorPopup = ref(null);
@@ -104,6 +105,53 @@ const errorPopup = ref(null);
 //     });
 //     return obj;
 // }
+
+function checklist(field,group_product) {
+  const checklistPrinter = ["Recript printer","Lable printer","Kitchen printer"]
+  const checklistKiosk = ['KIOSK']
+  const checklistUPS = ['UPS']
+  const checklistScanner = ['Scanner']
+  const checklistDrawer = ['Drawer']
+  const checklistPOSMonitor = ["POS VIVIPOS (1st Monitor)","POS VIVIPOS (2st Monitor)","POS Casio"]
+  if (checklistPrinter.includes(group_product)) {
+    if (field === 'checklist_pre') {
+      return data.printer_pre;
+    } else if (field === 'checklist_final') {
+      return data.printer_final;
+    }
+  } else if (checklistKiosk.includes(group_product)) {
+    if (field === 'checklist_pre') {
+      return data.kiosk_pre;
+    } else if (field === 'checklist_final') {
+      return data.kiosk_final;
+    }
+  } else if (checklistUPS.includes(group_product)) {
+    if (field === 'checklist_pre') {
+      return data.ups_pre;
+    } else if (field === 'checklist_final') {
+      return data.ups_final;
+    }
+  } else if (checklistScanner.includes(group_product)) {
+    if (field === 'checklist_pre') {
+      return data.scanner_pre;
+    } else if (field === 'checklist_final') {
+      return data.scanner_final;
+    }
+  } else if (checklistDrawer.includes(group_product)) {
+    if (field === 'checklist_pre') {
+      return data.drawer_pre;
+    } else if (field === 'checklist_final') {
+      return data.drawer_final;
+    }
+  } else if (checklistPOSMonitor.includes(group_product)) {
+    if (field === 'checklist_pre') {
+      return data.pos_monitor_pre;
+    } else if (field === 'checklist_final') {
+      return data.pos_monitor_final;
+    }
+  }
+  return null;
+}
 
 const addStock = async () => {
   const stockItems = []
@@ -129,6 +177,8 @@ const addStock = async () => {
         po_number: formData.value.poNumber || null,
         device_status: formData.value.statusProduct,
         status: 'รอตรวจสอบอุปกรณ์',
+        checklist_pre: checklist('checklist_pre' ,receiptProducts.value[i].productModel),
+        checklist_final: checklist('checklist_final' ,receiptProducts.value[i].productModel),
       };
       stockItems.push(stockItem);
     }

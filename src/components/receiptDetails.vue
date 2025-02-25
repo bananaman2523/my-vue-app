@@ -119,7 +119,7 @@
           </div>
         </form>
       </div>
-      <PrinterChecklist />
+      <Checklist />
       <div class="container">
         <form>
           <div class="form">
@@ -143,7 +143,7 @@ import { directus } from "@/services/directus";
 import { readItems, deleteItem , updateItem } from "@directus/sdk";
 import SidebarMenu from "@/components/SidebarMenu.vue";
 import { useRoute , useRouter} from "vue-router";
-import PrinterChecklist from "./checklists/PrinterChecklist.vue";
+import Checklist from "./checklists/Checklist.vue";
 import ApprovePopup from "@/components/popup/ApprovePopup.vue";
 import ErrorPopup from "@/components/popup/ErrorPopup.vue";
 import WarningPopup from "@/components/popup/WarningPopup.vue";
@@ -155,7 +155,6 @@ const user = `${getUser.first_name} ${getUser.last_name}`
 const route = useRoute();
 const router = useRouter();
 const disabledField = ref(false);
-
 const formData = ref({
   receive_date: "",
   supplierName: "",
