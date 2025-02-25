@@ -255,16 +255,26 @@ async function updateForm() {
   if (!confirmUpdateResult.isConfirmed) return;
   
   try {
-    const update = await directus.request(
-      updateItem('stock', route.params.id, {
-        device_status: formData.value.statusProduct,
-        status: formData.value.status,
-        broken_category: formData.value.status === 'พร้อมใช้งาน' ? null : formData.value.broken_category || '',
-        broken_description: formData.value.status === 'พร้อมใช้งาน' ? null : formData.value.broken_description || '',
-        checked_by: formData.value.status === 'พร้อมใช้งาน' ? null : user || '',
-      })
-    );
-    approvePopup.value.showSuccessUpdate()
+    if (checklist.includes(formData.value.group_product)) {
+      const update = await directus.request(
+        updateItem('stock', route.params.id, {
+          device_status: formData.value.statusProduct,
+          status: formData.value.status,
+          broken_category: formData.value.status === 'พร้อมใช้งาน' ? null : formData.value.broken_category || '',
+          broken_description: formData.value.status === 'พร้อมใช้งาน' ? null : formData.value.broken_description || '',
+          checked_by: formData.value.status === 'พร้อมใช้งาน' ? null : user || '',
+        })
+      );
+      approvePopup.value.showSuccessUpdate()
+    }
+    if (!checklist.includes(formData.value.group_product)) {
+      const update = await directus.request(
+        updateItem('stock', route.params.id, {
+          device_status: formData.value.statusProduct,
+        })
+      );
+      approvePopup.value.showSuccessUpdate()
+    }
   } catch (error) {
     alert("Failed to update item: " + error.message);
   }
