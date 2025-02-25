@@ -72,7 +72,7 @@ const fetchData = async () => {
         const payload = { status: 'ชำรุด' };
         await directus.request(updateItem("stock", route.params.id, payload));
       } else if (allPassed) {
-        const payload = { status: 'ผ่าน' };
+        const payload = { status: 'พร้อมใช้งาน' };
         await directus.request(updateItem("stock", route.params.id, payload));
       } else {
         const payload = { status: 'รอตรวจสอบอุปกรณ์' };

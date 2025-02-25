@@ -155,6 +155,14 @@ function checklist(field,group_product) {
 
 const addStock = async () => {
   const stockItems = []
+  const hasEmptySerialNumber = receiptProducts.value.some(product =>
+    product.serialNumbers.some(serial => serial.trim() === "")
+  );
+
+  if (hasEmptySerialNumber) {
+    warningPopup.value.showWarningNoFullField();
+    return
+  }
   for (let i = 0; i < receiptProducts.value.length; i++) {
     for (let j = 0; j < receiptProducts.value[i].serialNumbers.length; j++) {
       const stockItem = {

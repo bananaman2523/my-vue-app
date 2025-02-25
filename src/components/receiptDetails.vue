@@ -68,19 +68,6 @@
             <label>ชื่อสินค้า (Supplier) <label style="color: red;">*</label></label>
             <input type="text" v-model="formData.supplierProductName" required :disabled="disabledField" class="disable-form"/>
           </div> -->
-          <br>
-          <div class="form-row" v-if="formData.status === 'ชำรุด'">
-            <label>ประเภทชำรุด</label>
-            <select v-model="formData.broken_category">
-              <option value="software">software</option>
-              <option value="hardware">hardware</option>
-            </select>
-          </div>
-          <br>
-          <div class="form-row" v-if="formData.status === 'ชำรุด'">
-            <label>รายละเอียดชำรุด</label>
-            <input type="text" v-model="formData.broken_description" class="description"/>
-          </div>
         </form>
       </div>
       <h1>อุปกรณ์</h1>
@@ -97,12 +84,12 @@
             </div>
             <div class="form-row">
               <label>สถานะอุปกรณ์</label>
-              <input type="text" v-model="formData.status" required :disabled="disabledField" class="disable-form"/>
-              <!-- <select v-model="formData.status">
+              <input v-if="!checklist.includes(formData.group_product)" type="text" v-model="formData.status" required :disabled="disabledField" class="disable-form"/>
+              <select v-if="checklist.includes(formData.group_product)" v-model="formData.status">
                 <option value="รอตรวจสอบอุปกรณ์">รอตรวจสอบอุปกรณ์</option>
                 <option value="ชำรุด">ชำรุด</option>
                 <option value="พร้อมใช้งาน">พร้อมใช้งาน</option>
-              </select> -->
+              </select>
             </div>
             <div class="form-row">
               <label>อุปกรณ์ <label style="color: red;">*</label></label>
@@ -115,6 +102,17 @@
             <div class="form-row">
               <label>S/N <label style="color: red;">*</label></label>
               <input type="text" v-model="formData.serial_number" required :disabled="disabledField" class="disable-form"/>
+            </div>
+            <div class="form-row" v-if="formData.status === 'ชำรุด'">
+              <label>ประเภทชำรุด</label>
+              <select v-model="formData.broken_category">
+                <option value="software">software</option>
+                <option value="hardware">hardware</option>
+              </select>
+            </div>
+            <div class="form-row" v-if="formData.status === 'ชำรุด'">
+              <label>รายละเอียดชำรุด</label>
+              <input type="text" v-model="formData.broken_description" class="description"/>
             </div>
           </div>
         </form>
@@ -276,7 +274,7 @@ async function updateForm() {
 
 <style scoped>
 .description {
-  width: 715px;
+  width: 695px;
 }
 .disable-form{
   background-color: #D9D9D9;
