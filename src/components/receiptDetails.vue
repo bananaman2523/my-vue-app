@@ -119,7 +119,8 @@
           </div>
         </form>
       </div>
-      <Checklist />
+      <Checklist v-if="!checklist.includes(formData.group_product)" />
+      <!-- <Checklist /> -->
       <div class="container">
         <form>
           <div class="form">
@@ -155,6 +156,7 @@ const user = `${getUser.first_name} ${getUser.last_name}`
 const route = useRoute();
 const router = useRouter();
 const disabledField = ref(false);
+const checklist = ["Keyboard & Mouse","Router Wifi","Swich hub","Mouse","Keyboard"]
 const formData = ref({
   receive_date: "",
   supplierName: "",

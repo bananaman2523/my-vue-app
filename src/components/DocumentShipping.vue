@@ -80,10 +80,10 @@
               @click="navigate('documentShippingDetail', item.id)">
               <td>{{ item.delivery_date }}</td>
               <td>{{ item.document_delivery_number }}</td>
-              <td>{{ item.packing_sheet[0].customer_order_number }}</td>
-              <td>{{ item.packing_sheet[0].quotation_number_office_design }}</td>
-              <td>{{ item.packing_sheet[0].customer_name }}</td>
-              <td>{{ item.packing_sheet[0].branch_name }}</td>
+              <td>{{ item.packing_sheet[0]?.customer_order_number }}</td>
+              <td>{{ item.packing_sheet[0]?.quotation_number_office_design }}</td>
+              <td>{{ item.packing_sheet[0]?.customer_name }}</td>
+              <td>{{ item.packing_sheet[0]?.branch_name }}</td>
               <td>{{ item.delivery_status }}</td>
               <td>{{ item.install_status }}</td>
             </tr>

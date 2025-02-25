@@ -64,17 +64,20 @@ const fetchData = async () => {
       };
     }
 
-    const hasNotPassed = formData.value.checklist.some(item => item.status === "ไม่ผ่าน");
-    const allPassed = formData.value.checklist.every(item => item.status === "ผ่าน");
-    if (hasNotPassed) {
+    if (formData.value.checklist.length > 0) {
+      const hasNotPassed = formData.value.checklist.some(item => item.status === "ไม่ผ่าน");
+      const allPassed = formData.value.checklist.every(item => item.status === "ผ่าน");
+      
+      if (hasNotPassed) {
         const payload = { status: 'ชำรุด' };
         await directus.request(updateItem("stock", route.params.id, payload));
-    } else if (allPassed) {
+      } else if (allPassed) {
         const payload = { status: 'ผ่าน' };
         await directus.request(updateItem("stock", route.params.id, payload));
-    } else {
+      } else {
         const payload = { status: 'รอตรวจสอบอุปกรณ์' };
         await directus.request(updateItem("stock", route.params.id, payload));
+      }
     }
     
   } catch (error) {

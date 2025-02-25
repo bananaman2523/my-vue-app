@@ -43,7 +43,7 @@ const printer_pre = [
     }
 ];
 
-const printer_fianl = [
+const printer_final = [
     {
         category: "ตรวจเช็กสภาพภายนอกของเครื่อง",
         description: "ตรวจสอบสภาพของเครื่องไม่มีรอยแตกหักหรือชำรุด",
@@ -484,4 +484,4 @@ const pos_monitor_final = [
     }
 ]
 
-export default { printer_pre, printer_fianl, kiosk_pre, kiosk_final, ups_pre, ups_final, scanner_pre, scanner_final, drawer_pre, drawer_final, pos_monitor_pre, pos_monitor_final };
+export default { printer_pre, printer_final, kiosk_pre, kiosk_final, ups_pre, ups_final, scanner_pre, scanner_final, drawer_pre, drawer_final, pos_monitor_pre, pos_monitor_final };
