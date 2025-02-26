@@ -424,20 +424,49 @@ const downloadReport = async () => {
         }
       })
     );
-    
     const payload = packing_sheet[0]
-
-    const response = await axios.post('http://localhost:3000/downloadProduct', payload, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      responseType: 'blob'
+    const response = await axios.post('http://localhost:3001/generate-pdf/packing', payload, {
+        responseType: 'blob'
     });
+
+    const blob = new Blob([response.data], { type: 'application/pdf' });
+    const blobUrl = URL.createObjectURL(blob);
     
     const link = document.createElement('a');
-    link.href = URL.createObjectURL(response.data);
-    link.download = 'ใบจัดเตรียมสินค้า.xlsx';
+    link.href = blobUrl;
+    link.download = 'เอกสารรายการจัดของ.pdf';
+
+    document.body.appendChild(link);
     link.click();
+    document.body.removeChild(link);
+
+    URL.revokeObjectURL(blobUrl);
+    // const packing_sheet = await directus.request(
+    //   readItems("packing_sheet", {
+    //     fields: [
+    //       "*.*",
+    //     ],
+    //     filter:{
+    //       id:{
+    //         _eq: route.params.id
+    //       }
+    //     }
+    //   })
+    // );
+    
+    // const payload = packing_sheet[0]
+
+    // const response = await axios.post('http://localhost:3000/downloadProduct', payload, {
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //   },
+    //   responseType: 'blob'
+    // });
+    
+    // const link = document.createElement('a');
+    // link.href = URL.createObjectURL(response.data);
+    // link.download = 'ใบจัดเตรียมสินค้า.xlsx';
+    // link.click();
   } catch (error) {
     console.error('Error exporting report:', error);
   }

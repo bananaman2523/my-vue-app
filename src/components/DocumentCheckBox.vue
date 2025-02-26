@@ -117,6 +117,7 @@
         <textarea v-model="formData.description" @change="updateDeliveryNote('description',formData.description)" class="note-textarea"></textarea>
         <br>
         <button @click="downloadInstallDoc">Export</button>
+        <button @click="testPDFMake">Export</button>
 
     </main>
     <WarningPopup ref="warningPopup" />
@@ -303,6 +304,29 @@ const downloadInstallDoc = async () => {
   }
 };
 
+const testPDFMake = async () => {
+    try {
+        const payload = formData.value;
+        const response = await axios.post('http://localhost:3001/generate-pdf', payload, {
+            responseType: 'blob' // Ensure binary data
+        });
+
+        const blob = new Blob([response.data], { type: 'application/pdf' });
+        const blobUrl = URL.createObjectURL(blob);
+        
+        const link = document.createElement('a');
+        link.href = blobUrl;
+        link.download = 'install_document.pdf';
+
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        URL.revokeObjectURL(blobUrl); // Revoke URL after download
+    } catch (error) {
+        console.error('Error exporting report:', error.response ? error.response.data : error);
+    }
+};
 
 </script>
 
