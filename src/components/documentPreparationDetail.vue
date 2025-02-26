@@ -11,7 +11,7 @@
           </div>
           <div class="form-row">
             <label>ชื่อบริษัท</label>
-            <select v-model="formData.company_name" disabled class="disable-form">
+            <select v-model="formData.company_name" disabled class="disable-form" >
               <option disabled :value="formData.company_name">{{formData.company_name}}</option>
             </select>
           </div>
@@ -75,7 +75,7 @@
             <input type="text" v-model="item.model" disabled/>
           </div>
           <div class="form-row">
-            <label>Serial Number</label>
+            <label>Serial Number</label> 
             <input type="text" v-model="item.serial_number" disabled/>
           </div>
           <!-- <div class="form-row" style="grid-column: 1 / span 3; width: 345px;">
@@ -87,7 +87,7 @@
             </select>
           </div> -->
         </form>
-        <ChecklistFinal :id="item.id" style="margin-top: 16px;margin-bottom: 16px;" @update:checklist="handleChecklistUpdate"/>
+        <ChecklistFinal :id="item.id" :checklist="item.checklist" style="margin-top: 16px;margin-bottom: 16px;" @update:checklist="handleChecklistUpdate"/>
         <form>
           <div v-if="item.status === 'ชำรุด' || hasNotPassed[index]" style="display: contents;">
             <div class="form-row">
@@ -113,7 +113,7 @@
             </div>
             <div class="form-row">
               <label>Serial Number</label>
-              <input v-model="item.serialNumber" @change="cheakSerialNumberInStock(item.serialNumber, formData.stock[index])" type="text" :disabled="!item.productCode" :class="!item.productCode ? 'disable-form' : ''"/>
+              <input v-model="item.serialNumber" @change="cheakSerialNumberInStock(item.serialNumber, item)" type="text" :disabled="!item.productCode" :class="!item.productCode ? 'disable-form' : ''"/>
             </div>
             <br>
             <div class="form-row">
@@ -206,10 +206,10 @@ async function submitForm() {
     const packingID = route.params.id
     
     const allPassed = formData.value.stock.every(stockItem => 
-        stockItem.checklist.every(item => item.status === "ผ่าน")
+        stockItem.checklist?.every(item => item.status === "ผ่าน")
     );
     const hasNotPassed = formData.value.stock.some(stockItem => 
-      stockItem.checklist.some(item => item.status === "ไม่ผ่าน")
+      stockItem.checklist?.some(item => item.status === "ไม่ผ่าน")
     );
     const timestamp = new Date().toISOString().split('.')[0];
     if (allPassed) {
@@ -350,7 +350,8 @@ const fetchData = async () => {
           "product_name_office_design",
           "serial_number",
           "group_product",
-          "model"
+          "model",
+          "checklist"
         ],
         filter:{
           status:{
@@ -376,7 +377,7 @@ const fetchData = async () => {
       product_name_office_design: item.product_name_office_design,
       group_product: item.group_product,
       model: item.model
-    }));
+    })); 
     
 
     if (packing_sheet.length > 0) {
@@ -496,7 +497,7 @@ async function cheakSerialNumberInStock(serialNumber, formItem) {
         return;
       }
 
-      const checks = (await directus.request(
+      const checks = await directus.request(
         readItems("stock", {
           filter: {
             serial_number: {
@@ -516,7 +517,7 @@ async function cheakSerialNumberInStock(serialNumber, formItem) {
             },
           },
         })
-      )) || [];
+      );
 
       const checksStatus = checks[0]
 
@@ -551,16 +552,16 @@ async function cheakSerialNumberInStock(serialNumber, formItem) {
 }
 
 const handleChecklistUpdate = (updatedChecklist) => {
-  fetchData()
-  // formData.value = {
-  //   ...formData.value,
-  //   checklist: [...updatedChecklist]
-  // };
+  const stockItem = formData.value.stock.find(item => item.id === updatedChecklist[0].stock_id);
+  if (stockItem) {
+    stockItem.checklist = updatedChecklist;
+  }
 };
 
 const hasNotPassed = computed(() => {
   return (formData.value.stock || []).map(stockItem =>
-    (stockItem.checklist || []).some(item => item.status === "ไม่ผ่าน")
+    (stockItem.checklist || []).some(item => item.status === "ไม่ผ่าน") 
+
   );
 });
 
