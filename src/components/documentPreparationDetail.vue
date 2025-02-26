@@ -87,9 +87,9 @@
             </select>
           </div> -->
         </form>
-        <ChecklistFinal :id="item.id" style="margin-top: 16px;margin-bottom: 16px;"/>
+        <ChecklistFinal :id="item.id" style="margin-top: 16px;margin-bottom: 16px;" @update:checklist="handleChecklistUpdate"/>
         <form>
-          <div v-if="item.status === 'ชำรุด'" style="display: contents;">
+          <div v-if="item.status === 'ชำรุด' || hasNotPassed[index]" style="display: contents;">
             <div class="form-row">
               <label>ชื่อสินค้าของ Office Design</label>
               <select v-model="item.productName" @change="updateProduct(index)">
@@ -205,7 +205,12 @@ async function submitForm() {
   try {
     const packingID = route.params.id
     
-    const allPassed = formData.value.stock.every(item => item.status === 'ผ่าน');
+    const allPassed = formData.value.stock.every(stockItem => 
+        stockItem.checklist.every(item => item.status === "ผ่าน")
+    );
+    const hasNotPassed = formData.value.stock.some(stockItem => 
+      stockItem.checklist.some(item => item.status === "ไม่ผ่าน")
+    );
     const timestamp = new Date().toISOString().split('.')[0];
     if (allPassed) {
       const updatePacking = await directus.request(
@@ -544,6 +549,21 @@ async function cheakSerialNumberInStock(serialNumber, formItem) {
   }
   
 }
+
+const handleChecklistUpdate = (updatedChecklist) => {
+  fetchData()
+  // formData.value = {
+  //   ...formData.value,
+  //   checklist: [...updatedChecklist]
+  // };
+};
+
+const hasNotPassed = computed(() => {
+  return (formData.value.stock || []).map(stockItem =>
+    (stockItem.checklist || []).some(item => item.status === "ไม่ผ่าน")
+  );
+});
+
 </script>
 
 <style scoped>

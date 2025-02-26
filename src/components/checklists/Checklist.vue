@@ -21,7 +21,7 @@
                           <select v-model="item.status"
                                   class="p-2 rounded w-full font-bold text-center"
                                   :class="statusClass(item.status)"
-                                  :disabled="item.disabled">
+                                  :disabled="item.disabled || formData.status == 'ผ่าน'">
                               <option value="รอตรวจสอบ" disabled>รอตรวจสอบ</option>
                               <option value="ผ่าน">ผ่าน</option>
                               <option value="ไม่ผ่าน">ไม่ผ่าน</option>
@@ -30,7 +30,7 @@
                       <td class="border border-gray-300 p-2 italic text-gray-600 text-center">
                           <textarea v-model="item.note"
                                     class="w-full p-1 border rounded text-gray-700"
-                                    :disabled="item.disabled"></textarea>
+                                    :disabled="item.disabled || formData.status == 'ผ่าน'"></textarea>
                       </td>
                   </tr>
                 </template>

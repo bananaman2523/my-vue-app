@@ -35,10 +35,11 @@
 </template>
 
 <script setup>
-import { ref, computed, watch , defineProps} from 'vue';
+import { ref, computed, watch , defineProps , defineEmits} from 'vue';
 import { directus } from "@/services/directus";
 import { readItems, updateItem } from "@directus/sdk";
-import { useRoute } from "vue-router";
+
+const emit = defineEmits(["update:checklist"]);
 
 const props = defineProps({
   id: {
@@ -71,21 +72,21 @@ try {
     };
   }
 
-  if (formData.value.checklist.length > 0) {
-    const hasNotPassed = formData.value.checklist.some(item => item.status === "ไม่ผ่าน");
-    const allPassed = formData.value.checklist.every(item => item.status === "ผ่าน");
+  // if (formData.value.checklist.length > 0) {
+  //   const hasNotPassed = formData.value.checklist.some(item => item.status === "ไม่ผ่าน");
+  //   const allPassed = formData.value.checklist.every(item => item.status === "ผ่าน");
     
-    if (hasNotPassed) {
-      const payload = { status: 'ชำรุด' };
-      await directus.request(updateItem("stock", props.id, payload));
-    } else if (allPassed) {
-      const payload = { status: 'ผ่าน' };
-      await directus.request(updateItem("stock", props.id, payload));
-    } else {
-      const payload = { status: 'รอตรวจสอบอุปกรณ์' };
-      await directus.request(updateItem("stock", props.id, payload));
-    }
-  }
+  //   if (hasNotPassed) {
+  //     const payload = { status: 'ชำรุด' };
+  //     await directus.request(updateItem("stock", props.id, payload));
+  //   } else if (allPassed) {
+  //     const payload = { status: 'ผ่าน' };
+  //     await directus.request(updateItem("stock", props.id, payload));
+  //   } else {
+  //     const payload = { status: 'รอตรวจสอบอุปกรณ์' };
+  //     await directus.request(updateItem("stock", props.id, payload));
+  //   }
+  // }
   
 } catch (error) {
   console.error("Error fetching activities:", error);
@@ -117,7 +118,7 @@ return {
 const updateChecklist = async (value) => {
 try {
   const result = value;
-  
+  emit("update:checklist", value);
   const payload = { checklist: result };
   await directus.request(updateItem("stock", props.id, payload));
 } catch (error) {

@@ -279,7 +279,7 @@ async function updateForm() {
       );
       approvePopup.value.showSuccessUpdate()
     }
-    if (!checklist.includes(formData.value.group_product)) {
+    if (!checklist.includes(formData.value.group_product) && formData.value.status !== 'ผ่าน') {
       const filteredData = {
         ...formData.value,
         checklist: (formData.value.checklist || []).filter(item => !item.disabled)
@@ -312,6 +312,13 @@ async function updateForm() {
         );
         approvePopup.value.showSuccessUpdate()
       }
+    }else{
+      await directus.request(
+        updateItem('stock', route.params.id, {
+          device_status: formData.value.statusProduct,
+        })
+      );
+      approvePopup.value.showSuccessUpdate()
     }
   } catch (error) {
     alert("Failed to update item: " + error.message);
