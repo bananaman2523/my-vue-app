@@ -202,6 +202,7 @@ const productConfig = ref({ product: [] });
 
 
 async function submitForm() {
+  fetchData()
   try {
     const packingID = route.params.id
     

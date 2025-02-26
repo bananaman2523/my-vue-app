@@ -15,7 +15,7 @@
                     <span>1. ใบจัดส่งสินค้า (กรุณากรอกรายละเอียดเพื่อจัดทำเอกสาร)</span>
                     <div class="activity">
                         <button class="btn btn-upload" @click="fileInputShippingPDF.click()">อัปโหลด</button>
-                        <input type="file" ref="fileInputShippingPDF" accept="application/pdf" @change="handleFileChange('ใบจัดส่งสินค้า', $event)" hidden/>
+                        <input type="file" ref="fileInputShippingPDF" @change="handleFileChange('ใบจัดส่งสินค้า', $event)" hidden multiple/>
                         <button class="btn btn-save" @click="saveFilesToDirectus('shipping')">บันทึก</button>
                     </div>
                 </div>
@@ -36,7 +36,7 @@
                     <span>2. รูปภาพการจัดส่งสินค้า (กรุณากรอกรายละเอียดเพื่อจัดทำเอกสาร)</span>
                     <div class="activity">
                         <button class="btn btn-upload" @click="fileInputProductDeliveryImages.click()">อัปโหลด</button>
-                        <input type="file" ref="fileInputProductDeliveryImages" accept="image/png, image/gif, image/jpeg" @change="handleFileChange('delivery_image', $event)" hidden multiple/>
+                        <input type="file" ref="fileInputProductDeliveryImages" @change="handleFileChange('delivery_image', $event)" hidden multiple/>
                         <button class="btn btn-save" @click="saveFilesToDirectus('delivery_image')">บันทึก</button>
                     </div>
                 </div>
@@ -104,10 +104,14 @@ const fetchData = async () => {
             delivery_status: data.delivery_status || "",
         };
 
-        uploadedFilesShippingPDF.value = data.shipping_pdf && data.shipping_pdf.id
-            ? [{ id: data.shipping_pdf.id, name: data.shipping_pdf.filename_download }]
+        uploadedFilesShippingPDF.value = Array.isArray(data.shipping_pdf)
+            ? data.shipping_pdf
+                .filter(file => file && file.directus_files_id)
+                .map(file => ({
+                id: file.directus_files_id.id,
+                name: file.directus_files_id.filename_download
+                }))
             : [];
-      
         uploadedFilesProductDeliveryImages.value = Array.isArray(data.product_delivery_images)
             ? data.product_delivery_images
                 .filter(file => file && file.directus_files_id)
@@ -161,7 +165,10 @@ const handleFileChange = (filename, event) => {
   for (let index = 0; index < selectedFiles.length; index++) {
 
     if (filename === 'ใบจัดส่งสินค้า') {
-        uploadedFilesShippingPDF.value = [selectedFiles[0]];
+        if (!uploadedFilesShippingPDF.value) {
+            uploadedFilesShippingPDF.value = [];
+        }
+        uploadedFilesShippingPDF.value.push(selectedFiles[index]);
     } else if (filename === 'delivery_image') {
         if (!uploadedFilesProductDeliveryImages.value) {
             uploadedFilesProductDeliveryImages.value = [];
@@ -175,7 +182,6 @@ const deleteFileForm = async (index, type , file) => {
   let fileToDelete = file;
   
   if (!fileToDelete || !fileToDelete.id) {
-    console.error("File ID is missing.");
     if (type === 'shipping') {
         uploadedFilesShippingPDF.value.splice(index, 1);
     } else if (type === 'delivery_image') {
@@ -224,20 +230,31 @@ const saveFilesToDirectus = async (type) => {
     });
 
     const fileResponse = await directus.request(uploadFiles(formData));
-
-    if (Array.isArray(fileResponse) && fileResponse.length > 1) {
-      const ids = processFiles(fileResponse);
-      await directus.request(
-        updateItem('delivery_sheet', route.params.id, {
-          [fieldKey]: ids
-        })
-      );
-    } else {
-      await directus.request(
-        updateItem('delivery_sheet', route.params.id, {
-          [fieldKey]: fileResponse.id
-        })
-      );
+    if (type === 'delivery_image' || type === 'shipping') {
+        const formattedResponse = Array.isArray(fileResponse) ? fileResponse : Object.keys(fileResponse).length === 0 ? [{}] : [fileResponse];
+        const ids = processFiles(formattedResponse);
+        const currentData = await directus.request(
+            readItems('delivery_sheet', {
+            fields: [fieldKey],
+            filter: {
+                id: { _eq: route.params.id },
+            },
+            })
+        );
+        const existingFiles = currentData[0][fieldKey] || [];
+        let updatedFiles;
+        if(Array.isArray(existingFiles)){
+            updatedFiles = [...existingFiles, ...ids]
+        }else if(existingFiles !== null && typeof existingFiles === 'object'){
+            updatedFiles = [existingFiles, ...ids]
+        } else {
+            updatedFiles = ids;
+        }
+        await directus.request(
+                updateItem('delivery_sheet', route.params.id, {
+                [fieldKey]: updatedFiles
+            })
+        );
     }
 
     fetchData();

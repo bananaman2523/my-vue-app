@@ -32,7 +32,7 @@
                     <span>1. ใบรายงานติดตั้ง (กรุณากรอกรายละเอียดเพื่อจัดทำเอกสาร)</span>
                     <div class="activity">
                         <button class="btn btn-upload" @click="fileInputInstallPDF.click()">อัปโหลด</button>
-                        <input type="file" ref="fileInputInstallPDF" accept="application/pdf" @change="handleFileChange('ใบรายงานติดตั้ง', $event)" hidden/>
+                        <input type="file" ref="fileInputInstallPDF" @change="handleFileChange('ใบรายงานติดตั้ง', $event)" hidden multiple/>
                         <button class="btn btn-save" @click="saveFilesToDirectus('install')">บันทึก</button>
                     </div>
                 </div>
@@ -53,7 +53,7 @@
                     <span>2. ใบ Checklist (กรุณากรอกรายละเอียดเพื่อจัดทำเอกสาร)</span>
                     <div class="activity">
                     <button class="btn btn-upload" @click="fileInputCheckListPDF.click()">อัปโหลด</button>
-                    <input type="file" ref="fileInputCheckListPDF" accept="application/pdf" @change="handleFileChange('ใบ CheckList', $event)" hidden multiple />
+                    <input type="file" ref="fileInputCheckListPDF" @change="handleFileChange('ใบ CheckList', $event)" hidden multiple />
                     <button class="btn btn-save" @click="saveFilesToDirectus('checklist')">บันทึก</button>
                     </div>
                 </div>
@@ -74,7 +74,7 @@
                     <span>3. รูปภาพการติดตั้งสินค้า (กรุณากรอกรายละเอียดเพื่อจัดทำเอกสาร)</span>
                     <div class="activity">
                         <button class="btn btn-upload" @click="fileInputProductInstallImages.click()">อัปโหลด</button>
-                        <input type="file" ref="fileInputProductInstallImages" accept="image/png, image/gif, image/jpeg" @change="handleFileChange('install_image', $event)" hidden multiple/>
+                        <input type="file" ref="fileInputProductInstallImages" @change="handleFileChange('install_image', $event)" hidden multiple/>
                         <button class="btn btn-save" @click="saveFilesToDirectus('install_image')">บันทึก</button>
                     </div>
                 </div>
@@ -148,8 +148,13 @@ const fetchData = async () => {
             install_date: formatDate(data.install_date) || "",
         };
 
-        uploadedFilesInstallPDF.value = data.install_report_pdf && data.install_report_pdf.id
-            ? [{ id: data.install_report_pdf.id, name: data.install_report_pdf.filename_download }]
+        uploadedFilesInstallPDF.value = data.install_report_pdf && Array.isArray(data.install_report_pdf)
+            ? data.install_report_pdf
+                .filter(file => file.directus_files_id && file.directus_files_id.id)
+                .map(file => ({
+                    id: file.directus_files_id.id,
+                    name: file.directus_files_id.filename_download
+                }))
             : [];
         
         uploadedFilesCheckListPDF.value = data.checklist_pdf && Array.isArray(data.checklist_pdf)
@@ -227,9 +232,12 @@ const handleFileChange = (filename, event) => {
   for (let index = 0; index < selectedFiles.length; index++) {
     
     if (filename === 'ใบรายงานติดตั้ง') {
-        uploadedFilesInstallPDF.value.push(selectedFiles[0]);
+        if (!uploadedFilesInstallPDF.value) {
+            uploadedFilesInstallPDF.value = [];
+        }
+        uploadedFilesInstallPDF.value.push(selectedFiles[index]);
     } else if (filename === 'ใบ CheckList') {
-        if (!uploadedFilesProductInstallImages.value) {
+        if (!uploadedFilesCheckListPDF.value) {
             uploadedFilesCheckListPDF.value = [];
         }
         uploadedFilesCheckListPDF.value.push(selectedFiles[index]);
@@ -302,19 +310,31 @@ const saveFilesToDirectus = async (type) => {
 
     const fileResponse = await directus.request(uploadFiles(formData));
 
-    if (Array.isArray(fileResponse) && fileResponse.length > 1) {
-      const ids = processFiles(fileResponse);
-      await directus.request(
-        updateItem('delivery_sheet', route.params.id, {
-          [fieldKey]: ids
-        })
-      );
-    } else {
-      await directus.request(
-        updateItem('delivery_sheet', route.params.id, {
-          [fieldKey]: fileResponse.id
-        })
-      );
+    if (type === 'install' || type === 'checklist' || type === 'install_image') {
+        const formattedResponse = Array.isArray(fileResponse) ? fileResponse : Object.keys(fileResponse).length === 0 ? [{}] : [fileResponse];
+        const ids = processFiles(formattedResponse);
+        const currentData = await directus.request(
+            readItems('delivery_sheet', {
+            fields: [fieldKey],
+            filter: {
+                id: { _eq: route.params.id },
+            },
+            })
+        );
+        const existingFiles = currentData[0][fieldKey] || [];
+        let updatedFiles;
+        if(Array.isArray(existingFiles)){
+            updatedFiles = [...existingFiles, ...ids]
+        }else if(existingFiles !== null && typeof existingFiles === 'object'){
+            updatedFiles = [existingFiles, ...ids]
+        } else {
+            updatedFiles = ids;
+        }
+        await directus.request(
+                updateItem('delivery_sheet', route.params.id, {
+                [fieldKey]: updatedFiles
+            })
+        );
     }
 
     fetchData();
