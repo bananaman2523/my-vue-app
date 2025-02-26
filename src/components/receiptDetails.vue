@@ -103,21 +103,21 @@
               <label>S/N <label style="color: red;">*</label></label>
               <input type="text" v-model="formData.serial_number" required :disabled="disabledField" class="disable-form"/>
             </div>
-            <div class="form-row" v-if="formData.status === 'ชำรุด'">
+            <div class="form-row" v-if="hasNotPassed || formData.status === 'ชำรุด'">
               <label>ประเภทชำรุด</label>
               <select v-model="formData.broken_category">
                 <option value="software">software</option>
                 <option value="hardware">hardware</option>
               </select>
             </div>
-            <div class="form-row" v-if="formData.status === 'ชำรุด'">
+            <div class="form-row" v-if="hasNotPassed || formData.status === 'ชำรุด'">
               <label>รายละเอียดชำรุด</label>
               <input type="text" v-model="formData.broken_description" class="description"/>
             </div>
           </div>
         </form>
       </div>
-      <Checklist v-if="!checklist.includes(formData.group_product)" />
+      <Checklist v-if="!checklist.includes(formData.group_product)" @update:checklist="handleChecklistUpdate"/>
       <!-- <Checklist /> -->
       <div class="container">
         <form>
@@ -137,7 +137,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted , computed} from "vue";
 import { directus } from "@/services/directus";
 import { readItems, deleteItem , updateItem } from "@directus/sdk";
 import SidebarMenu from "@/components/SidebarMenu.vue";
@@ -174,6 +174,17 @@ const formData = ref({
   broken_category: "",
   broken_description: "",
   checked_by: "",
+});
+
+const handleChecklistUpdate = (updatedChecklist) => {
+  formData.value = {
+    ...formData.value,
+    checklist: [...updatedChecklist]
+  };
+};
+
+const hasNotPassed = computed(() => {
+  return (formData.value.checklist || []).some(item => item.status === "ไม่ผ่าน");
 });
 
 const formatDate = (dateString) => {
@@ -219,6 +230,7 @@ const fetchData = async () => {
         broken_category: data.broken_category || "",
         broken_description: data.broken_description || "",
         checked_by: user || "",
+        checklist: []
       };
       disabledField.value = true;
     }
@@ -268,12 +280,38 @@ async function updateForm() {
       approvePopup.value.showSuccessUpdate()
     }
     if (!checklist.includes(formData.value.group_product)) {
-      const update = await directus.request(
-        updateItem('stock', route.params.id, {
-          device_status: formData.value.statusProduct,
-        })
-      );
-      approvePopup.value.showSuccessUpdate()
+      const filteredData = {
+        ...formData.value,
+        checklist: (formData.value.checklist || []).filter(item => !item.disabled)
+      };
+
+      const allPassed = filteredData.checklist.every(item => item.status === "ผ่าน");
+      const hasNotPassed = filteredData.checklist.some(item => item.status === "ไม่ผ่าน");
+
+      if (hasNotPassed) {
+        await directus.request(
+          updateItem('stock', route.params.id, {
+            device_status: formData.value.statusProduct,
+            status: 'ชำรุด',
+          })
+        );
+        approvePopup.value.showSuccessUpdate()
+      } else if (allPassed) {
+        await directus.request(
+          updateItem('stock', route.params.id, {
+            device_status: formData.value.statusProduct,
+            status: 'พร้อมใช้งาน',
+          })
+        );
+        approvePopup.value.showSuccessUpdate()
+      }else{
+        await directus.request(
+          updateItem('stock', route.params.id, {
+            device_status: formData.value.statusProduct,
+          })
+        );
+        approvePopup.value.showSuccessUpdate()
+      }
     }
   } catch (error) {
     alert("Failed to update item: " + error.message);

@@ -40,10 +40,12 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue';
+import { ref, computed, watch , defineEmits} from 'vue';
 import { directus } from "@/services/directus";
 import { readItems, updateItem } from "@directus/sdk";
 import { useRoute } from "vue-router";
+
+const emit = defineEmits(["update:checklist"]);
 
 const route = useRoute();
 const formData = ref({ checklist: [] });
@@ -70,29 +72,29 @@ const fetchData = async () => {
       };
     }
 
-    const filteredData = {
-      ...formData.value,
-      checklist: (formData.value.checklist || []).filter(item => !item.disabled)
-    };
+    // const filteredData = {
+    //   ...formData.value,
+    //   checklist: (formData.value.checklist || []).filter(item => !item.disabled)
+    // };
 
 
-    if (formData.value.checklist.length > 0) {
-      const hasNotPassed = filteredData.checklist.some(item => item.status === "ไม่ผ่าน");
-      const allPassed = filteredData.checklist.every(item => item.status === "ผ่าน");
+    // if (formData.value.checklist.length > 0) {
+    //   const hasNotPassed = filteredData.checklist.some(item => item.status === "ไม่ผ่าน");
+    //   const allPassed = filteredData.checklist.every(item => item.status === "ผ่าน");
       
-      if (formData.value.status !== 'รอเช็คก่อนส่ง' && formData.value.status !== 'ผ่าน' && formData.value.status !== 'ชำรุด') {
-        if (hasNotPassed) {
-          const payload = { status: 'ชำรุด' };
-          await directus.request(updateItem("stock", route.params.id, payload));
-        } else if (allPassed) {
-          const payload = { status: 'พร้อมใช้งาน' };
-          await directus.request(updateItem("stock", route.params.id, payload));
-        } else {
-          const payload = { status: 'รอตรวจสอบอุปกรณ์' };
-          await directus.request(updateItem("stock", route.params.id, payload));
-        }
-      }
-    }
+    //   if (formData.value.status !== 'รอเช็คก่อนส่ง' && formData.value.status !== 'ผ่าน' && formData.value.status !== 'ชำรุด') {
+    //     if (hasNotPassed) {
+    //       const payload = { status: 'ชำรุด' };
+    //       await directus.request(updateItem("stock", route.params.id, payload));
+    //     } else if (allPassed) {
+    //       const payload = { status: 'พร้อมใช้งาน' };
+    //       await directus.request(updateItem("stock", route.params.id, payload));
+    //     } else {
+    //       const payload = { status: 'รอตรวจสอบอุปกรณ์' };
+    //       await directus.request(updateItem("stock", route.params.id, payload));
+    //     }
+    //   }
+    // }
     
   } catch (error) {
     console.error("Error fetching activities:", error);
@@ -124,6 +126,8 @@ const statusClass = (status) => {
 const updateChecklist = async (value) => {
   try {
     const result = value;
+
+    emit("update:checklist", value);
     
     const payload = { checklist: result };
     await directus.request(updateItem("stock", route.params.id, payload));

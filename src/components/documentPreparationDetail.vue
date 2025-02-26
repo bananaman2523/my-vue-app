@@ -204,7 +204,6 @@ const productConfig = ref({ product: [] });
 async function submitForm() {
   try {
     const packingID = route.params.id
-    console.log(formData.value);
     
     const allPassed = formData.value.stock.every(item => item.status === 'ผ่าน');
     const timestamp = new Date().toISOString().split('.')[0];
