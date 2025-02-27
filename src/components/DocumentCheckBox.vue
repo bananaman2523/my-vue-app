@@ -117,7 +117,6 @@
         <textarea v-model="formData.description" @change="updateDeliveryNote('description',formData.description)" class="note-textarea"></textarea>
         <br>
         <button @click="downloadInstallDoc">Export</button>
-        <button @click="testPDFMake">Export</button>
 
     </main>
     <WarningPopup ref="warningPopup" />
@@ -286,48 +285,43 @@ watch(() => formData.value.thirdSection, (newVal) => updateDeliverySheet("third_
 
 const downloadInstallDoc = async () => {
   try {
+
+    const delivery_sheet = await directus.request(
+      readItems("delivery_sheet", {
+        fields: [
+          "document_delivery_number",
+        ],
+        filter:{
+          id:{
+            _eq: route.params.id
+          }
+        }
+      })
+    );
+    
     const payload = formData.value
-    const response = await axios.post('http://localhost:3000/downloadPDF', payload, {
-      responseType: 'blob'
+    payload['document_delivery_number'] = delivery_sheet[0].document_delivery_number
+    
+    const response = await axios.post('http://localhost:3001/generate-pdf/installDoc', payload, {
+        responseType: 'blob'
     });
+
     const blob = new Blob([response.data], { type: 'application/pdf' });
+    const blobUrl = URL.createObjectURL(blob);
+    
     const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = 'install_document.pdf';
+    link.href = blobUrl;
+    link.download = 'เอกสารรายการติดตั้ง.pdf';
 
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    URL.revokeObjectURL(link.href);
+
+    URL.revokeObjectURL(blobUrl);
   } catch (error) {
-    console.error('Error exporting report:', error.response ? error.response.data : error);
+    console.error('Error exporting report:', error);
   }
 };
-
-const testPDFMake = async () => {
-    try {
-        const payload = formData.value;
-        const response = await axios.post('http://localhost:3001/generate-pdf', payload, {
-            responseType: 'blob' // Ensure binary data
-        });
-
-        const blob = new Blob([response.data], { type: 'application/pdf' });
-        const blobUrl = URL.createObjectURL(blob);
-        
-        const link = document.createElement('a');
-        link.href = blobUrl;
-        link.download = 'install_document.pdf';
-
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-
-        URL.revokeObjectURL(blobUrl); // Revoke URL after download
-    } catch (error) {
-        console.error('Error exporting report:', error.response ? error.response.data : error);
-    }
-};
-
 </script>
 
 <style scoped>

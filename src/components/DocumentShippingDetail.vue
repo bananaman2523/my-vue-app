@@ -197,7 +197,7 @@ const downloadReport = async () => {
     );
     const payload = delivery_sheet[0]
     
-    const response = await axios.post('http://localhost:3001/generate-pdf/shipping', payload, {
+    const response = await axios.post('http://localhost:3001/generate-pdf/shippingDoc', payload, {
         responseType: 'blob'
     });
 
