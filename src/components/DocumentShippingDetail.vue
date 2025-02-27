@@ -7,7 +7,7 @@
         <form @submit.prevent="submitForm">
           <div class="form-row">
             <label>วันที่จัดส่งสินค้า</label>
-            <input v-model="formData.delivery_date" type="date"/>
+            <input v-model="formData.delivery_date" @change="updateItemSheet('delivery_date',formData.delivery_date)" type="date"/>
           </div>
           <div class="form-row">
             <label>ชื่อลูกค้า</label>
@@ -27,7 +27,7 @@
           </div>
           <div class="form-row">
             <label>เลขที่ใบแจ้งหนี้</label>
-            <input v-model="formData.invoice_number" type="text"/>
+            <input v-model="formData.invoice_number" @change="updateItemSheet('invoice_number',formData.invoice_number)" type="text"/>
           </div>
         </form>
       </div>
@@ -112,30 +112,27 @@ const formData = ref({
 const route = useRoute();
 const router = useRouter();
 
+const updateItemSheet = async (field, value) => {
+  try {
+      if (value !== undefined && value !== null) {
+          const payload = { [field]: value };
+          await directus.request(updateItem("delivery_sheet", route.params.id, payload));
+      }
+  } catch (error) {
+      console.error(`Error updating ${field} in delivery_sheet:`, error);
+  }
+};
+
 async function submitForm() {
   try {
     const packingID = route.params.id
-    const allPassed = formData.value.stock.every(item => item.status === 'ผ่าน');
-    if (allPassed) {
-      const updatePacking = await directus.request(
-        updateItem('packing_sheet', packingID, {
-          status: 'ผ่าน',
-          checked_by: user
-        })
-      );
-      const ids = formData.value.stock.map(item => item.id);      
-      const updateStock = await directus.request(
-        updateItems('stock', ids, {
-          status: 'ผ่าน',
+    const updatePacking = await directus.request(
+      updateItem('delivery_sheet', packingID, {
+        delivery_date: formData.value.delivery_date,
+        invoice_number: formData.value.invoice_number
       })
-      )
-      // window.scrollTo(0, 0);
-      // window.location.reload();
-      createShippingDocument();
-      approvePopup.value.showSuccess();
-    } else {
-      console.warn('Not all items are marked as "ผ่าน". Update skipped.');
-    }
+    );
+    approvePopup.value.showSuccess();
   } catch (error) {
     console.error('Error updating stock:', error);
   }
@@ -145,29 +142,6 @@ const formatDate = (dateString) => {
   if (!dateString) return "";
   return dateString.split("T")[0];
 };
-
-async function createShippingDocument() {
-  try {
-    const packing_sheet = await directus.request(
-      readItems("packing_sheet", {
-        fields: ['*.*'],
-        filter: {
-          id: { _eq: route.params.id }
-        }
-      })
-    );
-    const packing = packing_sheet[0]
-    const result = await directus.request(
-      createItem('delivery_sheet', {
-        document_delivery_number: packing.document_preparation_number,
-        delivery_date: packing.plan_delivery_date,
-        packing_sheet: [packing.id]
-      })
-    );
-  } catch (error) {
-    console.error('Error updating stock:', error);
-  }
-}
 
 const fetchData = async () => {
   try {
@@ -209,7 +183,7 @@ fetchData();
 
 const downloadReport = async () => {
   try {
-    const packing_sheet = await directus.request(
+    const delivery_sheet = await directus.request(
       readItems("delivery_sheet", {
         fields: [
           "*.*.*",
@@ -221,20 +195,24 @@ const downloadReport = async () => {
         }
       })
     );
+    const payload = delivery_sheet[0]
     
-    const payload = packing_sheet[0]
-    
-    const response = await axios.post('http://localhost:3000/downloadShipping', payload, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      responseType: 'blob'
+    const response = await axios.post('http://localhost:3001/generate-pdf/shipping', payload, {
+        responseType: 'blob'
     });
+
+    const blob = new Blob([response.data], { type: 'application/pdf' });
+    const blobUrl = URL.createObjectURL(blob);
     
     const link = document.createElement('a');
-    link.href = URL.createObjectURL(response.data);
-    link.download = 'ใบจัดเตรียมสินค้า.xlsx';
+    link.href = blobUrl;
+    link.download = 'เอกสารจัดส่งสินค้า.pdf';
+
+    document.body.appendChild(link);
     link.click();
+    document.body.removeChild(link);
+
+    URL.revokeObjectURL(blobUrl);
   } catch (error) {
     console.error('Error exporting report:', error);
   }
