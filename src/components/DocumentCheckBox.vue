@@ -65,6 +65,11 @@
                     </div>
                     <div class="form-row">
                         <label>
+                            <input type="checkbox" v-model="formData.thirdSection.kioskChecked" class="custom-checkbox" /> KIOSK
+                        </label>
+                    </div>
+                    <div class="form-row">
+                        <label>
                             <input type="checkbox" v-model="formData.secondSection.otherChecked" class="custom-checkbox" /> อุปกรณ์อื่นๆ โปรดระบุ
                         </label>
                         <label>
@@ -77,11 +82,6 @@
         <div class="container_checkbox">
             <form @submit.prevent="submitForm">
                 <div style="display: contents;">
-                    <div class="form-row">
-                        <label>
-                            <input type="checkbox" v-model="formData.thirdSection.kioskChecked" class="custom-checkbox" /> KIOSK
-                        </label>
-                    </div>
                     <div class="form-row">
                         <label>
                             <input type="checkbox" v-model="formData.thirdSection.queueChecked" class="custom-checkbox" /> ระบบ Queue
