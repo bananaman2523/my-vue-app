@@ -415,13 +415,16 @@ table td {
 }
 
 table th {
-  background-color: #f8f9fa;
   font-weight: bold;
   color: #333;
   text-transform: uppercase;
   position: sticky;
   top: 0;
   z-index: 2;
+  border-bottom: gray 2px solid;
+  border-top: none;
+  border-left: none;
+  border-right: none;
 }
 
 table tbody tr:nth-child(even) {

@@ -4,7 +4,7 @@ import listPage from "@/components/List.vue";
 import detailPage from "@/components/Detail.vue";
 import receiptProductPage from "@/components/receiptProduct.vue";
 import ListStockPage from "@/components/ListStock.vue";
-import listPreparationPage from "@/components/listPreparation.vue";
+import listPreparationPage from "@/components/ListPreparation.vue";
 import DocumentPreparationPage from "@/components/DocumentPreparation.vue";
 import LoginPage from "@/components/Login.vue";
 import productOrderPage from "@/components/productOrder.vue";
@@ -15,6 +15,8 @@ import ListStockDefectivePage from "@/components/ListStockDefective.vue";
 import BackupStockPage from "@/components/BackupStock.vue";
 import DocumentShippingPage from "@/components/DocumentShipping.vue";
 import DocumentShippingDetailPage from "@/components/DocumentShippingDetail.vue";
+import ServiceFeeListPage from "@/components/ServiceFeeList.vue";
+import ServiceFeeListDetailPage from "@/components/ServiceFeeListDetail.vue";
 const routes = [
   {
     path: "/updateReceipt/:id",
@@ -36,69 +38,79 @@ const routes = [
     component: listPage,
   },
   {
-    path: "/receiptProduct",
+    path: "/ReceiptProduct",
     name: "receiptProduct",
     component: receiptProductPage,
   },
   {
-    path: "/receiptDetail/:id",
+    path: "/ReceiptDetail/:id",
     name: "receiptDetail",
     component: receiptDetailsPage,
   },
   {
-    path: "/listStock",
+    path: "/ListStock",
     name: "listStock",
     component: ListStockPage,
   },
   {
-    path: "/documentPreparation",
+    path: "/DocumentPreparation",
     name: "documentPreparation",
     component: DocumentPreparationPage,
   },
   {
-    path: "/login",
+    path: "/Login",
     name: "login",
     component: LoginPage,
   },
   {
-    path: "/productOrder",
+    path: "/ProductOrder",
     name: "productOrder",
     component: productOrderPage,
   },
   {
-    path: "/stickerOrder",
+    path: "/StickerOrder",
     name: "stickerOrder",
     component: stickerOrderPage,
   },
   {
-    path: "/listPreparation",
+    path: "/ListPreparation",
     name: "listPreparation",
     component: listPreparationPage,
   },
   {
-    path: "/documentPreparationDetail/:id",
+    path: "/DocumentPreparationDetail/:id",
     name: "documentPreparationDetail",
     component: DocumentPreparationDetailPage
   },
   {
-    path: "/listStockDefective",
+    path: "/ListStockDefective",
     name: "listStockDefective",
     component: ListStockDefectivePage
   },
   {
-    path: "/backupStock",
+    path: "/BackupStock",
     name: "backupStock",
     component: BackupStockPage
   },
   {
-    path: "/documentShipping",
+    path: "/DocumentShipping",
     name: "documentShipping",
     component: DocumentShippingPage
   },
   {
-    path: "/documentShippingDetail/:id",
+    path: "/DocumentShippingDetail/:id",
     name: "documentShippingDetail",
     component: DocumentShippingDetailPage,
+  },
+  {
+    path: "/ServiceFeeList/",
+    name: "serviceFeeList",
+    component: ServiceFeeListPage,
+  },
+  {
+    path: "/ServiceFeeListDetail/:id",
+    name: "serviceFeeListDetail",
+    component: ServiceFeeListDetailPage,
   },
 ];
 

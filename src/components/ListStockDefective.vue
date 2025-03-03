@@ -377,7 +377,10 @@ table td {
 }
 
 table th {
-  background-color: #f8f9fa;
+  border-bottom: gray 2px solid;
+  border-top: none;
+  border-left: none;
+  border-right: none;
   font-weight: bold;
   color: #333;
   text-transform: uppercase;

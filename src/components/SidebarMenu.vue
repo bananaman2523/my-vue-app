@@ -46,6 +46,12 @@
       >
         ใบจัดส่งสินค้า
       </li>
+      <li @click="navigate('serviceFeeList')" :class="{ active: activeMenu === 'serviceFeeList'  || activeMenu === 'serviceFeeListDetail' }">
+        รายการเก็บค่าบริการรายปี
+      </li>
+      <!-- <li @click="navigate('documentShipping')" :class="{ active: activeMenu === 'documentShipping' || activeMenu === 'documentShippingDetail' }">
+        เพิ่มค่าเก็บค่าบริการรายปี
+      </li> -->
     </ul>
     <div class="login">
       <div>
