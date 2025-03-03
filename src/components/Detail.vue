@@ -155,7 +155,7 @@ h1 {
 .repair-form {
   display: flex;
   justify-content: center;
-  max-width: 1440px;
+  /* max-width: 1440px; */
   color: #333;
   margin: 0 auto;
   padding: 20px;

@@ -41,7 +41,7 @@
             <label>Invoice date <label style="color: red;">*</label></label>
             <input type="date" v-model="formData.invoiceDate" required/>
           </div>
-          <br>
+          <!-- <br> -->
           <div class="form-row">
             <label>เลขที่ใบเสร็จ</label>
             <input type="text" v-model="formData.receiptNumber" />
@@ -50,7 +50,7 @@
             <label>วันที่ใบเสร็จ</label>
             <input type="date" v-model="formData.receiptDate" />
           </div>
-          <br>
+          <!-- <br> -->
           <div class="form-row">
             <label>เลขที่ใบวางบิล</label>
             <input type="text" v-model="formData.billingNoteNumber" />
@@ -59,7 +59,7 @@
             <label>วันที่ due ชำระ</label>
             <input type="date" v-model="formData.dueDate" />
           </div>
-          <br>
+          <!-- <br> -->
           <!-- <div class="form-row">
             <label>Item code <label style="color: red;">*</label></label>
             <input type="text" v-model="formData.itemCode" required/>
@@ -224,7 +224,7 @@ const submitForm = () => {
 .repair-form {
   display: flex;
   justify-content: center;
-  max-width: 1440px;
+  /* max-width: 1440px; */
   color: #333;
   margin: 0 auto;
   /* padding: 20px; */

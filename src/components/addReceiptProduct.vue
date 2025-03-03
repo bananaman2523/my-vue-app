@@ -17,9 +17,6 @@
               <label>รหัสสินค้า Office Design <label style="color: red;">*</label></label>
               <input type="text" v-model="form.productCode" disabled class="disable-form"/>
             </div>
-            <div style="display: flex; justify-content: end;">
-              <button type="button" @click="removeForm(index)" class="delete-button">X</button>
-            </div>
             <div class="form-row">
               <label>อุปกรณ์ <label style="color: red;">*</label></label>
               <input type="text" v-model="form.productModel" disabled class="disable-form"/>
@@ -38,6 +35,10 @@
             <div class="form-row" v-for="(sn, snIndex) in form.serialNumbers" :key="snIndex">
               <label>S/N {{ snIndex + 1 }} <label style="color: red;">*</label></label>
               <input type="text" v-model="form.serialNumbers[snIndex]" @change="cheakSerialNumberInStock(form.serialNumbers[snIndex], form)"/>
+            </div>
+
+            <div style="display: flex; justify-content: end;">
+              <button type="button" @click="removeForm(index)" class="delete-button">X</button>
             </div>
           </div>
         </form>
