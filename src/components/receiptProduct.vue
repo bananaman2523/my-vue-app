@@ -329,15 +329,6 @@ button:disabled {
 }
 
 @media (max-width: 768px) {
-  .repair-form {
-    padding: 20px;
-  }
-
-  main {
-    width: 100%;
-    padding: 20px;
-  }
-
   form {
     grid-template-columns: 1fr;
   }

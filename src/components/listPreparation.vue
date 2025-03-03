@@ -12,7 +12,6 @@
           <label>ค้นหาด้วย วันเตรียมสินค้า สิ้นสุด</label>
           <input type="date" v-model="filterData.product_preparation_date_to" placeholder="To Date">
         </div>
-        <br>
         <div class="form-row">
           <label>ค้นหาด้วย วัน plan จัดส่ง เริ่มต้น</label>
           <input type="date" v-model="filterData.plan_delivery_date_from" placeholder="From Date">
@@ -21,7 +20,6 @@
           <label>ค้นหาด้วย วัน plan จัดส่ง สิ้นสุด</label>
           <input type="date" v-model="filterData.plan_delivery_date_to" placeholder="To Date">
         </div>
-        <br>
         <div class="form-row">
           <label class="label-filter">ค้นหาด้วย เลขที่ใบจัดสินค้า</label>
           <input v-model="filterData.document_preparation_number" type="text" class="input-field" placeholder="เลขที่ใบจัดสินค้า">
@@ -279,6 +277,7 @@ select {
   background-color: #f7f7f7;
   color: #333;
   transition: all 0.3s ease;
+  margin-top: auto;
 }
 .repair-form {
   display: flex;
@@ -433,7 +432,7 @@ table th:nth-last-child(2), table td:nth-last-child(2) {
 
 .input-container {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  /* grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); */
   gap: 20px;
   padding: 25px;
   max-width: 100%;
@@ -495,41 +494,9 @@ button.input-button {
 
 .input-container input[type="text"] {
   height: 45px;
+  margin-top: auto;
 }
-
-@media (max-width: 768px) {
-  .input-container {
-    grid-template-columns: 1fr;
-  }
-
-  .input-button {
-    width: 100%;
-  }
-
-  .repair-form {
-    flex-direction: column;
-    padding: 10px;
-  }
-
-  main {
-    width: 100%;
-  }
-
-  table th,
-  table td {
-    font-size: 12px;
-    padding: 10px;
-  }
-
-  .update-button,
-  .details-button {
-    padding: 6px 12px;
-    font-size: 12px;
-  }
-
-  .pagination button {
-    padding: 8px 10px;
-    font-size: 12px;
-  }
+.input-container input[type="date"] {
+  margin-top: auto;
 }
 </style>

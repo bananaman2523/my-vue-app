@@ -432,22 +432,4 @@ button:disabled {
 .delete-button:hover {
   background-color: #c0392b;
 }
-@media (max-width: 768px) {
-  .repair-form {
-    padding: 20px;
-  }
-
-  main {
-    width: 100%;
-    padding: 20px;
-  }
-
-  form {
-    grid-template-columns: 1fr;
-  }
-
-  .form-actions {
-    grid-column: span 1;
-  }
-}
 </style>

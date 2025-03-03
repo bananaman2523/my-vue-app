@@ -508,7 +508,7 @@ table tbody tr:hover {
 
 .input-container {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  color: #333;
   gap: 20px;
   padding: 25px;
   max-width: 100%;
@@ -570,41 +570,7 @@ button.input-button {
 
 .input-container input[type="text"] {
   height: 45px;
+  margin-top: auto;
 }
 
-@media (max-width: 768px) {
-  .input-container {
-    grid-template-columns: 1fr;
-  }
-
-  .input-button {
-    width: 100%;
-  }
-
-  .repair-form {
-    flex-direction: column;
-    padding: 10px;
-  }
-
-  main {
-    width: 100%;
-  }
-
-  table th,
-  table td {
-    font-size: 12px;
-    padding: 10px;
-  }
-
-  .update-button,
-  .details-button {
-    padding: 6px 12px;
-    font-size: 12px;
-  }
-
-  .pagination button {
-    padding: 8px 10px;
-    font-size: 12px;
-  }
-}
 </style>

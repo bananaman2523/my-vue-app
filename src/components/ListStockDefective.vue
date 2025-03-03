@@ -13,7 +13,7 @@
           <input type="date" v-model="filterData.receive_date_to" placeholder="To Date">
         </div>
         <div class="form-row">
-          <label class="label-filter">ค้นหาด้วย ชื่อ supplier</label>
+          <label>ค้นหาด้วย ชื่อ supplier</label>
           <input v-model="filterData.name_supplier" type="text" class="input-field" placeholder="ชื่อ supplier">
         </div>
         <div class="form-row">
@@ -470,7 +470,7 @@ table tbody tr:hover {
 
 .input-container {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  /* grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); */
   gap: 20px;
   padding: 25px;
   max-width: 100%;
@@ -532,41 +532,6 @@ button.input-button {
 
 .input-container input[type="text"] {
   height: 45px;
-}
-
-@media (max-width: 768px) {
-  .input-container {
-    grid-template-columns: 1fr;
-  }
-
-  .input-button {
-    width: 100%;
-  }
-
-  .repair-form {
-    flex-direction: column;
-    padding: 10px;
-  }
-
-  main {
-    width: 100%;
-  }
-
-  table th,
-  table td {
-    font-size: 12px;
-    padding: 10px;
-  }
-
-  .update-button,
-  .details-button {
-    padding: 6px 12px;
-    font-size: 12px;
-  }
-
-  .pagination button {
-    padding: 8px 10px;
-    font-size: 12px;
-  }
+  margin-top: auto;
 }
 </style>
