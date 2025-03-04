@@ -21,6 +21,10 @@
                         <label>ชื่อสาขา</label>
                         <input type="text"/>
                     </div>
+                </form>
+            </div>
+            <div class="container">
+                <form @submit.prevent="submitForm">
                     <div class="form-row">
                         <label>รหัสสาขา</label>
                         <input type="text" />
@@ -45,6 +49,10 @@
                         <label>จ่ายจริง</label>
                         <input type="text" />
                     </div>
+                </form>
+            </div>
+            <div class="container">
+                <form @submit.prevent="submitForm">
                     <div class="form-row">
                         <label>วันเริ่มรอบปัจจุบัน</label>
                         <input type="date"/>
@@ -55,14 +63,139 @@
                     </div>
                 </form>
             </div>
+            <div class="container">
+                <form @submit.prevent="submitForm">
+                    <div class="form-row">
+                        <label>BL</label>
+                        <input type="text"/>
+                    </div>
+                    <div class="form-row">
+                        <label>INV</label>
+                        <input type="text"/>
+                    </div>
+                    <div class="form-row">
+                        <label>RE</label>
+                        <input type="text"/>
+                    </div>
+                </form>
+            </div>
+            <div class="container">
+                <form @submit.prevent="submitForm">
+                    <div class="form-row">
+                        <label>รายละเอียดเพิ่มเติม/หมายเหตุ</label>
+                        <input type="text"/>
+                    </div>
+                </form>
+            </div>
+            <div class="container">
+                <form @submit.prevent="submitForm">
+                    <div>
+                        <button type="button" @click="submitForm()">บันทึก</button>
+                    </div>
+                </form>
+            </div>
+            <h1>ประวัติการใช้งาน</h1>
+            <TableList :table="table" :data="data"/>
         </main>
     </div>
 </template>
 
 <script setup>
 import SidebarMenu from "@/components/SidebarMenu.vue";
+import TableList from "@/components/Table.vue";
 import { ref } from "vue";
+import { directus } from "@/services/directus";
+import { readItems } from "@directus/sdk";
+import { useRoute } from 'vue-router';
 
+const route = useRoute();
+const table = ref({
+    headers: ['Cloud', 'บริษัท', 'ร้าน', 'รหัสสาขา', 'สาขา', 'Package', 'หมวดหมู่'],
+    format: [" ","company_name","customer_name","branch_code","branch_name","package"," "]
+});
+async function submitForm() {
+  try {
+    console.log('test');
+    
+  } catch (error) {
+    console.error('Error updating stock:', error);
+  }
+}
+
+const data = ref([]);
+
+const fetchData = async () => {
+    try {        
+        const response = await directus.request(
+            readItems("service_fee", {
+                fields: [
+                    "id",
+                    "delivery_sheet.id",
+                    "delivery_sheet.packing_sheet.branch_code",
+                    "delivery_sheet.packing_sheet.branch_name",
+                    "delivery_sheet.packing_sheet.company_name",
+                    "delivery_sheet.packing_sheet.customer_name",
+                    "status",
+                    "pay",
+                    "package",
+                    "current_start_date",
+                    "due_date",
+                    "invoice_number",
+                    "receipt_number",
+                    "bill_number",
+                    "description",
+                    "history",
+                ],
+                filter:{
+                    id:{
+                        _eq: route.params.id
+                    }
+                }
+            })
+        );
+        
+        data.value = transformData(response);
+        console.log(data.value);
+        
+    } catch (error) {
+        console.error("Error fetching activities:", error);
+    }
+};
+
+fetchData();
+
+function transformData(data) {
+    return data.map(item => {
+        const transformedItem = {
+            id: item.id,
+            status: item.status,
+            pay: item.pay,
+            package: item.package,
+            current_start_date: item.current_start_date,
+            due_date: item.due_date,
+            invoice_number: item.invoice_number,
+            receipt_number: item.receipt_number,
+            bill_number: item.bill_number,
+            description: item.description,
+            history: item.history
+        };
+        
+        if (item.delivery_sheet && item.delivery_sheet.packing_sheet && item.delivery_sheet.packing_sheet.length > 0) {
+            const packing = item.delivery_sheet;
+            console.log(packing);
+            
+            Object.assign(transformedItem, {
+                packing_id: packing.id,
+                branch_code: packing.packing_sheet[0].branch_code,
+                branch_name: packing.packing_sheet[0].branch_name,
+                company_name: packing.packing_sheet[0].company_name,
+                customer_name: packing.packing_sheet[0].customer_name
+            });
+        }
+        
+        return transformedItem;
+    });
+}
 </script>
 
 <style scoped>
@@ -266,24 +399,5 @@ button:disabled {
 
 .delete-button:hover {
     background-color: #c0392b;
-}
-
-@media (max-width: 768px) {
-    .repair-form {
-        padding: 20px;
-    }
-
-    main {
-        width: 100%;
-        padding: 20px;
-    }
-
-    form {
-        grid-template-columns: 1fr;
-    }
-
-    .form-actions {
-        grid-column: span 1;
-    }
 }
 </style>
