@@ -34,7 +34,10 @@
             </div>
             <div class="form-row" v-for="(sn, snIndex) in form.serialNumbers" :key="snIndex">
               <label>S/N {{ snIndex + 1 }} <label style="color: red;">*</label></label>
-              <input type="text" v-model="form.serialNumbers[snIndex]" @change="cheakSerialNumberInStock(form.serialNumbers[snIndex], form)"/>
+              <input type="text" v-model="form.serialNumbers[snIndex]" 
+                :ref="el => setSerialInputRef(el, index, snIndex)"
+                @change="cheakSerialNumberInStock(form.serialNumbers[snIndex], form, index, snIndex)" />
+
             </div>
 
             <div style="display: flex; justify-content: end;">
@@ -50,14 +53,17 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue';
+import { ref, watch, nextTick } from 'vue';
 import { directus } from "@/services/directus";
 import { readItems } from "@directus/sdk";
 import WarningPopup from "@/components/popup/WarningPopup.vue";
 import { useRoute } from 'vue-router';
+
 const route = useRoute();
 const warningPopup = ref(null);
 
+// เปลี่ยนเป็น object เก็บ index ของแต่ละฟอร์ม
+const serialInputs = ref([]); 
 const emit = defineEmits(['update:products']);
 const data = ref({ product: [] });
 
@@ -71,9 +77,10 @@ const addForm = () => {
 
 const removeForm = (index) => {
   forms.value.splice(index, 1);
+  delete serialInputs.value[index]; // ลบ ref ของ form ที่ถูกลบออกไป
 };
 
-const generateSerialNumbers = (index) => {
+const generateSerialNumbers = async (index) => {
   const form = forms.value[index];
   const newQuantity = Math.max(form.quantity || 1, 1);
   
@@ -85,6 +92,21 @@ const generateSerialNumbers = (index) => {
       ...Array(newQuantity - form.serialNumbers.length).fill('')
     ];
   }
+
+  await nextTick();  // Wait for DOM update
+
+  // Move focus to the first empty serial number field of this form
+  const serialInputsArray = serialInputs.value[index] || [];
+  const firstEmptyInput = serialInputsArray.find(input => input?.value === '');
+  if (firstEmptyInput) firstEmptyInput.focus();
+};
+
+// ฟังก์ชันเซ็ต ref ให้กับแต่ละ serial number แยกตาม index ของ form
+const setSerialInputRef = (el, formIndex, snIndex) => {
+  if (!serialInputs.value[formIndex]) {
+    serialInputs.value[formIndex] = [];
+  }
+  serialInputs.value[formIndex][snIndex] = el;
 };
 
 watch(forms, (newForms) => {
@@ -100,7 +122,7 @@ const fetchData = async () => {
         ],
       })
     );
-    data.value = response[0].product_code
+    data.value = response[0].product_code;
   } catch (error) {
     console.error("Error fetching data:", error);
   }
@@ -111,27 +133,15 @@ const updateProduct = (index) => {
   const selectedProduct = data.value.find(product => product.product_name === form.productName);
   if (selectedProduct) {
     form.productCode = selectedProduct.product_code || '';
-    form.productModel = selectedProduct.equipment.model || ''
-    form.productBrand = selectedProduct.equipment.brand || ''
+    form.productModel = selectedProduct.equipment.model || '';
+    form.productBrand = selectedProduct.equipment.brand || '';
   }
 };
 fetchData();
 
-function findDuplicatePosition(arr, num) {
-  let lastIndex = -1;
-  
-  for (let i = 0; i < arr.length; i++) {
-    if (arr[i] === num) {
-      lastIndex = i;
-    }
-  }
-
-  return lastIndex;
-}
-async function cheakSerialNumberInStock(serialNumber, formItem) {
+async function cheakSerialNumberInStock(serialNumber, formItem, formIndex, snIndex) {
   try {
     if (serialNumber) {
-
       const checks = (await directus.request(
         readItems("stock", {
           fields:["*.*"]
@@ -141,15 +151,14 @@ async function cheakSerialNumberInStock(serialNumber, formItem) {
       const isDuplicateInStock = checks.some(check => check.serial_number === serialNumber);
       if (isDuplicateInStock && route.name !== 'documentPreparation') {
         warningPopup.value.showWarningSerailNumberDuplicated();
-        formItem.serialNumbers[formItem.serialNumbers.indexOf(serialNumber)] = "";
+        formItem.serialNumbers[snIndex] = "";
         return;
       }
       
       const isDuplicateInCurrentForm = formItem.serialNumbers.filter(sn => sn === serialNumber).length > 1;
       if (isDuplicateInCurrentForm) {
         warningPopup.value.showWarningDuplicate();
-        const position = findDuplicatePosition(formItem.serialNumbers, serialNumber);
-        formItem.serialNumbers[position] = "";
+        formItem.serialNumbers[snIndex] = "";
         return;
       }
 
@@ -166,25 +175,22 @@ async function cheakSerialNumberInStock(serialNumber, formItem) {
         
         if (stock.length === 0 ) {
           warningPopup.value.showWarning();
-          const position = findDuplicatePosition(formItem.serialNumbers, serialNumber);
-          formItem.serialNumbers[position] = "";
+          formItem.serialNumbers[snIndex] = "";
           return;   
-        }else if (stock[0].status === 'ชำรุด') {
+        } else if (stock[0].status === 'ชำรุด') {
           warningPopup.value.showWarningBroken();
-          const position = findDuplicatePosition(formItem.serialNumbers, serialNumber);
-          formItem.serialNumbers[position] = "";
+          formItem.serialNumbers[snIndex] = "";
           return;
         }
-        // if (stock[0].status !== 'พร้อมใช้งาน' ) {
-        //   warningPopup.value.showWarningAlert('อุปกรณ์ยังไม่ได้ตรวจสอบ');
-        //   const position = findDuplicatePosition(formItem.serialNumbers, serialNumber);
-        //   formItem.serialNumbers[position] = "";
-        //   return;   
-        // }
       }
 
+      await nextTick();  
+      // Focus ไปที่ช่องถัดไปของ form ที่กำลังใช้งาน
+      const serialInputsArray = serialInputs.value[formIndex] || [];
+      if (serialInputsArray[snIndex + 1]) {
+        serialInputsArray[snIndex + 1].focus();
+      }
     }
-    
   } catch (error) {
     console.error("Error generating preparation number:", error);
   } 

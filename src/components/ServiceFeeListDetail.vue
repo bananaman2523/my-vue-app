@@ -111,7 +111,7 @@ import { useRoute } from 'vue-router';
 const route = useRoute();
 const table = ref({
     headers: ['Cloud', 'บริษัท', 'ร้าน', 'รหัสสาขา', 'สาขา', 'Package', 'หมวดหมู่'],
-    format: [" ","company_name","customer_name","branch_code","branch_name","package"," "]
+    format: ["cloud_name","company_name","customer_name","branch_code","branch_name","package","status"]
 });
 async function submitForm() {
   try {
@@ -129,22 +129,7 @@ const fetchData = async () => {
         const response = await directus.request(
             readItems("service_fee", {
                 fields: [
-                    "id",
-                    "delivery_sheet.id",
-                    "delivery_sheet.packing_sheet.branch_code",
-                    "delivery_sheet.packing_sheet.branch_name",
-                    "delivery_sheet.packing_sheet.company_name",
-                    "delivery_sheet.packing_sheet.customer_name",
-                    "status",
-                    "pay",
-                    "package",
-                    "current_start_date",
-                    "due_date",
-                    "invoice_number",
-                    "receipt_number",
-                    "bill_number",
-                    "description",
-                    "history",
+                    "id","delivery_sheet.id","delivery_sheet.packing_sheet.branch_code","delivery_sheet.packing_sheet.branch_name","delivery_sheet.packing_sheet.company_name","delivery_sheet.packing_sheet.customer_name","status","pay","package","current_start_date","due_date","invoice_number","receipt_number","bill_number","description","history","cloud_id.id","cloud_id.cloud_name"
                 ],
                 filter:{
                     id:{
@@ -155,7 +140,7 @@ const fetchData = async () => {
         );
         
         data.value = transformData(response);
-        console.log(data.value);
+
         
     } catch (error) {
         console.error("Error fetching activities:", error);
@@ -182,14 +167,20 @@ function transformData(data) {
         
         if (item.delivery_sheet && item.delivery_sheet.packing_sheet && item.delivery_sheet.packing_sheet.length > 0) {
             const packing = item.delivery_sheet;
-            console.log(packing);
-            
             Object.assign(transformedItem, {
                 packing_id: packing.id,
                 branch_code: packing.packing_sheet[0].branch_code,
                 branch_name: packing.packing_sheet[0].branch_name,
                 company_name: packing.packing_sheet[0].company_name,
                 customer_name: packing.packing_sheet[0].customer_name
+            });
+        }
+
+        if (item.cloud_id) {
+            const cloud = item.cloud_id;
+            Object.assign(transformedItem, {
+                cloud_id: cloud.id,
+                cloud_name: cloud.cloud_name
             });
         }
         
