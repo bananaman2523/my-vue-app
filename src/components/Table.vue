@@ -122,12 +122,12 @@ table th {
     border-left: none;
     border-right: none;
 }
-table th:nth-last-child(1), table td:nth-last-child(1) {
+/* table th:nth-last-child(1), table td:nth-last-child(1) {
   position: sticky;
   right: -1px;
   background-color: #ffffff;
   z-index: 4;
-}
+} */
 
 table tbody tr:nth-child(even) {
     background-color: #f9f9f9;
