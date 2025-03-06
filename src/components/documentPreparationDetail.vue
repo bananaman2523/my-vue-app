@@ -281,10 +281,16 @@ async function createShippingDocument() {
 async function switchEquipment(item) {
   try {
     const packingID = route.params.id;
+    
 
     const [packing_sheet] = await directus.request(
       readItems("packing_sheet", {
         fields: ["stock"],
+        filter: {
+          id: {
+            _eq: packingID
+          }
+        }
       })
     );
 

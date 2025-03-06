@@ -46,12 +46,12 @@
       >
         ใบจัดส่งสินค้า
       </li>
+    </ul>
+    <div style="border: 2px black solid;padding-right: 100%;"></div>
+    <ul>
       <li @click="navigate('serviceFeeList')" :class="{ active: activeMenu === 'serviceFeeList'  || activeMenu === 'serviceFeeListDetail' }">
         รายการเก็บค่าบริการรายปี
       </li>
-      <!-- <li @click="navigate('documentShipping')" :class="{ active: activeMenu === 'documentShipping' || activeMenu === 'documentShippingDetail' }">
-        เพิ่มค่าเก็บค่าบริการรายปี
-      </li> -->
     </ul>
     <div class="login">
       <div>
@@ -157,7 +157,8 @@ li {
   transition: background-color 0.3s, transform 0.2s ease;
   cursor: pointer;
   width: 100%;
-  margin-bottom: 16px;
+  margin-bottom: 8px;
+  margin-top: 8px;
   display: flex;
   align-items: center;
 }

@@ -129,7 +129,24 @@ const fetchData = async () => {
         const response = await directus.request(
             readItems("service_fee", {
                 fields: [
-                    "id","delivery_sheet.id","delivery_sheet.packing_sheet.branch_code","delivery_sheet.packing_sheet.branch_name","delivery_sheet.packing_sheet.company_name","delivery_sheet.packing_sheet.customer_name","status","pay","package","current_start_date","due_date","invoice_number","receipt_number","bill_number","description","history","cloud_id.id","cloud_id.cloud_name"
+                    "id",
+                    "delivery_sheet.id",
+                    "delivery_sheet.packing_sheet.branch_code",
+                    "delivery_sheet.packing_sheet.branch_name",
+                    "delivery_sheet.packing_sheet.company_name",
+                    "delivery_sheet.packing_sheet.customer_name",
+                    "status",
+                    "pay",
+                    "package",
+                    "current_start_date",
+                    "due_date",
+                    "invoice_number",
+                    "receipt_number",
+                    "bill_number",
+                    "description",
+                    "history",
+                    "cloud_id.id",
+                    "cloud_id.cloud_name"
                 ],
                 filter:{
                     id:{

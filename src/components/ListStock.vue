@@ -117,7 +117,7 @@
               <td>{{ item.serial_number }}</td>
               <td>{{ item.status}}</td>
               <td>{{ item.stock_id?.document_preparation_number || '-' }}</td>
-              <td></td>
+              <td>{{ item.stock_id?.packing_sheet_id?.document_delivery_number || '-' }}</td>
             </tr>
           </tbody>
         </table>
@@ -188,7 +188,7 @@ const fetchData = async () => {
   try {
     const response = await directus.request(
       readItems("stock", {
-        fields: ["*.*"],
+        fields: ["*.*.*"],
         filter: {
           device_status:{
             _eq: 'สินค้าขาย'

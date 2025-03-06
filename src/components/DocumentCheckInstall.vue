@@ -24,6 +24,96 @@
                 </div>
             </form>
         </div>
+        <div class="documents-section">
+            <h2>รายการอุปกรณ์ติดตั้งไปยังบริษัท/ร้าน</h2>
+            <div v-for="(item, index) in formData.stock" :key="index">
+                <form>
+                    <div class="form-row">
+                        <label>รหัสสินค้าของ Office Design</label>
+                        <input type="text" v-model="item.id" disabled/>
+                    </div>
+                    <div class="form-row">
+                        <label>รหัสสินค้าของ Office Design</label>
+                        <input type="text" v-model="item.product_code_office_design" disabled/>
+                    </div>
+                    <div class="form-row">
+                        <label>ชื่อสินค้าของ Office Design</label>
+                        <input type="text" v-model="item.product_name_office_design" disabled/>
+                    </div>
+                    <div class="form-row">
+                        <label>อุปกรณ์</label>
+                        <input type="text" v-model="item.group_product" disabled/>
+                    </div>
+                    <div class="form-row">
+                        <label>รุ่น/แบรนด์</label>
+                        <input type="text" v-model="item.model" disabled/>
+                    </div>
+                    <div class="form-row">
+                        <label>Serial Number</label> 
+                        <input type="text" v-model="item.serial_number" disabled/>
+                    </div>
+                    <div class="form-row">
+                        <label>คุณภาพสินค้า</label>
+                        <select v-model="item.status" :disabled="formData.status === 'ผ่าน'">
+                            <option disabled>ระบุ</option>
+                            <option>ผ่าน</option>
+                            <option>ชำรุด</option>
+                            <option>ไม่ได้ใช้</option>
+                        </select>
+                    </div>
+                </form>
+                <form>
+                    <div v-if="item.status === 'ชำรุด'" style="display: contents;">
+                        <div class="form-row">
+                            <label>ชื่อสินค้าของ Office Design</label>
+                            <select v-model="item.productName" @change="updateProduct(index)">
+                                <option value="">Select a category</option>
+                                <option v-for="productName in filteredProducts" :key="productName.product_name" :value="productName.product_name">
+                                {{ productName.product_name }}
+                                </option>
+                            </select>
+                        </div>
+                        <div class="form-row">
+                            <label>รหัสสินค้าของ Office Design</label>
+                            <input v-model="item.productCode" type="text" disabled class="disable-form"/>
+                        </div>
+                        <div class="form-row">
+                            <label>อุปกรณ์</label>
+                            <input v-model="item.productModel" type="text" disabled class="disable-form"/>
+                        </div>
+                        <div class="form-row">
+                            <label>รุ่น/แบรนด์</label>
+                            <input v-model="item.productBrand" type="text" disabled class="disable-form"/>
+                        </div>
+                        <div class="form-row">
+                            <label>Serial Number</label>
+                            <input v-model="item.serialNumber" @change="cheakSerialNumberInStock(item.serialNumber, item)" type="text" :disabled="!item.productCode" :class="!item.productCode ? 'disable-form' : ''"/>
+                        </div>
+                        <br>
+                        <div class="form-row">
+                            <label>ประเภทชำรุด</label>
+                            <select v-model="item.brokenCategory" :disabled="!item.serialNumber" :class="!item.serialNumber ? 'disable-form' : ''">
+                                <option>ระบุ</option>
+                                <option>software</option>
+                                <option>hardware</option>
+                            </select>
+                        </div>
+                        <div class="form-row">
+                            <label>รายละเอียด</label>
+                            <input v-model="item.brokenDescription" type="text" style="width: 320px;" :disabled="!item.serialNumber" :class="!item.serialNumber ? 'disable-form' : ''"/>
+                        </div>
+                        <div style="display: flex; align-items: flex-end;">
+                            <button type="button" @click="switchEquipment(item)">สับเปลี่ยน</button>
+                        </div>
+                    </div>
+                </form>
+                <div v-if="item.status !== 'ชำรุด'" style="display: contents;">
+                    <div style="text-align: right;margin-top: 8px;">
+                        <button type="button">บันทึก</button>
+                    </div>
+                </div>
+            </div>
+        </div>
         <DocumentCheckBox />
         <div class="documents-section">
             <h2>เอกสารประกอบการติดตั้ง</h2>
@@ -102,7 +192,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref , computed} from 'vue';
 import { directus } from "@/services/directus";
 import { readItems, uploadFiles , updateItem , deleteFile} from "@directus/sdk";
 import { useRoute } from "vue-router";
@@ -138,6 +228,14 @@ const fetchData = async () => {
         }
       })
     );
+    const config = await directus.request(
+      readItems("config", {
+        fields: [
+          "product_code"
+        ],
+      })
+    );
+    productConfig.value = config[0].product_code
     
     if (delivery_sheet.length > 0) {
         const data = delivery_sheet[0];
@@ -146,8 +244,11 @@ const fetchData = async () => {
             company_name: data.packing_sheet[0].company_name || "",
             branch_name: data.packing_sheet[0].branch_name || "",
             install_date: formatDate(data.install_date) || "",
+            stock: data.packing_sheet[0].stock || [],
+            packing_sheet_id: data.packing_sheet[0].id || "",
         };
-
+        console.log(formData.value);
+        
         uploadedFilesInstallPDF.value = data.install_report_pdf && Array.isArray(data.install_report_pdf)
             ? data.install_report_pdf
                 .filter(file => file.directus_files_id && file.directus_files_id.id)
@@ -368,6 +469,171 @@ const saveFilesToDirectus = async (type) => {
     );
   }
 };
+
+const form = ref({
+  customerName: '',
+  companyName: '',
+  branchName: '',
+  branchCode: '',
+  quotationNumber: '',
+  customerOrderNumber: '',
+  preparedDate: '',
+  deliveryDate: '',
+  items: [
+    { productCode: '', productName: '', selectedCategory: '', selectedModel: '', serialNumber: '' }
+  ]
+});
+const productConfig = ref({ product: [] });
+
+const filteredProducts = computed(() => {
+  const index = 0;
+  const text = formData.value.stock[index].product_name_office_design;
+  const textBeforeHash = text.split('#')[0];
+
+  return productConfig.value.filter(product => product.product_name.includes(textBeforeHash));
+});
+
+const updateProduct = (index) => {
+  const formItem = formData.value.stock[index];
+  const selectedProduct = productConfig.value.find(
+    (product) => product.product_name === formItem.productName
+  );
+
+  if (selectedProduct) {
+    formItem.productCode = selectedProduct.product_code || '';
+    formItem.productModel = selectedProduct.equipment.model || '';
+    formItem.productBrand = selectedProduct.equipment.brand || '';
+  }else{
+    formItem.productCode = '';
+    formItem.productModel = '';
+    formItem.productBrand = '';
+  }
+};
+
+async function cheakSerialNumberInStock(serialNumber, formItem) {
+  try {
+    if (serialNumber) {
+      const isDuplicateInForm = form.value.items.some(
+        (item) => item !== formItem && item.serialNumber === serialNumber
+      );
+
+      if (isDuplicateInForm) {
+        warningPopup.value.showWarningDuplicate();
+        formItem.serialNumber = "";
+        return;
+      }
+
+      const checks = await directus.request(
+        readItems("stock", {
+          filter: {
+            serial_number: {
+              _eq: serialNumber,
+            },
+            model: {
+              _eq: formItem.productBrand,
+            },
+            group_product: {
+              _eq: formItem.productModel,
+            },
+            product_name_office_design: {
+              _eq: formItem.productName,
+            },
+            product_code_office_design: {
+              _eq: formItem.productCode,
+            },
+          },
+        })
+      );
+
+      const checksStatus = checks[0]
+
+      if (checks.length != 0) {
+        if (checksStatus.status === 'ชำรุด') {
+          warningPopup.value.showWarningBroken();
+          formItem.serialNumber = "";
+        } else if (checksStatus.stock_id !== null) {
+          warningPopup.value.showWarningAlreadyUse();
+          formItem.serialNumber = "";
+        }  else if (checksStatus.device_status === 'เครื่องสำรอง') {
+          warningPopup.value.showWarningBackupDevice();
+          formItem.serialNumber = "";
+        }
+        
+        if (Array.isArray(checks) && checks.length == 0) {
+          warningPopup.value.showWarning();
+          formItem.serialNumber = "";
+        }  
+      }else{
+        warningPopup.value.showWarning();
+        formItem.serialNumber = "";
+      }
+      
+      
+    }
+    
+  } catch (error) {
+    console.error("Error generating preparation number:", error);
+  }
+  
+}
+
+async function switchEquipment(item) {
+  try {
+    const packingID = formData.value.packing_sheet_id   ;
+    console.log(packingID);
+    
+    const [packing_sheet] = await directus.request(
+      readItems("packing_sheet", {
+        fields: ["stock"],
+        filter: {
+          id: {
+            _eq: packingID
+          }
+        }
+      })
+    );
+
+    const newStockItem = await directus.request(
+      readItems("stock", {
+        fields: ["id"],
+        filter: {
+          serial_number: { _eq: item.serialNumber }
+        }
+      })
+    );
+    
+
+    if (newStockItem.length === 0) {
+      throw new Error("Stock item not found with the given serial number.");
+    }
+
+    let selectValue = item.id;
+    
+    let newValue = newStockItem[0].id;
+    
+    let updatedArr = packing_sheet.stock.map(num => num === selectValue ? newValue : num);
+    
+    await directus.request(
+      updateItem('stock', item.id, { 
+        status: 'ชำรุด',
+        broken_description: item.brokenDescription,
+        broken_category: item.brokenCategory,
+      })
+    );
+
+    await directus.request(
+      updateItem('packing_sheet', packingID, { stock: updatedArr })
+    );
+
+    await directus.request(
+      updateItem('stock', newStockItem[0].id, { status: 'ผ่าน' })
+    );
+
+    window.location.reload();
+  } catch (error) {
+    console.error("Error updating equipment:", error);
+  }
+}
 </script>
 
 <style scoped>
